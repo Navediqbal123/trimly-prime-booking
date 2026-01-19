@@ -5,59 +5,57 @@ import { Search, Star, MapPin, Clock, Scissors } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { BarberShop } from '@/lib/supabase';
+
+interface BarberShop {
+  id: string;
+  shop_name: string;
+  description: string;
+  address: string;
+  phone: string;
+  image_url: string;
+  rating: number;
+  services_count: number;
+}
 
 // Mock data for barber shops
-const mockBarberShops: (BarberShop & { rating: number; services_count: number })[] = [
+const mockBarberShops: BarberShop[] = [
   {
     id: '1',
-    owner_id: '1',
     shop_name: 'Classic Cuts Barbershop',
     description: 'Traditional barbershop offering classic cuts and hot towel shaves.',
     address: '123 Main Street, Downtown',
     phone: '+1 234 567 890',
     image_url: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=500',
-    is_approved: true,
-    created_at: new Date().toISOString(),
     rating: 4.8,
     services_count: 12,
   },
   {
     id: '2',
-    owner_id: '2',
     shop_name: 'Modern Styles Studio',
     description: 'Contemporary styling with the latest trends and techniques.',
     address: '456 Oak Avenue, Uptown',
     phone: '+1 234 567 891',
     image_url: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=500',
-    is_approved: true,
-    created_at: new Date().toISOString(),
     rating: 4.9,
     services_count: 15,
   },
   {
     id: '3',
-    owner_id: '3',
     shop_name: 'The Gentleman\'s Corner',
     description: 'Premium grooming experience for the modern gentleman.',
     address: '789 Elite Boulevard',
     phone: '+1 234 567 892',
     image_url: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=500',
-    is_approved: true,
-    created_at: new Date().toISOString(),
     rating: 4.7,
     services_count: 10,
   },
   {
     id: '4',
-    owner_id: '4',
     shop_name: 'Urban Edge Barbers',
     description: 'Trendy cuts and fades in a cool urban atmosphere.',
     address: '321 Street Art Lane',
     phone: '+1 234 567 893',
     image_url: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=500',
-    is_approved: true,
-    created_at: new Date().toISOString(),
     rating: 4.6,
     services_count: 8,
   },
@@ -79,7 +77,7 @@ const item = {
 };
 
 export default function Dashboard() {
-  const { profile, isBarberPending } = useAuth();
+  const { user, isBarberPending } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [shops, setShops] = useState(mockBarberShops);
@@ -106,7 +104,7 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl lg:text-4xl font-display font-bold mb-2"
         >
-          Welcome back, <span className="gradient-text">{profile?.full_name?.split(' ')[0] || 'User'}</span>
+          Welcome back, <span className="gradient-text">{user?.full_name?.split(' ')[0] || 'User'}</span>
         </motion.h1>
         <p className="text-muted-foreground">
           Find your perfect barber and book an appointment today.

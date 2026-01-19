@@ -11,8 +11,11 @@ import {
   Check,
   ChevronRight,
   Loader2,
+  Home,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { createBooking } from '@/lib/api';
@@ -30,12 +33,12 @@ const mockShop = {
 };
 
 const mockServices = [
-  { id: '1', name: 'Classic Haircut', duration: 30, price: 25 },
-  { id: '2', name: 'Fade Haircut', duration: 45, price: 35 },
-  { id: '3', name: 'Beard Trim', duration: 20, price: 15 },
-  { id: '4', name: 'Hot Towel Shave', duration: 30, price: 30 },
-  { id: '5', name: 'Haircut + Beard', duration: 60, price: 45 },
-  { id: '6', name: 'Kids Haircut', duration: 20, price: 18 },
+  { id: '1', name: 'Classic Haircut', duration: 30, price: 25, home_service: true },
+  { id: '2', name: 'Fade Haircut', duration: 45, price: 35, home_service: false },
+  { id: '3', name: 'Beard Trim', duration: 20, price: 15, home_service: true },
+  { id: '4', name: 'Hot Towel Shave', duration: 30, price: 30, home_service: false },
+  { id: '5', name: 'Haircut + Beard', duration: 60, price: 45, home_service: true },
+  { id: '6', name: 'Kids Haircut', duration: 20, price: 18, home_service: false },
 ];
 
 const timeSlots = [
@@ -51,6 +54,7 @@ export default function BookingPage() {
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [homeService, setHomeService] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const selectedServiceData = mockServices.find((s) => s.id === selectedService);
@@ -80,7 +84,8 @@ export default function BookingPage() {
       barber_id: shopId || mockShop.id,
       service_id: selectedService,
       date: formattedDate,
-      time: selectedTime,
+      time_slot: selectedTime,
+      home_service: homeService,
     });
 
     if (response.success) {
@@ -194,7 +199,13 @@ export default function BookingPage() {
                     <motion.div
                       key={service.id}
                       whileHover={{ scale: 1.01 }}
-                      onClick={() => setSelectedService(service.id)}
+                      onClick={() => {
+                        setSelectedService(service.id);
+                        // Reset home service if not available
+                        if (!service.home_service) {
+                          setHomeService(false);
+                        }
+                      }}
                       className={cn(
                         'p-4 rounded-xl border cursor-pointer transition-all',
                         selectedService === service.id
@@ -204,7 +215,12 @@ export default function BookingPage() {
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-medium">{service.name}</h4>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-medium">{service.name}</h4>
+                            {service.home_service && (
+                              <Home className="w-4 h-4 text-green-500" />
+                            )}
+                          </div>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                             <Clock className="w-4 h-4" />
                             <span>{service.duration} min</span>
@@ -281,6 +297,24 @@ export default function BookingPage() {
                   ))}
                 </div>
 
+                {/* Home Service Option */}
+                {selectedServiceData?.home_service && (
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-card border border-border mb-6">
+                    <div className="flex items-center gap-3">
+                      <Home className="w-5 h-5 text-green-500" />
+                      <div>
+                        <Label htmlFor="home-service" className="font-medium">Home Service</Label>
+                        <p className="text-sm text-muted-foreground">Get service at your location</p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="home-service"
+                      checked={homeService}
+                      onCheckedChange={setHomeService}
+                    />
+                  </div>
+                )}
+
                 <div className="flex gap-3">
                   <Button variant="outline" onClick={() => setStep(1)}>
                     Back
@@ -335,6 +369,19 @@ export default function BookingPage() {
                       <span className="text-muted-foreground">Duration</span>
                       <span className="font-medium">
                         {selectedServiceData?.duration} minutes
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center pb-4 border-b border-border">
+                      <span className="text-muted-foreground">Service Type</span>
+                      <span className="font-medium flex items-center gap-2">
+                        {homeService ? (
+                          <>
+                            <Home className="w-4 h-4 text-green-500" />
+                            Home Service
+                          </>
+                        ) : (
+                          'At Shop'
+                        )}
                       </span>
                     </div>
                     <div className="flex justify-between items-center pt-2">

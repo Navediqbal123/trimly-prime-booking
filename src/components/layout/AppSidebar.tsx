@@ -53,7 +53,7 @@ const adminNavItems: NavItem[] = [
 
 export function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { profile, signOut, isAdmin, isSuperAdmin, isBarber } = useAuth();
+  const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending } = useAuth();
   const location = useLocation();
 
   const getNavItems = (): NavItem[] => {
@@ -61,7 +61,7 @@ export function AppSidebar() {
       return barberNavItems;
     }
     // Filter out "Become a Barber" for barber_pending users
-    if (profile?.role === 'barber_pending') {
+    if (isBarberPending) {
       return userNavItems.filter(item => item.href !== '/become-barber');
     }
     return userNavItems;
@@ -155,9 +155,9 @@ export function AppSidebar() {
               <User className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">{profile?.full_name || 'User'}</p>
+              <p className="font-medium truncate">{user?.full_name || 'User'}</p>
               <p className="text-xs text-muted-foreground truncate capitalize">
-                {profile?.role?.replace('_', ' ') || 'User'}
+                {user?.role?.replace('_', ' ') || 'User'}
               </p>
             </div>
           </div>

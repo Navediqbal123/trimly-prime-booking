@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scissors, Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Scissors, Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,27 +14,16 @@ const loginSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
-const signupSchema = loginSchema.extend({
-  fullName: z.string().min(2, 'Name must be at least 2 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
 export default function Auth() {
-  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    confirmPassword: '',
-    fullName: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, user } = useAuth();
 
   if (user) {
     return <Navigate to="/dashboard" replace />;
@@ -51,52 +40,27 @@ export default function Auth() {
     setErrors({});
 
     try {
-      if (isLogin) {
-        const result = loginSchema.safeParse(formData);
-        if (!result.success) {
-          const fieldErrors: Record<string, string> = {};
-          result.error.errors.forEach((err) => {
-            if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
-          });
-          setErrors(fieldErrors);
-          return;
-        }
+      const result = loginSchema.safeParse(formData);
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.errors.forEach((err) => {
+          if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+        });
+        setErrors(fieldErrors);
+        return;
+      }
 
-        setLoading(true);
-        const { error } = await signIn(formData.email, formData.password);
-        
-        if (error) {
-          if (error.message.includes('Invalid login credentials')) {
-            toast.error('Invalid email or password');
-          } else {
-            toast.error(error.message);
-          }
+      setLoading(true);
+      const { error } = await signIn(formData.email, formData.password);
+      
+      if (error) {
+        if (error.message.includes('Invalid login credentials') || error.message.includes('Invalid')) {
+          toast.error('Invalid email or password');
         } else {
-          toast.success('Welcome back!');
+          toast.error(error.message);
         }
       } else {
-        const result = signupSchema.safeParse(formData);
-        if (!result.success) {
-          const fieldErrors: Record<string, string> = {};
-          result.error.errors.forEach((err) => {
-            if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
-          });
-          setErrors(fieldErrors);
-          return;
-        }
-
-        setLoading(true);
-        const { error } = await signUp(formData.email, formData.password, formData.fullName);
-        
-        if (error) {
-          if (error.message.includes('already registered')) {
-            toast.error('This email is already registered. Please sign in.');
-          } else {
-            toast.error(error.message);
-          }
-        } else {
-          toast.success('Account created! Please check your email to verify.');
-        }
+        toast.success('Welcome back!');
       }
     } catch (err) {
       toast.error('An unexpected error occurred');
@@ -157,41 +121,14 @@ export default function Auth() {
           <div className="bg-card border border-border rounded-2xl p-8 glow-card">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-display font-bold mb-2">
-                {isLogin ? 'Welcome Back' : 'Create Account'}
+                Welcome Back
               </h2>
               <p className="text-muted-foreground">
-                {isLogin ? 'Sign in to your account' : 'Join Trimly today'}
+                Sign in to your account
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <AnimatePresence mode="wait">
-                {!isLogin && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-2"
-                  >
-                    <Label htmlFor="fullName">Full Name</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        id="fullName"
-                        name="fullName"
-                        placeholder="John Doe"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        className="pl-10"
-                      />
-                    </div>
-                    {errors.fullName && (
-                      <p className="text-sm text-destructive">{errors.fullName}</p>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -237,34 +174,6 @@ export default function Auth() {
                 )}
               </div>
 
-              <AnimatePresence mode="wait">
-                {!isLogin && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-2"
-                  >
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="••••••••"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        className="pl-10"
-                      />
-                    </div>
-                    {errors.confirmPassword && (
-                      <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
               <Button
                 type="submit"
                 className="w-full mt-6"
@@ -272,29 +181,11 @@ export default function Auth() {
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
-                ) : isLogin ? (
-                  'Sign In'
                 ) : (
-                  'Create Account'
+                  'Sign In'
                 )}
               </Button>
             </form>
-
-            <div className="mt-6 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setErrors({});
-                }}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                {isLogin ? "Don't have an account? " : 'Already have an account? '}
-                <span className="text-primary font-medium">
-                  {isLogin ? 'Sign Up' : 'Sign In'}
-                </span>
-              </button>
-            </div>
           </div>
         </motion.div>
       </div>

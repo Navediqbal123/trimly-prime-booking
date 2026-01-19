@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Clock, DollarSign, Scissors, Loader2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Clock, DollarSign, Scissors, Loader2, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   Dialog,
   DialogContent,
@@ -19,14 +20,15 @@ interface Service {
   name: string;
   duration: number;
   price: number;
+  home_service: boolean;
 }
 
 const initialServices: Service[] = [
-  { id: '1', name: 'Classic Haircut', duration: 30, price: 25 },
-  { id: '2', name: 'Fade Haircut', duration: 45, price: 35 },
-  { id: '3', name: 'Beard Trim', duration: 20, price: 15 },
-  { id: '4', name: 'Hot Towel Shave', duration: 30, price: 30 },
-  { id: '5', name: 'Haircut + Beard', duration: 60, price: 45 },
+  { id: '1', name: 'Classic Haircut', duration: 30, price: 25, home_service: false },
+  { id: '2', name: 'Fade Haircut', duration: 45, price: 35, home_service: false },
+  { id: '3', name: 'Beard Trim', duration: 20, price: 15, home_service: true },
+  { id: '4', name: 'Hot Towel Shave', duration: 30, price: 30, home_service: false },
+  { id: '5', name: 'Haircut + Beard', duration: 60, price: 45, home_service: true },
 ];
 
 export default function Services() {
@@ -38,6 +40,7 @@ export default function Services() {
     name: '',
     duration: '',
     price: '',
+    home_service: false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +66,7 @@ export default function Services() {
                 name: formData.name,
                 duration: parseInt(formData.duration),
                 price: parseFloat(formData.price),
+                home_service: formData.home_service,
               }
             : s
         )
@@ -70,7 +74,7 @@ export default function Services() {
       toast.success('Service updated successfully');
       setIsOpen(false);
       setEditingService(null);
-      setFormData({ name: '', duration: '', price: '' });
+      setFormData({ name: '', duration: '', price: '', home_service: false });
     } else {
       // Adding new service - call backend API
       setLoading(true);
@@ -78,6 +82,7 @@ export default function Services() {
         name: formData.name,
         duration: parseInt(formData.duration),
         price: parseFloat(formData.price),
+        home_service: formData.home_service,
       });
 
       if (response.success) {
@@ -86,11 +91,12 @@ export default function Services() {
           name: formData.name,
           duration: parseInt(formData.duration),
           price: parseFloat(formData.price),
+          home_service: formData.home_service,
         };
         setServices((prev) => [...prev, newService]);
         toast.success('Service added successfully');
         setIsOpen(false);
-        setFormData({ name: '', duration: '', price: '' });
+        setFormData({ name: '', duration: '', price: '', home_service: false });
       } else {
         toast.error(response.error || 'Failed to add service');
       }
@@ -106,6 +112,7 @@ export default function Services() {
       name: service.name,
       duration: service.duration.toString(),
       price: service.price.toString(),
+      home_service: service.home_service,
     });
     setIsOpen(true);
   };
@@ -117,7 +124,7 @@ export default function Services() {
 
   const openAddDialog = () => {
     setEditingService(null);
-    setFormData({ name: '', duration: '', price: '' });
+    setFormData({ name: '', duration: '', price: '', home_service: false });
     setIsOpen(true);
   };
 
@@ -178,6 +185,17 @@ export default function Services() {
                   value={formData.price}
                   onChange={handleChange}
                   placeholder="25.00"
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="home_service">Home Service Available</Label>
+                <Switch
+                  id="home_service"
+                  checked={formData.home_service}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, home_service: checked }))
+                  }
                 />
               </div>
 
@@ -243,6 +261,11 @@ export default function Services() {
                 <DollarSign className="w-4 h-4" />
                 <span className="text-primary font-medium">${service.price}</span>
               </div>
+              {service.home_service && (
+                <div className="flex items-center gap-1">
+                  <Home className="w-4 h-4 text-green-500" />
+                </div>
+              )}
             </div>
           </motion.div>
         ))}
