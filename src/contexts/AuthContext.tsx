@@ -1,16 +1,23 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase, Profile, UserRole, SUPER_ADMIN_EMAIL } from '@/lib/supabase';
+import { login as apiLogin, getAuthToken, removeAuthToken, isAuthenticated } from '@/lib/api';
+
+// Super admin email - special handling
+const SUPER_ADMIN_EMAIL = 'navedahmad9012@gmail.com';
+
+export type UserRole = 'user' | 'barber_pending' | 'barber' | 'admin' | 'super_admin';
+
+export interface UserProfile {
+  email: string;
+  full_name?: string;
+  role: UserRole;
+}
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  profile: Profile | null;
+  user: UserProfile | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
-  updateProfile: (updates: Partial<Profile>) => Promise<{ error: Error | null }>;
+  updateLocalRole: (role: UserRole) => void;
   isSuperAdmin: boolean;
   isAdmin: boolean;
   isBarber: boolean;
@@ -27,176 +34,107 @@ export const useAuth = () => {
   return context;
 };
 
+// Helper to decode JWT payload (without verification - backend handles that)
+function decodeToken(token: string): { email?: string; role?: string } | null {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string, email: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error && error.code === 'PGRST116') {
-        // Profile doesn't exist, create one
-        const role: UserRole = email === SUPER_ADMIN_EMAIL ? 'super_admin' : 'user';
-        const newProfile: Partial<Profile> = {
-          id: userId,
-          email,
-          full_name: email.split('@')[0],
-          role,
-        };
-
-        const { data: createdProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert(newProfile)
-          .select()
-          .single();
-
-        if (createError) {
-          console.error('Error creating profile:', createError);
-          // Fallback to mock profile
-          setProfile({
-            id: userId,
+  // Initialize user from stored token on mount
+  useEffect(() => {
+    const initAuth = () => {
+      const token = getAuthToken();
+      if (token) {
+        const decoded = decodeToken(token);
+        if (decoded?.email) {
+          const email = decoded.email;
+          // Determine role - super admin gets special treatment
+          const role: UserRole = email === SUPER_ADMIN_EMAIL 
+            ? 'super_admin' 
+            : (decoded.role as UserRole) || 'user';
+          
+          setUser({
             email,
             full_name: email.split('@')[0],
             role,
-            created_at: new Date().toISOString(),
           });
-        } else {
-          setProfile(createdProfile);
-        }
-      } else if (error) {
-        console.error('Error fetching profile:', error);
-        // Fallback to mock profile
-        const role: UserRole = email === SUPER_ADMIN_EMAIL ? 'super_admin' : 'user';
-        setProfile({
-          id: userId,
-          email,
-          full_name: email.split('@')[0],
-          role,
-          created_at: new Date().toISOString(),
-        });
-      } else {
-        // Check if super admin
-        if (email === SUPER_ADMIN_EMAIL && data.role !== 'super_admin') {
-          const { data: updatedProfile } = await supabase
-            .from('profiles')
-            .update({ role: 'super_admin' })
-            .eq('id', userId)
-            .select()
-            .single();
-          setProfile(updatedProfile || { ...data, role: 'super_admin' });
-        } else {
-          setProfile(data);
         }
       }
-    } catch (err) {
-      console.error('Profile fetch error:', err);
-      const role: UserRole = email === SUPER_ADMIN_EMAIL ? 'super_admin' : 'user';
-      setProfile({
-        id: userId,
-        email,
-        full_name: email.split('@')[0],
-        role,
-        created_at: new Date().toISOString(),
-      });
-    }
-  };
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        setTimeout(() => {
-          fetchProfile(session.user.id, session.user.email || '');
-        }, 0);
-      } else {
-        setProfile(null);
-      }
       setLoading(false);
-    });
+    };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id, session.user.email || '');
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    initAuth();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          full_name: fullName,
-        },
-      },
-    });
-
-    return { error: error as Error | null };
-  };
-
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const result = await apiLogin({ email, password });
 
-    return { error: error as Error | null };
+      if (!result.success) {
+        return { error: new Error(result.error || 'Login failed') };
+      }
+
+      // Decode token to get user info
+      const token = result.data?.token;
+      if (token) {
+        const decoded = decodeToken(token);
+        const role: UserRole = email === SUPER_ADMIN_EMAIL 
+          ? 'super_admin' 
+          : (decoded?.role as UserRole) || 'user';
+
+        setUser({
+          email,
+          full_name: decoded?.email?.split('@')[0] || email.split('@')[0],
+          role,
+        });
+      }
+
+      return { error: null };
+    } catch (err) {
+      return { error: err as Error };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setProfile(null);
+    removeAuthToken();
+    setUser(null);
   };
 
-  const updateProfile = async (updates: Partial<Profile>) => {
-    if (!user) return { error: new Error('No user logged in') };
-
-    const { error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', user.id);
-
-    if (!error && profile) {
-      setProfile({ ...profile, ...updates });
+  // Update local role (for UI purposes after becoming barber, etc.)
+  const updateLocalRole = (role: UserRole) => {
+    if (user) {
+      setUser({ ...user, role });
     }
-
-    return { error: error as Error | null };
   };
 
-  const isSuperAdmin = profile?.role === 'super_admin' || profile?.email === SUPER_ADMIN_EMAIL;
-  const isAdmin = isSuperAdmin || profile?.role === 'admin';
-  const isBarber = profile?.role === 'barber';
-  const isBarberPending = profile?.role === 'barber_pending';
+  const isSuperAdmin = user?.role === 'super_admin' || user?.email === SUPER_ADMIN_EMAIL;
+  const isAdmin = isSuperAdmin || user?.role === 'admin';
+  const isBarber = user?.role === 'barber';
+  const isBarberPending = user?.role === 'barber_pending';
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        session,
-        profile,
         loading,
-        signUp,
         signIn,
         signOut,
-        updateProfile,
+        updateLocalRole,
         isSuperAdmin,
         isAdmin,
         isBarber,
