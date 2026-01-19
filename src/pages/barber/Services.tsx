@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Clock, DollarSign, Scissors } from 'lucide-react';
+import { Plus, Edit2, Trash2, Clock, DollarSign, Scissors, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { addService } from '@/lib/api';
 
 interface Service {
   id: string;
@@ -32,6 +33,7 @@ export default function Services() {
   const [services, setServices] = useState<Service[]>(initialServices);
   const [isOpen, setIsOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     duration: '',
@@ -43,7 +45,7 @@ export default function Services() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name || !formData.duration || !formData.price) {
@@ -52,6 +54,7 @@ export default function Services() {
     }
 
     if (editingService) {
+      // Editing - no backend route, just update UI
       setServices((prev) =>
         prev.map((s) =>
           s.id === editingService.id
@@ -65,20 +68,36 @@ export default function Services() {
         )
       );
       toast.success('Service updated successfully');
+      setIsOpen(false);
+      setEditingService(null);
+      setFormData({ name: '', duration: '', price: '' });
     } else {
-      const newService: Service = {
-        id: Date.now().toString(),
+      // Adding new service - call backend API
+      setLoading(true);
+      const response = await addService({
         name: formData.name,
         duration: parseInt(formData.duration),
         price: parseFloat(formData.price),
-      };
-      setServices((prev) => [...prev, newService]);
-      toast.success('Service added successfully');
+      });
+
+      if (response.success) {
+        const newService: Service = {
+          id: Date.now().toString(),
+          name: formData.name,
+          duration: parseInt(formData.duration),
+          price: parseFloat(formData.price),
+        };
+        setServices((prev) => [...prev, newService]);
+        toast.success('Service added successfully');
+        setIsOpen(false);
+        setFormData({ name: '', duration: '', price: '' });
+      } else {
+        toast.error(response.error || 'Failed to add service');
+      }
+      setLoading(false);
     }
 
-    setIsOpen(false);
     setEditingService(null);
-    setFormData({ name: '', duration: '', price: '' });
   };
 
   const handleEdit = (service: Service) => {
@@ -162,8 +181,17 @@ export default function Services() {
                 />
               </div>
 
-              <Button type="submit" className="w-full">
-                {editingService ? 'Update Service' : 'Add Service'}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Adding...
+                  </>
+                ) : editingService ? (
+                  'Update Service'
+                ) : (
+                  'Add Service'
+                )}
               </Button>
             </form>
           </DialogContent>

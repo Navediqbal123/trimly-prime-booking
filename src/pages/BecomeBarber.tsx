@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { registerBarber } from '@/lib/api';
 
 export default function BecomeBarber() {
   const { profile, updateProfile, isBarberPending } = useAuth();
@@ -85,13 +86,23 @@ export default function BecomeBarber() {
       return;
     }
 
-    // Update role to barber_pending
-    const { error } = await updateProfile({ role: 'barber_pending' });
+    // Call backend API to register barber
+    const response = await registerBarber({
+      fullName: formData.fullName,
+      shopName: formData.shopName,
+      phone: formData.phone,
+      email: formData.email,
+      address: formData.address,
+      description: formData.description,
+      imageUrl: formData.imageUrl || undefined,
+    });
 
-    if (error) {
-      toast.error('Failed to submit application');
+    if (response.success) {
+      // Update local role to barber_pending
+      await updateProfile({ role: 'barber_pending' });
+      toast.success('Request submitted, waiting for admin approval');
     } else {
-      toast.success('Application submitted successfully!');
+      toast.error(response.error || 'Failed to submit application');
     }
 
     setLoading(false);

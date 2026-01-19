@@ -10,10 +10,12 @@ import {
   Calendar,
   Check,
   ChevronRight,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { createBooking } from '@/lib/api';
 
 const mockShop = {
   id: '1',
@@ -49,6 +51,7 @@ export default function BookingPage() {
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const selectedServiceData = mockServices.find((s) => s.id === selectedService);
 
@@ -62,14 +65,32 @@ export default function BookingPage() {
     return dates;
   };
 
-  const handleBook = () => {
+  const handleBook = async () => {
     if (!selectedService || !selectedDate || !selectedTime) {
       toast.error('Please complete all steps');
       return;
     }
 
-    toast.success('Booking confirmed! Check your bookings for details.');
-    navigate('/bookings');
+    setLoading(true);
+
+    // Format date as YYYY-MM-DD
+    const formattedDate = selectedDate.toISOString().split('T')[0];
+
+    const response = await createBooking({
+      barber_id: shopId || mockShop.id,
+      service_id: selectedService,
+      date: formattedDate,
+      time: selectedTime,
+    });
+
+    if (response.success) {
+      toast.success('Booking confirmed! Check your bookings for details.');
+      navigate('/bookings');
+    } else {
+      toast.error(response.error || 'Failed to create booking');
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -326,12 +347,16 @@ export default function BookingPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(2)}>
+                  <Button variant="outline" onClick={() => setStep(2)} disabled={loading}>
                     Back
                   </Button>
-                  <Button className="flex-1" onClick={handleBook}>
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Confirm Booking
+                  <Button className="flex-1" onClick={handleBook} disabled={loading}>
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Calendar className="w-4 h-4 mr-2" />
+                    )}
+                    {loading ? 'Booking...' : 'Confirm Booking'}
                   </Button>
                 </div>
               </motion.div>
