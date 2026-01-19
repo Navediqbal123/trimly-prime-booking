@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Store, Phone, Mail, MapPin, Check, X } from 'lucide-react';
+import { Store, Phone, Mail, MapPin, Check, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { approveBarber } from '@/lib/api';
 
 interface BarberRequest {
   id: string;
@@ -40,13 +41,23 @@ const mockRequests: BarberRequest[] = [
 
 export default function BarberRequests() {
   const [requests, setRequests] = useState<BarberRequest[]>(mockRequests);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const handleApprove = (id: string) => {
-    setRequests((prev) => prev.filter((r) => r.id !== id));
-    toast.success('Barber approved successfully');
+  const handleApprove = async (id: string) => {
+    setLoadingId(id);
+    const response = await approveBarber(id);
+    
+    if (response.success) {
+      setRequests((prev) => prev.filter((r) => r.id !== id));
+      toast.success('Barber approved successfully');
+    } else {
+      toast.error(response.error || 'Failed to approve barber');
+    }
+    setLoadingId(null);
   };
 
   const handleReject = (id: string) => {
+    // No backend route for reject - just update UI
     setRequests((prev) => prev.filter((r) => r.id !== id));
     toast.success('Request rejected');
   };
@@ -84,11 +95,16 @@ export default function BarberRequests() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button variant="outline" className="flex-1" onClick={() => handleReject(request.id)}>
+                  <Button variant="outline" className="flex-1" onClick={() => handleReject(request.id)} disabled={loadingId === request.id}>
                     <X className="w-4 h-4 mr-2" />Reject
                   </Button>
-                  <Button className="flex-1" onClick={() => handleApprove(request.id)}>
-                    <Check className="w-4 h-4 mr-2" />Approve
+                  <Button className="flex-1" onClick={() => handleApprove(request.id)} disabled={loadingId === request.id}>
+                    {loadingId === request.id ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Check className="w-4 h-4 mr-2" />
+                    )}
+                    Approve
                   </Button>
                 </div>
               </div>
