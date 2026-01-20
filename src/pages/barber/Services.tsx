@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Clock, DollarSign, Scissors, Loader2, Home } from 'lucide-react';
+import { Plus, Edit2, Trash2, Clock, DollarSign, Scissors, Loader2, Home, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,16 +23,10 @@ interface Service {
   home_service: boolean;
 }
 
-const initialServices: Service[] = [
-  { id: '1', name: 'Classic Haircut', duration: 30, price: 25, home_service: false },
-  { id: '2', name: 'Fade Haircut', duration: 45, price: 35, home_service: false },
-  { id: '3', name: 'Beard Trim', duration: 20, price: 15, home_service: true },
-  { id: '4', name: 'Hot Towel Shave', duration: 30, price: 30, home_service: false },
-  { id: '5', name: 'Haircut + Beard', duration: 60, price: 45, home_service: true },
-];
-
 export default function Services() {
-  const [services, setServices] = useState<Service[]>(initialServices);
+  // Start with empty array - no mock data with numeric IDs
+  // Services should be fetched from backend once a GET endpoint is available
+  const [services, setServices] = useState<Service[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,7 +51,7 @@ export default function Services() {
     }
 
     if (editingService) {
-      // Editing - no backend route, just update UI
+      // Editing - no backend route, just update local UI
       setServices((prev) =>
         prev.map((s) =>
           s.id === editingService.id
@@ -71,12 +65,13 @@ export default function Services() {
             : s
         )
       );
-      toast.success('Service updated successfully');
+      toast.success('Service updated locally');
       setIsOpen(false);
       setEditingService(null);
       setFormData({ name: '', duration: '', price: '', home_service: false });
     } else {
       // Adding new service - call backend API
+      // Backend resolves barber_id from JWT, do NOT send barber_id
       setLoading(true);
       const response = await addService({
         name: formData.name,
@@ -86,8 +81,11 @@ export default function Services() {
       });
 
       if (response.success) {
+        // Generate a temporary UUID for local display
+        // In production, backend should return the created service with its UUID
+        const tempId = crypto.randomUUID();
         const newService: Service = {
-          id: Date.now().toString(),
+          id: tempId,
           name: formData.name,
           duration: parseInt(formData.duration),
           price: parseFloat(formData.price),
@@ -102,8 +100,6 @@ export default function Services() {
       }
       setLoading(false);
     }
-
-    setEditingService(null);
   };
 
   const handleEdit = (service: Service) => {
@@ -118,19 +114,19 @@ export default function Services() {
   };
 
   const handleDelete = (id: string) => {
+    // No backend route for delete - just update local UI
     setServices((prev) => prev.filter((s) => s.id !== id));
-    toast.success('Service deleted');
+    toast.success('Service removed locally');
   };
 
-  const openAddDialog = () => {
+  const resetForm = () => {
     setEditingService(null);
     setFormData({ name: '', duration: '', price: '', home_service: false });
-    setIsOpen(true);
   };
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
             My <span className="gradient-text">Services</span>
@@ -138,18 +134,16 @@ export default function Services() {
           <p className="text-muted-foreground">Manage your service offerings</p>
         </div>
 
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
-            <Button onClick={openAddDialog}>
+            <Button>
               <Plus className="w-4 h-4 mr-2" />
               Add Service
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>
-                {editingService ? 'Edit Service' : 'Add New Service'}
-              </DialogTitle>
+              <DialogTitle>{editingService ? 'Edit Service' : 'Add New Service'}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">
               <div className="space-y-2">
@@ -216,69 +210,60 @@ export default function Services() {
         </Dialog>
       </div>
 
-      {/* Services Grid */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-      >
-        {services.map((service, index) => (
-          <motion.div
-            key={service.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-            className="bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-all"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Scissors className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleEdit(service)}
-                  className="p-2 rounded-lg hover:bg-secondary transition-colors"
-                >
-                  <Edit2 className="w-4 h-4 text-muted-foreground" />
-                </button>
-                <button
-                  onClick={() => handleDelete(service.id)}
-                  className="p-2 rounded-lg hover:bg-destructive/10 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4 text-destructive" />
-                </button>
-              </div>
-            </div>
-
-            <h3 className="font-semibold mb-2">{service.name}</h3>
-
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                <span>{service.duration} min</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <DollarSign className="w-4 h-4" />
-                <span className="text-primary font-medium">${service.price}</span>
-              </div>
-              {service.home_service && (
-                <div className="flex items-center gap-1">
-                  <Home className="w-4 h-4 text-green-500" />
+      {services.length > 0 ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          {services.map((service) => (
+            <motion.div
+              key={service.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-card border border-border rounded-2xl p-5"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Scissors className="w-6 h-6 text-primary" />
                 </div>
-              )}
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
+                <div className="flex gap-2">
+                  <Button size="icon" variant="ghost" onClick={() => handleEdit(service)}>
+                    <Edit2 className="w-4 h-4" />
+                  </Button>
+                  <Button size="icon" variant="ghost" onClick={() => handleDelete(service.id)}>
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
+                </div>
+              </div>
 
-      {services.length === 0 && (
-        <div className="text-center py-12 bg-card rounded-xl border border-border">
-          <Scissors className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground mb-4">No services added yet</p>
-          <Button onClick={openAddDialog}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Your First Service
-          </Button>
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="font-semibold text-lg">{service.name}</h3>
+                {service.home_service && (
+                  <Home className="w-4 h-4 text-green-500" />
+                )}
+              </div>
+
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  <span>{service.duration} min</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <DollarSign className="w-4 h-4" />
+                  <span>{service.price}</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <AlertCircle className="w-16 h-16 text-muted-foreground mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No Services Yet</h3>
+          <p className="text-muted-foreground max-w-md mb-6">
+            Add your first service to start accepting bookings. Click the "Add Service" button above.
+          </p>
         </div>
       )}
     </div>
