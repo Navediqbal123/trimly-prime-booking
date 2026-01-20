@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Store, Phone, Mail, MapPin, Check, X, Loader2 } from 'lucide-react';
+import { Store, Phone, Mail, MapPin, Check, X, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { approveBarber } from '@/lib/api';
 
 interface BarberRequest {
-  id: string;
+  id: string; // UUID from backend
   owner_name: string;
   shop_name: string;
   email: string;
@@ -14,36 +14,24 @@ interface BarberRequest {
   address: string;
   image_url: string;
   description: string;
+  status: string;
 }
 
-const mockRequests: BarberRequest[] = [
-  {
-    id: '1',
-    owner_name: 'Alex Johnson',
-    shop_name: 'Sharp Styles Barbershop',
-    email: 'alex@example.com',
-    phone: '+1 555 123 4567',
-    address: '456 Oak Street, City',
-    image_url: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=500',
-    description: 'Modern barbershop specializing in contemporary styles and fades.',
-  },
-  {
-    id: '2',
-    owner_name: 'Marcus Williams',
-    shop_name: 'Elite Cuts Studio',
-    email: 'marcus@example.com',
-    phone: '+1 555 987 6543',
-    address: '789 Pine Avenue, Downtown',
-    image_url: 'https://images.unsplash.com/photo-1493256338651-d82f7acb2b38?w=500',
-    description: 'Premium grooming services for the modern gentleman.',
-  },
-];
-
 export default function BarberRequests() {
-  const [requests, setRequests] = useState<BarberRequest[]>(mockRequests);
+  // Start with empty array - no mock data
+  // Backend should provide a GET endpoint for fetching pending requests
+  // For now, show empty state
+  const [requests, setRequests] = useState<BarberRequest[]>([]);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
   const handleApprove = async (id: string) => {
+    // Validate UUID format before sending
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      toast.error('Invalid barber ID format');
+      return;
+    }
+
     setLoadingId(id);
     const response = await approveBarber(id);
     
@@ -63,7 +51,11 @@ export default function BarberRequests() {
   };
 
   return (
-    <div className="animate-fade-in">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="animate-fade-in"
+    >
       <div className="mb-8">
         <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
           Barber <span className="gradient-text">Requests</span>
@@ -73,7 +65,7 @@ export default function BarberRequests() {
 
       {requests.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {requests.map((request) => (
+          {requests.filter(r => r.status === 'pending').map((request) => (
             <motion.div
               key={request.id}
               initial={{ opacity: 0, y: 20 }}
@@ -112,11 +104,15 @@ export default function BarberRequests() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 bg-card rounded-xl border border-border">
-          <Store className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">No pending barber requests</p>
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <AlertCircle className="w-16 h-16 text-muted-foreground mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No Pending Requests</h3>
+          <p className="text-muted-foreground max-w-md">
+            When barbers submit applications, they will appear here for approval.
+            Pending requests with valid UUIDs from the backend will be shown.
+          </p>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
