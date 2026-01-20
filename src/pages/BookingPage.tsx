@@ -1,44 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MapPin,
-  Star,
   Clock,
   Calendar,
   ArrowLeft,
   Check,
-  Phone,
   Home,
   Loader2,
   AlertCircle,
+  Scissors,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { createBooking } from '@/lib/api';
-
-// NOTE: In production, shop and services should be fetched from backend
-// Currently there's no GET endpoint for barbers/services, so booking cannot work
-// Until backend provides these endpoints, this page shows placeholder guidance
-
-interface ShopData {
-  id: string; // Must be UUID from backend
-  shop_name: string;
-  description: string;
-  address: string;
-  phone: string;
-  rating: number;
-  image_url: string;
-}
-
-interface ServiceData {
-  id: string; // Must be UUID from backend
-  name: string;
-  duration: number;
-  price: number;
-  home_service: boolean;
-}
+import { createBooking, getApprovedBarbers, getBarberServices, ApprovedBarberData, ServiceData } from '@/lib/api';
 
 const timeSlots = [
   '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
@@ -55,11 +32,40 @@ export default function BookingPage() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [homeService, setHomeService] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
+  
+  const [shop, setShop] = useState<ApprovedBarberData | null>(null);
+  const [services, setServices] = useState<ServiceData[]>([]);
 
-  // Since no backend endpoint exists to fetch shop/services data,
-  // we start with empty data and show a message
-  const [shop] = useState<ShopData | null>(null);
-  const [services] = useState<ServiceData[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!shopId) {
+        setLoadingData(false);
+        return;
+      }
+
+      setLoadingData(true);
+
+      // Fetch barber details
+      const barbersResponse = await getApprovedBarbers();
+      if (barbersResponse.success && barbersResponse.data) {
+        const foundBarber = barbersResponse.data.find(b => b.id === shopId);
+        if (foundBarber) {
+          setShop(foundBarber);
+        }
+      }
+
+      // Fetch services for this barber
+      const servicesResponse = await getBarberServices(shopId);
+      if (servicesResponse.success && servicesResponse.data) {
+        setServices(servicesResponse.data);
+      }
+
+      setLoadingData(false);
+    };
+
+    fetchData();
+  }, [shopId]);
 
   const selectedServiceData = services.find((s) => s.id === selectedService);
 
@@ -127,8 +133,18 @@ export default function BookingPage() {
     setStep(step + 1);
   };
 
+  // Loading state
+  if (loadingData) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground">Loading barber details...</p>
+      </div>
+    );
+  }
+
   // Show message if no shop ID or no data available
-  if (!shopId || !shop || services.length === 0) {
+  if (!shopId || !shop) {
     return (
       <div className="animate-fade-in">
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
@@ -138,16 +154,35 @@ export default function BookingPage() {
 
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <AlertCircle className="w-16 h-16 text-muted-foreground mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Booking Not Available</h3>
+          <h3 className="text-xl font-semibold mb-2">Barber Not Found</h3>
           <p className="text-muted-foreground max-w-md mb-6">
-            To book an appointment, you need to select a barber from the Discover Barbers page.
-            The barber must have services available for booking.
-          </p>
-          <p className="text-sm text-muted-foreground max-w-md mb-6">
-            Note: Backend endpoints for fetching barber and service lists are required for the booking flow to work properly.
+            The barber you're looking for doesn't exist or hasn't been approved yet.
           </p>
           <Button onClick={() => navigate('/discover')}>
             Discover Barbers
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no services
+  if (services.length === 0) {
+    return (
+      <div className="animate-fade-in">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
+
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Scissors className="w-16 h-16 text-muted-foreground mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No Services Available</h3>
+          <p className="text-muted-foreground max-w-md mb-6">
+            {shop.shop_name} hasn't added any services yet. Please check back later.
+          </p>
+          <Button onClick={() => navigate('/discover')}>
+            Browse Other Barbers
           </Button>
         </div>
       </div>
@@ -169,31 +204,19 @@ export default function BookingPage() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-card border border-border rounded-2xl overflow-hidden sticky top-24"
           >
-            <div className="h-48 overflow-hidden">
-              <img
-                src={shop.image_url}
-                alt={shop.shop_name}
-                className="w-full h-full object-cover"
-              />
+            <div className="h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+              <Scissors className="w-16 h-16 text-primary/40" />
             </div>
             <div className="p-5">
               <h2 className="text-xl font-semibold mb-2">{shop.shop_name}</h2>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <span>{shop.rating}</span>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                {shop.description}
-              </p>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-muted-foreground" />
-                  <span>{shop.address}</span>
+                  <span>{shop.location}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-muted-foreground" />
-                  <span>{shop.phone}</span>
-                </div>
+                {shop.user?.name && (
+                  <p className="text-muted-foreground">Owner: {shop.user.name}</p>
+                )}
               </div>
             </div>
           </motion.div>

@@ -157,3 +157,98 @@ export async function createBooking(data: CreateBookingData): Promise<ApiRespons
     body: JSON.stringify(data),
   });
 }
+
+// GET /api/booking/my - Get user's bookings
+export interface BookingData {
+  id: string;
+  barber_id: string;
+  service_id: string;
+  date: string;
+  time_slot: string;
+  status: string;
+  home_service: boolean;
+  barber?: {
+    shop_name: string;
+    location: string;
+  };
+  service?: {
+    name: string;
+    price: number;
+  };
+}
+
+export async function getMyBookings(): Promise<ApiResponse<BookingData[]>> {
+  return apiCall<BookingData[]>('/api/booking/my', {
+    method: 'GET',
+  });
+}
+
+// GET /api/booking/all - Admin: get all bookings
+export async function getAllBookings(): Promise<ApiResponse<BookingData[]>> {
+  return apiCall<BookingData[]>('/api/booking/all', {
+    method: 'GET',
+  });
+}
+
+// ==========================================
+// BARBER FETCH ENDPOINTS
+// ==========================================
+
+// GET /api/barber/pending - Admin: get pending barber requests
+export interface PendingBarberData {
+  id: string;
+  user_id: string;
+  shop_name: string;
+  location: string;
+  status: string;
+  created_at: string;
+  user?: {
+    email: string;
+    name: string;
+  };
+}
+
+export async function getPendingBarbers(): Promise<ApiResponse<PendingBarberData[]>> {
+  return apiCall<PendingBarberData[]>('/api/barber/pending', {
+    method: 'GET',
+  });
+}
+
+// GET /api/barber/approved - Get approved barbers for booking
+export interface ApprovedBarberData {
+  id: string;
+  shop_name: string;
+  location: string;
+  user_id: string;
+  status: string;
+  user?: {
+    email: string;
+    name: string;
+  };
+}
+
+export async function getApprovedBarbers(): Promise<ApiResponse<ApprovedBarberData[]>> {
+  return apiCall<ApprovedBarberData[]>('/api/barber/approved', {
+    method: 'GET',
+  });
+}
+
+// ==========================================
+// SERVICES ENDPOINTS
+// ==========================================
+
+// GET /api/services/:barber_id - Get services for a barber
+export interface ServiceData {
+  id: string;
+  barber_id: string;
+  name: string;
+  price: number;
+  duration: number;
+  home_service: boolean;
+}
+
+export async function getBarberServices(barberId: string): Promise<ApiResponse<ServiceData[]>> {
+  return apiCall<ServiceData[]>(`/api/services/${barberId}`, {
+    method: 'GET',
+  });
+}
