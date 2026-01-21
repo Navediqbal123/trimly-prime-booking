@@ -293,7 +293,7 @@ export default function BookingPage() {
                         </div>
                         <div className="text-right">
                           <span className="text-xl font-bold text-primary">
-                            ${service.price}
+                            ₹{service.price}
                           </span>
                         </div>
                       </div>
@@ -453,7 +453,7 @@ export default function BookingPage() {
                   <div className="flex justify-between items-center pt-2">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-2xl font-bold text-primary">
-                      ${selectedServiceData?.price}
+                      ₹{selectedServiceData?.price}
                     </span>
                   </div>
                 </div>

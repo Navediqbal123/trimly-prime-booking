@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Clock, DollarSign, Scissors, Loader2, Home, AlertCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, Clock, DollarSign, Scissors, Loader2, Home, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,29 +13,49 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { addService } from '@/lib/api';
-
-interface Service {
-  id: string;
-  name: string;
-  duration: number;
-  price: number;
-  home_service: boolean;
-}
+import { addService, getMyBarberProfile, getBarberServices, ServiceData } from '@/lib/api';
 
 export default function Services() {
-  // Start with empty array - no mock data with numeric IDs
-  // Services should be fetched from backend once a GET endpoint is available
-  const [services, setServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<ServiceData[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-  const [editingService, setEditingService] = useState<Service | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [editingService, setEditingService] = useState<ServiceData | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [barberId, setBarberId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     duration: '',
     price: '',
     home_service: false,
   });
+
+  const fetchServices = async () => {
+    setLoading(true);
+    
+    // First get the barber's profile to get their ID
+    const profileResponse = await getMyBarberProfile();
+    
+    if (profileResponse.success && profileResponse.data) {
+      const myBarberId = profileResponse.data.id;
+      setBarberId(myBarberId);
+      
+      // Now fetch services for this barber
+      const servicesResponse = await getBarberServices(myBarberId);
+      
+      if (servicesResponse.success && servicesResponse.data) {
+        setServices(servicesResponse.data);
+      }
+    } else {
+      // Barber not found or not approved yet
+      toast.error(profileResponse.error || 'Unable to load barber profile');
+    }
+    
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -71,8 +91,7 @@ export default function Services() {
       setFormData({ name: '', duration: '', price: '', home_service: false });
     } else {
       // Adding new service - call backend API
-      // Backend resolves barber_id from JWT, do NOT send barber_id
-      setLoading(true);
+      setSubmitting(true);
       const response = await addService({
         name: formData.name,
         duration: parseInt(formData.duration),
@@ -81,28 +100,19 @@ export default function Services() {
       });
 
       if (response.success) {
-        // Generate a temporary UUID for local display
-        // In production, backend should return the created service with its UUID
-        const tempId = crypto.randomUUID();
-        const newService: Service = {
-          id: tempId,
-          name: formData.name,
-          duration: parseInt(formData.duration),
-          price: parseFloat(formData.price),
-          home_service: formData.home_service,
-        };
-        setServices((prev) => [...prev, newService]);
         toast.success('Service added successfully');
         setIsOpen(false);
         setFormData({ name: '', duration: '', price: '', home_service: false });
+        // Refetch services to get the real data from backend
+        await fetchServices();
       } else {
         toast.error(response.error || 'Failed to add service');
       }
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  const handleEdit = (service: Service) => {
+  const handleEdit = (service: ServiceData) => {
     setEditingService(service);
     setFormData({
       name: service.name,
@@ -124,6 +134,15 @@ export default function Services() {
     setFormData({ name: '', duration: '', price: '', home_service: false });
   };
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground">Loading services...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -134,80 +153,87 @@ export default function Services() {
           <p className="text-muted-foreground">Manage your service offerings</p>
         </div>
 
-        <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Service
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{editingService ? 'Edit Service' : 'Add New Service'}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Service Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="e.g., Classic Haircut"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="duration">Duration (minutes)</Label>
-                <Input
-                  id="duration"
-                  name="duration"
-                  type="number"
-                  value={formData.duration}
-                  onChange={handleChange}
-                  placeholder="30"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="price">Price ($)</Label>
-                <Input
-                  id="price"
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={handleChange}
-                  placeholder="25.00"
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <Label htmlFor="home_service">Home Service Available</Label>
-                <Switch
-                  id="home_service"
-                  checked={formData.home_service}
-                  onCheckedChange={(checked) =>
-                    setFormData((prev) => ({ ...prev, home_service: checked }))
-                  }
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Adding...
-                  </>
-                ) : editingService ? (
-                  'Update Service'
-                ) : (
-                  'Add Service'
-                )}
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={fetchServices} disabled={loading}>
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          
+          <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Service
               </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{editingService ? 'Edit Service' : 'Add New Service'}</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Service Name</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="e.g., Classic Haircut"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="duration">Duration (minutes)</Label>
+                  <Input
+                    id="duration"
+                    name="duration"
+                    type="number"
+                    value={formData.duration}
+                    onChange={handleChange}
+                    placeholder="30"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="price">Price (₹)</Label>
+                  <Input
+                    id="price"
+                    name="price"
+                    type="number"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={handleChange}
+                    placeholder="250"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="home_service">Home Service Available</Label>
+                  <Switch
+                    id="home_service"
+                    checked={formData.home_service}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({ ...prev, home_service: checked }))
+                    }
+                  />
+                </div>
+
+                <Button type="submit" className="w-full" disabled={submitting}>
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Adding...
+                    </>
+                  ) : editingService ? (
+                    'Update Service'
+                  ) : (
+                    'Add Service'
+                  )}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {services.length > 0 ? (
@@ -251,7 +277,7 @@ export default function Services() {
                 </div>
                 <div className="flex items-center gap-1">
                   <DollarSign className="w-4 h-4" />
-                  <span>{service.price}</span>
+                  <span>₹{service.price}</span>
                 </div>
               </div>
             </motion.div>

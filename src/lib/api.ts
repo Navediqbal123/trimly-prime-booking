@@ -247,8 +247,29 @@ export interface ServiceData {
   home_service: boolean;
 }
 
+// GET /api/barber/me - Get current barber's profile (to get barber_id)
+export interface BarberProfileData {
+  id: string;
+  shop_name: string;
+  location: string;
+  status: string;
+}
+
+export async function getMyBarberProfile(): Promise<ApiResponse<BarberProfileData>> {
+  return apiCall<BarberProfileData>('/api/barber/me', {
+    method: 'GET',
+  });
+}
+
 export async function getBarberServices(barberId: string): Promise<ApiResponse<ServiceData[]>> {
   return apiCall<ServiceData[]>(`/api/services/${barberId}`, {
+    method: 'GET',
+  });
+}
+
+// GET /api/booking/barber - Barber: get bookings for their shop
+export async function getBarberBookings(): Promise<ApiResponse<BookingData[]>> {
+  return apiCall<BookingData[]>('/api/booking/barber', {
     method: 'GET',
   });
 }
