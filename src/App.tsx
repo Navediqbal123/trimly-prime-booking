@@ -22,6 +22,8 @@ import BarberBookings from "./pages/barber/BarberBookings";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import BarberRequests from "./pages/admin/BarberRequests";
 import AdminBookings from "./pages/admin/AdminBookings";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminBarbers from "./pages/admin/AdminBarbers";
 
 import NotFound from "./pages/NotFound";
 
@@ -54,9 +56,9 @@ const App = () => (
               
               {/* Admin Routes */}
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/users" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/requests" element={<BarberRequests />} />
-              <Route path="/admin/barbers" element={<AdminDashboard />} />
+              <Route path="/admin/barbers" element={<AdminBarbers />} />
               <Route path="/admin/bookings" element={<AdminBookings />} />
             </Route>
 

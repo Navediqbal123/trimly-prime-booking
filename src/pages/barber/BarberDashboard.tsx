@@ -1,52 +1,96 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, DollarSign, Users, TrendingUp, Loader2, AlertCircle, Clock } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getBarberBookings, BookingData } from '@/lib/api';
+import { Loader2, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { 
+  getBarberBookings, 
+  getMyServices, 
+  getMyBarberProfile,
+  BookingData, 
+  ServiceData 
+} from '@/lib/api';
+import { StatsCards } from '@/components/barber/StatsCards';
+import { EarningsChart } from '@/components/barber/EarningsChart';
+import { ServicesTable } from '@/components/barber/ServicesTable';
+import { BookingsTable } from '@/components/barber/BookingsTable';
 
 export default function BarberDashboard() {
   const [bookings, setBookings] = useState<BookingData[]>([]);
+  const [services, setServices] = useState<ServiceData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [servicesLoading, setServicesLoading] = useState(false);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      setLoading(true);
-      setError(null);
-      
-      const response = await getBarberBookings();
-      
-      if (response.success && response.data) {
-        setBookings(response.data);
+  const fetchAllData = async () => {
+    setLoading(true);
+    setError(null);
+    
+    // Check barber profile first
+    const profileResponse = await getMyBarberProfile();
+    
+    if (!profileResponse.success) {
+      if (profileResponse.error?.includes('403') || 
+          profileResponse.error?.toLowerCase().includes('unauthorized') || 
+          profileResponse.error?.toLowerCase().includes('forbidden') ||
+          profileResponse.error?.toLowerCase().includes('pending')) {
+        setError('pending');
       } else {
-        // Check if 403 (not approved barber)
-        if (response.error?.includes('403') || response.error?.toLowerCase().includes('unauthorized') || response.error?.toLowerCase().includes('forbidden')) {
-          setError('pending');
-        } else {
-          setError(response.error || 'Failed to load bookings');
-        }
+        setError(profileResponse.error || 'Failed to load profile');
       }
       setLoading(false);
-    };
+      return;
+    }
 
-    fetchBookings();
+    // If barber status is pending, show waiting message
+    if (profileResponse.data?.status === 'pending') {
+      setError('pending');
+      setLoading(false);
+      return;
+    }
+
+    // Fetch bookings and services in parallel
+    const [bookingsRes, servicesRes] = await Promise.all([
+      getBarberBookings(),
+      getMyServices(),
+    ]);
+
+    if (bookingsRes.success && bookingsRes.data) {
+      setBookings(bookingsRes.data);
+    }
+
+    if (servicesRes.success && servicesRes.data) {
+      setServices(servicesRes.data);
+    }
+
+    setLoading(false);
+  };
+
+  const refreshBookings = async () => {
+    setBookingsLoading(true);
+    const response = await getBarberBookings();
+    if (response.success && response.data) {
+      setBookings(response.data);
+    } else {
+      toast.error(response.error || 'Failed to refresh bookings');
+    }
+    setBookingsLoading(false);
+  };
+
+  const refreshServices = async () => {
+    setServicesLoading(true);
+    const response = await getMyServices();
+    if (response.success && response.data) {
+      setServices(response.data);
+    } else {
+      toast.error(response.error || 'Failed to refresh services');
+    }
+    setServicesLoading(false);
+  };
+
+  useEffect(() => {
+    fetchAllData();
   }, []);
-
-  // Calculate stats from real data
-  const todayStr = new Date().toISOString().split('T')[0];
-  const todayBookings = bookings.filter(b => b.date === todayStr);
-  const confirmedBookings = bookings.filter(b => b.status === 'confirmed' || b.status === 'pending');
-  const totalRevenue = bookings
-    .filter(b => b.status === 'completed')
-    .reduce((sum, b) => sum + (b.service?.price || 0), 0);
-
-  const stats = [
-    { title: 'Total Bookings', value: bookings.length.toString(), icon: Calendar },
-    { title: 'Revenue', value: `₹${totalRevenue}`, icon: DollarSign },
-    { title: 'Upcoming', value: confirmedBookings.length.toString(), icon: Users },
-    { title: 'Today', value: todayBookings.length.toString(), icon: TrendingUp },
-  ];
 
   if (loading) {
     return (
@@ -88,80 +132,50 @@ export default function BarberDashboard() {
   }
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-8">
+    <div className="animate-fade-in space-y-8">
+      <div>
         <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
           Barber <span className="gradient-text">Dashboard</span>
         </h1>
         <p className="text-muted-foreground">Overview of your barbershop performance</p>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Cards */}
+      <StatsCards services={services} bookings={bookings} />
+
+      {/* Earnings Chart */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+        transition={{ delay: 0.2 }}
       >
-        {stats.map((stat) => (
-          <Card key={stat.title} className="border-border">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {stat.title}
-              </CardTitle>
-              <stat.icon className="w-4 h-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-            </CardContent>
-          </Card>
-        ))}
+        <EarningsChart bookings={bookings} />
       </motion.div>
 
-      {/* Today's Bookings */}
+      {/* Services Table */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.3 }}
       >
-        <Card className="border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-primary" />
-              Today's Bookings
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {todayBookings.length > 0 ? (
-              <div className="space-y-4">
-                {todayBookings.map((booking) => (
-                  <div
-                    key={booking.id}
-                    className="flex items-center justify-between p-4 rounded-lg bg-secondary/50"
-                  >
-                    <div>
-                      <p className="font-medium">Customer</p>
-                      <p className="text-sm text-muted-foreground">{booking.service?.name || 'Service'}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">{booking.time_slot}</p>
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full ${
-                          booking.status === 'confirmed'
-                            ? 'bg-green-500/10 text-green-500'
-                            : 'bg-yellow-500/10 text-yellow-500'
-                        }`}
-                      >
-                        {booking.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground text-center py-8">No bookings for today</p>
-            )}
-          </CardContent>
-        </Card>
+        <ServicesTable 
+          services={services} 
+          onRefresh={refreshServices} 
+          loading={servicesLoading} 
+        />
+      </motion.div>
+
+      {/* Bookings Table */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+      >
+        <BookingsTable 
+          bookings={bookings} 
+          onRefresh={refreshBookings} 
+          loading={bookingsLoading} 
+        />
       </motion.div>
     </div>
   );
