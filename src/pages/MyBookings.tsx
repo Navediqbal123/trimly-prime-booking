@@ -100,7 +100,7 @@ export default function MyBookings() {
             </div>
             {booking.service?.price && (
               <div className="flex items-center gap-1">
-                <span className="font-medium text-foreground">${booking.service.price}</span>
+                <span className="font-medium text-foreground">₹{booking.service.price}</span>
               </div>
             )}
           </div>
