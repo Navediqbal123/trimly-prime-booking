@@ -273,3 +273,51 @@ export async function getBarberBookings(): Promise<ApiResponse<BookingData[]>> {
     method: 'GET',
   });
 }
+
+// GET /api/barber/my-services - Get barber's own services
+export async function getMyServices(): Promise<ApiResponse<ServiceData[]>> {
+  return apiCall<ServiceData[]>('/api/barber/my-services', {
+    method: 'GET',
+  });
+}
+
+// PATCH /api/barber/service/:id - Edit a service
+export interface UpdateServiceData {
+  name?: string;
+  price?: number;
+  duration?: number;
+  home_service?: boolean;
+}
+
+export async function updateService(serviceId: string, data: UpdateServiceData): Promise<ApiResponse> {
+  return apiCall(`/api/barber/service/${serviceId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+// PATCH /api/booking/cancel/:id - Cancel a booking
+export async function cancelBooking(bookingId: string): Promise<ApiResponse> {
+  return apiCall(`/api/booking/cancel/${bookingId}`, {
+    method: 'PATCH',
+  });
+}
+
+// ==========================================
+// ADMIN ENDPOINTS
+// ==========================================
+
+// GET /api/admin/users - Admin: get all users
+export interface UserData {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  created_at: string;
+}
+
+export async function getAdminUsers(): Promise<ApiResponse<UserData[]>> {
+  return apiCall<UserData[]>('/api/admin/users', {
+    method: 'GET',
+  });
+}
