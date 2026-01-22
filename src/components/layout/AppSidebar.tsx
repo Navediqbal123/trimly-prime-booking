@@ -57,13 +57,9 @@ export function AppSidebar() {
   const location = useLocation();
 
   const getNavItems = (): NavItem[] => {
-    // Show barber menu if user is an approved barber
-    if (isBarber) {
+    // Show barber menu if user is an approved barber OR pending barber
+    if (isBarber || isBarberPending) {
       return barberNavItems;
-    }
-    // Filter out "Become a Barber" for barber_pending users - show waiting status
-    if (isBarberPending) {
-      return userNavItems.filter(item => item.href !== '/become-barber');
     }
     // For regular users (after barber status is checked), show full menu
     return userNavItems;
