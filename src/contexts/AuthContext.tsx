@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { login as apiLogin, getAuthToken, removeAuthToken, isAuthenticated } from '@/lib/api';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { login as apiLogin, getAuthToken, removeAuthToken, getMyBarberProfile } from '@/lib/api';
 
 // Super admin email - special handling
 const SUPER_ADMIN_EMAIL = 'navedahmad9012@gmail.com';
@@ -18,10 +18,12 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   updateLocalRole: (role: UserRole) => void;
+  refreshBarberStatus: () => Promise<void>;
   isSuperAdmin: boolean;
   isAdmin: boolean;
   isBarber: boolean;
   isBarberPending: boolean;
+  barberStatusChecked: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -54,16 +56,47 @@ function decodeToken(token: string): { email?: string; role?: string } | null {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [barberStatusChecked, setBarberStatusChecked] = useState(false);
+
+  // Check barber status from backend API
+  const refreshBarberStatus = useCallback(async () => {
+    if (!user) return;
+    
+    // Skip for admins
+    if (user.email === SUPER_ADMIN_EMAIL || user.role === 'admin' || user.role === 'super_admin') {
+      setBarberStatusChecked(true);
+      return;
+    }
+
+    try {
+      const response = await getMyBarberProfile();
+      
+      if (response.success && response.data) {
+        const barberStatus = response.data.status;
+        
+        if (barberStatus === 'approved') {
+          setUser(prev => prev ? { ...prev, role: 'barber' } : null);
+        } else if (barberStatus === 'pending') {
+          setUser(prev => prev ? { ...prev, role: 'barber_pending' } : null);
+        }
+      }
+      // If no barber record, keep current role (user)
+    } catch (error) {
+      console.error('Failed to check barber status:', error);
+    } finally {
+      setBarberStatusChecked(true);
+    }
+  }, [user]);
 
   // Initialize user from stored token on mount
   useEffect(() => {
-    const initAuth = () => {
+    const initAuth = async () => {
       const token = getAuthToken();
       if (token) {
         const decoded = decodeToken(token);
         if (decoded?.email) {
           const email = decoded.email;
-          // Determine role - super admin gets special treatment
+          // Determine initial role - super admin gets special treatment
           const role: UserRole = email === SUPER_ADMIN_EMAIL 
             ? 'super_admin' 
             : (decoded.role as UserRole) || 'user';
@@ -81,8 +114,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initAuth();
   }, []);
 
+  // Check barber status after user is set
+  useEffect(() => {
+    if (user && !barberStatusChecked) {
+      refreshBarberStatus();
+    }
+  }, [user, barberStatusChecked, refreshBarberStatus]);
+
   const signIn = async (email: string, password: string) => {
     try {
+      setBarberStatusChecked(false);
       const result = await apiLogin({ email, password });
 
       if (!result.success) {
@@ -113,6 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     removeAuthToken();
     setUser(null);
+    setBarberStatusChecked(false);
   };
 
   // Update local role (for UI purposes after becoming barber, etc.)
@@ -135,10 +177,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signIn,
         signOut,
         updateLocalRole,
+        refreshBarberStatus,
         isSuperAdmin,
         isAdmin,
         isBarber,
         isBarberPending,
+        barberStatusChecked,
       }}
     >
       {children}
