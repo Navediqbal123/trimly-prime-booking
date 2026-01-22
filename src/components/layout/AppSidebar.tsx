@@ -36,7 +36,7 @@ const userNavItems: NavItem[] = [
 ];
 
 const barberNavItems: NavItem[] = [
-  { title: 'Dashboard', href: '/barber/dashboard', icon: LayoutDashboard },
+  { title: 'Barber Hub', href: '/barber/dashboard', icon: LayoutDashboard },
   { title: 'My Shop', href: '/barber/shop', icon: Store },
   { title: 'Services', href: '/barber/services', icon: Settings },
   { title: 'Bookings', href: '/barber/bookings', icon: Calendar },
