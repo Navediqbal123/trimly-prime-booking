@@ -53,17 +53,19 @@ const adminNavItems: NavItem[] = [
 
 export function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending } = useAuth();
+  const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending, barberStatusChecked } = useAuth();
   const location = useLocation();
 
   const getNavItems = (): NavItem[] => {
+    // Show barber menu if user is an approved barber
     if (isBarber) {
       return barberNavItems;
     }
-    // Filter out "Become a Barber" for barber_pending users
+    // Filter out "Become a Barber" for barber_pending users - show waiting status
     if (isBarberPending) {
       return userNavItems.filter(item => item.href !== '/become-barber');
     }
+    // For regular users (after barber status is checked), show full menu
     return userNavItems;
   };
 

@@ -5,7 +5,7 @@ import { Calendar, Clock, CheckCircle, XCircle, AlertCircle, Loader2, RefreshCw 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { getMyBookings, BookingData } from '@/lib/api';
+import { getMyBookings, cancelBooking, BookingData } from '@/lib/api';
 import { toast } from 'sonner';
 
 const statusConfig = {
@@ -36,6 +36,7 @@ export default function MyBookings() {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [bookings, setBookings] = useState<BookingData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -47,6 +48,19 @@ export default function MyBookings() {
       toast.error(response.error || 'Failed to fetch bookings');
     }
     setLoading(false);
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    setCancellingId(bookingId);
+    const response = await cancelBooking(bookingId);
+    
+    if (response.success) {
+      toast.success('Booking cancelled successfully');
+      fetchBookings(); // Refresh list
+    } else {
+      toast.error(response.error || 'Failed to cancel booking');
+    }
+    setCancellingId(null);
   };
 
   useEffect(() => {
@@ -107,11 +121,24 @@ export default function MyBookings() {
 
           {(booking.status === 'pending' || booking.status === 'confirmed') && (
             <div className="flex gap-2 mt-4">
-              <Button variant="outline" size="sm">
-                Reschedule
-              </Button>
-              <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10">
-                Cancel
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-destructive hover:bg-destructive/10"
+                onClick={() => handleCancelBooking(booking.id)}
+                disabled={cancellingId === booking.id}
+              >
+                {cancellingId === booking.id ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="w-4 h-4 mr-1" />
+                    Cancel
+                  </>
+                )}
               </Button>
             </div>
           )}

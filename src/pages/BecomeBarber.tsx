@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import { registerBarber } from '@/lib/api';
 
 export default function BecomeBarber() {
-  const { updateLocalRole, isBarberPending } = useAuth();
+  const { updateLocalRole, isBarberPending, refreshBarberStatus } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   // ONLY 2 fields as required by backend: shop_name and location
@@ -78,6 +78,8 @@ export default function BecomeBarber() {
     if (response.success) {
       // Update local role to barber_pending
       updateLocalRole('barber_pending');
+      // Refresh barber status from backend
+      await refreshBarberStatus();
       toast.success('Request submitted, waiting for admin approval');
     } else {
       toast.error(response.error || 'Failed to submit application');
