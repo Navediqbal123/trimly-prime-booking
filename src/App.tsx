@@ -1,10 +1,11 @@
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -37,46 +38,59 @@ const queryClient = new QueryClient({
   },
 });
 
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/auth" element={<Auth />} />
+      
+      <Route 
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/discover" element={<DiscoverBarbers />} />
+        <Route path="/bookings" element={<MyBookings />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/become-barber" element={<BecomeBarber />} />
+        <Route path="/book/:shopId" element={<BookingPage />} />
+        
+        {/* Barber Routes */}
+        <Route path="/barber/dashboard" element={<BarberDashboard />} />
+        <Route path="/barber/shop" element={<MyShop />} />
+        <Route path="/barber/services" element={<Services />} />
+        <Route path="/barber/bookings" element={<BarberBookings />} />
+        
+        {/* Admin Routes */}
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/requests" element={<BarberRequests />} />
+        <Route path="/admin/barbers" element={<AdminBarbers />} />
+        <Route path="/admin/bookings" element={<AdminBookings />} />
+      </Route>
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
+
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
           <AuthProvider>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              
-              <Route element={<MainLayout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/discover" element={<DiscoverBarbers />} />
-                <Route path="/bookings" element={<MyBookings />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/become-barber" element={<BecomeBarber />} />
-                <Route path="/book/:shopId" element={<BookingPage />} />
-                
-                {/* Barber Routes */}
-                <Route path="/barber/dashboard" element={<BarberDashboard />} />
-                <Route path="/barber/shop" element={<MyShop />} />
-                <Route path="/barber/services" element={<Services />} />
-                <Route path="/barber/bookings" element={<BarberBookings />} />
-                
-                {/* Admin Routes */}
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/users" element={<AdminUsers />} />
-                <Route path="/admin/requests" element={<BarberRequests />} />
-                <Route path="/admin/barbers" element={<AdminBarbers />} />
-                <Route path="/admin/bookings" element={<AdminBookings />} />
-              </Route>
-
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <BrowserRouter>
+              <Sonner />
+              <AppRoutes />
+            </BrowserRouter>
           </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
