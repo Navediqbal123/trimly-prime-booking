@@ -1,7 +1,11 @@
 // API service for backend endpoints
+import { toast } from 'sonner';
+
 const BASE_URL = 'https://saloon-backend-gp4v.onrender.com';
 
 const TOKEN_KEY = 'auth_token';
+const EXPIRES_KEY = 'auth_expires_at';
+const USER_KEY = 'auth_user';
 
 interface ApiResponse<T = unknown> {
   success: boolean;
@@ -9,33 +13,104 @@ interface ApiResponse<T = unknown> {
   error?: string;
 }
 
+// ==========================================
+// TOKEN MANAGEMENT
+// ==========================================
+
 // Get stored token
 export function getAuthToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
 
-// Store token
-export function setAuthToken(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token);
+// Get token expiry timestamp
+export function getTokenExpiry(): number | null {
+  const expiry = localStorage.getItem(EXPIRES_KEY);
+  return expiry ? parseInt(expiry, 10) : null;
 }
 
-// Remove token
+// Get stored user
+export function getStoredUser(): { email: string; id: string } | null {
+  const user = localStorage.getItem(USER_KEY);
+  if (user) {
+    try {
+      return JSON.parse(user);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+// Store token with expiry
+export function setAuthToken(token: string, expiresAt?: number): void {
+  localStorage.setItem(TOKEN_KEY, token);
+  if (expiresAt) {
+    localStorage.setItem(EXPIRES_KEY, expiresAt.toString());
+  }
+}
+
+// Store user data
+export function setStoredUser(user: { email: string; id: string }): void {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
+// Remove all auth data
 export function removeAuthToken(): void {
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(EXPIRES_KEY);
+  localStorage.removeItem(USER_KEY);
 }
 
-// Check if user is logged in
+// Check if token is expired
+export function isTokenExpired(): boolean {
+  const expiry = getTokenExpiry();
+  if (!expiry) return true;
+  return Date.now() >= expiry;
+}
+
+// Check if user is logged in with valid token
 export function isAuthenticated(): boolean {
-  return !!getAuthToken();
+  const token = getAuthToken();
+  if (!token) return false;
+  return !isTokenExpired();
 }
 
-// Helper function for API calls with Authorization header
+// Handle session expiry - centralized logout
+export function handleSessionExpiry(showToast = true): void {
+  removeAuthToken();
+  if (showToast) {
+    toast.error('Session expired. Please login again.');
+  }
+  // Redirect to auth page
+  if (window.location.pathname !== '/auth') {
+    window.location.href = '/auth';
+  }
+}
+
+// ==========================================
+// API INTERCEPTOR
+// ==========================================
+
 async function apiCall<T>(
   endpoint: string,
   options: RequestInit = {},
   requiresAuth = true
 ): Promise<ApiResponse<T>> {
   try {
+    // Pre-flight check for auth required calls
+    if (requiresAuth) {
+      const token = getAuthToken();
+      if (!token) {
+        handleSessionExpiry(false);
+        return { success: false, error: 'No authentication token' };
+      }
+      
+      if (isTokenExpired()) {
+        handleSessionExpiry(true);
+        return { success: false, error: 'Session expired' };
+      }
+    }
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
@@ -54,15 +129,59 @@ async function apiCall<T>(
       headers,
     });
 
+    // Handle 401 Unauthorized responses
+    if (response.status === 401) {
+      handleSessionExpiry(true);
+      return { success: false, error: 'Session expired' };
+    }
+
     const data = await response.json();
 
+    // Check for token-related error messages
     if (!response.ok) {
-      return { success: false, error: data.message || data.error || 'Request failed' };
+      const errorMessage = data.message || data.error || 'Request failed';
+      
+      // Check for token expiry/invalid messages
+      if (
+        errorMessage.toLowerCase().includes('invalid') && 
+        (errorMessage.toLowerCase().includes('token') || errorMessage.toLowerCase().includes('expired'))
+      ) {
+        handleSessionExpiry(true);
+        return { success: false, error: 'Session expired' };
+      }
+      
+      if (errorMessage.toLowerCase().includes('unauthorized')) {
+        handleSessionExpiry(true);
+        return { success: false, error: 'Session expired' };
+      }
+
+      return { success: false, error: errorMessage };
     }
 
     return { success: true, data };
   } catch (error) {
+    console.error('API call error:', error);
     return { success: false, error: 'Network error. Please try again.' };
+  }
+}
+
+// ==========================================
+// JWT DECODER
+// ==========================================
+
+export function decodeJWT(token: string): { id?: string; email?: string; role?: string; exp?: number; iat?: number } | null {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
   }
 }
 
@@ -70,7 +189,6 @@ async function apiCall<T>(
 // AUTH ENDPOINTS
 // ==========================================
 
-// POST /api/auth/login
 export interface LoginData {
   email: string;
   password: string;
@@ -86,9 +204,24 @@ export async function login(data: LoginData): Promise<ApiResponse<LoginResponse>
     body: JSON.stringify(data),
   }, false);
 
-  // Store token on successful login
+  // Store token and user data on successful login
   if (result.success && result.data?.token) {
-    setAuthToken(result.data.token);
+    const token = result.data.token;
+    const decoded = decodeJWT(token);
+    
+    // Calculate expiry - use exp from JWT or default to 7 days
+    let expiresAt: number;
+    if (decoded?.exp) {
+      expiresAt = decoded.exp * 1000; // Convert seconds to ms
+    } else {
+      expiresAt = Date.now() + (7 * 24 * 60 * 60 * 1000); // 7 days default
+    }
+    
+    setAuthToken(token, expiresAt);
+    
+    if (decoded?.email && decoded?.id) {
+      setStoredUser({ email: decoded.email, id: decoded.id });
+    }
   }
 
   return result;
@@ -98,7 +231,6 @@ export async function login(data: LoginData): Promise<ApiResponse<LoginResponse>
 // BARBER ENDPOINTS
 // ==========================================
 
-// POST /api/barber/register
 export interface BarberRegisterData {
   shop_name: string;
   location: string;
@@ -116,14 +248,12 @@ export async function registerBarber(data: BarberRegisterData): Promise<ApiRespo
   });
 }
 
-// POST /api/barber/approve/:id
 export async function approveBarber(barberId: string): Promise<ApiResponse> {
   return apiCall(`/api/barber/approve/${barberId}`, {
     method: 'POST',
   });
 }
 
-// POST /api/barber/add-service
 export interface AddServiceData {
   name: string;
   price: number;
@@ -142,7 +272,6 @@ export async function addService(data: AddServiceData): Promise<ApiResponse> {
 // BOOKING ENDPOINTS
 // ==========================================
 
-// POST /api/booking/create
 export interface CreateBookingData {
   barber_id: string;
   service_id: string;
@@ -158,7 +287,6 @@ export async function createBooking(data: CreateBookingData): Promise<ApiRespons
   });
 }
 
-// GET /api/booking/my - Get user's bookings
 export interface BookingData {
   id: string;
   barber_id: string;
@@ -183,7 +311,6 @@ export async function getMyBookings(): Promise<ApiResponse<BookingData[]>> {
   });
 }
 
-// GET /api/booking/all - Admin: get all bookings
 export async function getAllBookings(): Promise<ApiResponse<BookingData[]>> {
   return apiCall<BookingData[]>('/api/booking/all', {
     method: 'GET',
@@ -194,7 +321,6 @@ export async function getAllBookings(): Promise<ApiResponse<BookingData[]>> {
 // BARBER FETCH ENDPOINTS
 // ==========================================
 
-// GET /api/barber/pending - Admin: get pending barber requests
 export interface PendingBarberData {
   id: string;
   user_id: string;
@@ -214,7 +340,6 @@ export async function getPendingBarbers(): Promise<ApiResponse<PendingBarberData
   });
 }
 
-// GET /api/barber/approved - Get approved barbers for booking
 export interface ApprovedBarberData {
   id: string;
   shop_name: string;
@@ -237,7 +362,6 @@ export async function getApprovedBarbers(): Promise<ApiResponse<ApprovedBarberDa
 // SERVICES ENDPOINTS
 // ==========================================
 
-// GET /api/services/:barber_id - Get services for a barber
 export interface ServiceData {
   id: string;
   barber_id: string;
@@ -247,7 +371,6 @@ export interface ServiceData {
   home_service: boolean;
 }
 
-// GET /api/barber/me - Get current barber's profile (to get barber_id)
 export interface BarberProfileData {
   id: string;
   shop_name: string;
@@ -267,21 +390,18 @@ export async function getBarberServices(barberId: string): Promise<ApiResponse<S
   });
 }
 
-// GET /api/booking/barber - Barber: get bookings for their shop
 export async function getBarberBookings(): Promise<ApiResponse<BookingData[]>> {
   return apiCall<BookingData[]>('/api/booking/barber', {
     method: 'GET',
   });
 }
 
-// GET /api/barber/my-services - Get barber's own services
 export async function getMyServices(): Promise<ApiResponse<ServiceData[]>> {
   return apiCall<ServiceData[]>('/api/barber/my-services', {
     method: 'GET',
   });
 }
 
-// PATCH /api/barber/service/:id - Edit a service
 export interface UpdateServiceData {
   name?: string;
   price?: number;
@@ -296,7 +416,6 @@ export async function updateService(serviceId: string, data: UpdateServiceData):
   });
 }
 
-// PATCH /api/booking/cancel/:id - Cancel a booking
 export async function cancelBooking(bookingId: string): Promise<ApiResponse> {
   return apiCall(`/api/booking/cancel/${bookingId}`, {
     method: 'PATCH',
@@ -307,7 +426,6 @@ export async function cancelBooking(bookingId: string): Promise<ApiResponse> {
 // ADMIN ENDPOINTS
 // ==========================================
 
-// GET /api/admin/users - Admin: get all users
 export interface UserData {
   id: string;
   email: string;
