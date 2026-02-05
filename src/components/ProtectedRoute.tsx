@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { ProtectedUserProvider } from '@/contexts/ProtectedUserContext';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
@@ -7,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut, isSuperAdmin, isAdmin, isBarber, isBarberPending, barberStatusChecked } = useAuth();
   const location = useLocation();
 
   // Show loader while auth is being checked
@@ -24,5 +25,18 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  return <>{children}</>;
+  // Provide user data to children via context (so they don't need to call useAuth)
+  return (
+    <ProtectedUserProvider value={{ 
+      user, 
+      signOut, 
+      isSuperAdmin, 
+      isAdmin, 
+      isBarber, 
+      isBarberPending, 
+      barberStatusChecked 
+    }}>
+      {children}
+    </ProtectedUserProvider>
+  );
 }
