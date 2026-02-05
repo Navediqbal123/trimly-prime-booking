@@ -75,15 +75,11 @@ export function isAuthenticated(): boolean {
   return !isTokenExpired();
 }
 
-// Handle session expiry - centralized logout
+// Handle session expiry - centralized logout (no redirect, let components handle it)
 export function handleSessionExpiry(showToast = true): void {
   removeAuthToken();
   if (showToast) {
     toast.error('Session expired. Please login again.');
-  }
-  // Redirect to auth page
-  if (window.location.pathname !== '/auth') {
-    window.location.href = '/auth';
   }
 }
 
