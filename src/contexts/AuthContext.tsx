@@ -6,9 +6,7 @@ import {
   getMyBarberProfile,
   isTokenExpired,
   getTokenExpiry,
-  decodeJWT,
-  handleSessionExpiry,
-  getStoredUser
+  decodeJWT
 } from '@/lib/api';
 
 // Super admin email - special handling
@@ -68,7 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // If already expired, logout immediately
     if (timeUntilExpiry <= 0) {
-      handleSessionExpiry(true);
+      removeAuthToken();
       setUser(null);
       return;
     }
@@ -77,8 +75,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const logoutTime = Math.max(timeUntilExpiry - 10000, 0);
     
     logoutTimerRef.current = setTimeout(() => {
-      handleSessionExpiry(true);
+      removeAuthToken();
       setUser(null);
+      // Toast will be shown by MainLayout when it detects no user
     }, logoutTime);
   }, []);
 
@@ -123,9 +122,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
-      // Check if token is expired
+      // Check if token is expired - just clear, don't show toast on initial load
       if (isTokenExpired()) {
-        handleSessionExpiry(false); // Don't show toast on initial load
+        removeAuthToken();
         setLoading(false);
         return;
       }

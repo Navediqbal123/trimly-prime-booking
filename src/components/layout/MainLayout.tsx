@@ -1,25 +1,27 @@
-import { Outlet, Navigate, useLocation } from 'react-router-dom';
+import { Outlet, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AppSidebar } from './AppSidebar';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
-import { isAuthenticated, isTokenExpired, handleSessionExpiry } from '@/lib/api';
+import { isAuthenticated, isTokenExpired, removeAuthToken } from '@/lib/api';
+import { toast } from 'sonner';
 
 export function MainLayout() {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
-  // Protected route guard - check on every render and route change
+  // Protected route guard - check on every route change
   useEffect(() => {
-    if (!loading) {
+    if (!loading && user) {
       // Double-check token validity on route changes
-      if (!isAuthenticated()) {
-        if (isTokenExpired()) {
-          handleSessionExpiry(true);
-        }
+      if (isTokenExpired()) {
+        removeAuthToken();
+        toast.error('Session expired. Please login again.');
+        navigate('/auth', { replace: true });
       }
     }
-  }, [location.pathname, loading]);
+  }, [location.pathname, loading, user, navigate]);
 
   if (loading) {
     return (
@@ -29,7 +31,7 @@ export function MainLayout() {
     );
   }
 
-  // Additional auth check before rendering
+  // Auth check - redirect if not authenticated
   if (!user || !isAuthenticated()) {
     return <Navigate to="/auth" replace />;
   }
