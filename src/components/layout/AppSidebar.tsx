@@ -17,7 +17,7 @@ import {
   X,
   ChevronRight,
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -53,7 +53,7 @@ const adminNavItems: NavItem[] = [
 
 export function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending, barberStatusChecked } = useAuth();
+  const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending } = useProtectedUser();
   const location = useLocation();
 
   const getNavItems = (): NavItem[] => {
