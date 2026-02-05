@@ -35,11 +35,11 @@ interface AuthContextType {
   barberStatusChecked: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === null) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
@@ -49,6 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [barberStatusChecked, setBarberStatusChecked] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const logoutTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Setup auto-logout timer
@@ -77,7 +78,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logoutTimerRef.current = setTimeout(() => {
       removeAuthToken();
       setUser(null);
-      // Toast will be shown by MainLayout when it detects no user
     }, logoutTime);
   }, []);
 
@@ -103,7 +103,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(prev => prev ? { ...prev, role: 'barber_pending' } : null);
         }
       }
-      // If no barber record, keep current role (user)
     } catch (error) {
       console.error('Failed to check barber status:', error);
     } finally {
@@ -114,44 +113,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Initialize user from stored token on mount
   useEffect(() => {
     const initAuth = () => {
-      const token = getAuthToken();
-      
-      // No token - not logged in
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-      
-      // Check if token is expired - just clear, don't show toast on initial load
-      if (isTokenExpired()) {
-        removeAuthToken();
-        setLoading(false);
-        return;
-      }
-      
-      // Decode token and set user
-      const decoded = decodeJWT(token);
-      if (decoded?.email) {
-        const email = decoded.email;
-        const role: UserRole = email === SUPER_ADMIN_EMAIL 
-          ? 'super_admin' 
-          : (decoded.role as UserRole) || 'user';
+      try {
+        const token = getAuthToken();
         
-        setUser({
-          email,
-          full_name: email.split('@')[0],
-          role,
-          id: decoded.id,
-        });
+        // No token - not logged in
+        if (!token) {
+          setUser(null);
+          setLoading(false);
+          setIsInitialized(true);
+          return;
+        }
         
-        // Setup auto-logout timer
-        setupAutoLogoutTimer();
-      } else {
-        // Invalid token format
+        // Check if token is expired
+        if (isTokenExpired()) {
+          removeAuthToken();
+          setUser(null);
+          setLoading(false);
+          setIsInitialized(true);
+          return;
+        }
+        
+        // Decode token and set user
+        const decoded = decodeJWT(token);
+        if (decoded?.email) {
+          const email = decoded.email;
+          const role: UserRole = email === SUPER_ADMIN_EMAIL 
+            ? 'super_admin' 
+            : (decoded.role as UserRole) || 'user';
+          
+          setUser({
+            email,
+            full_name: email.split('@')[0],
+            role,
+            id: decoded.id,
+          });
+          
+          // Setup auto-logout timer
+          setupAutoLogoutTimer();
+        } else {
+          // Invalid token format
+          removeAuthToken();
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
         removeAuthToken();
+        setUser(null);
+      } finally {
+        setLoading(false);
+        setIsInitialized(true);
       }
-      
-      setLoading(false);
     };
 
     initAuth();
@@ -166,10 +177,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Check barber status after user is set
   useEffect(() => {
-    if (user && !barberStatusChecked) {
+    if (user && !barberStatusChecked && isInitialized) {
       refreshBarberStatus();
     }
-  }, [user, barberStatusChecked, refreshBarberStatus]);
+  }, [user, barberStatusChecked, refreshBarberStatus, isInitialized]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -228,6 +239,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isAdmin = isSuperAdmin || user?.role === 'admin';
   const isBarber = user?.role === 'barber';
   const isBarberPending = user?.role === 'barber_pending';
+
+  // Don't render children until auth is initialized
+  if (!isInitialized) {
+    return null;
+  }
 
   return (
     <AuthContext.Provider
