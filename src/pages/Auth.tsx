@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Scissors, Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { isAuthenticated } from '@/lib/api';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -24,8 +25,16 @@ export default function Auth() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const { signIn, user } = useAuth();
+  const navigate = useNavigate();
 
-  if (user) {
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user && isAuthenticated()) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
+
+  if (user && isAuthenticated()) {
     return <Navigate to="/dashboard" replace />;
   }
 

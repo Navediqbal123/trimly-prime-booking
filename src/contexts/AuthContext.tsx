@@ -1,5 +1,15 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { login as apiLogin, getAuthToken, removeAuthToken, getMyBarberProfile } from '@/lib/api';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { 
+  login as apiLogin, 
+  getAuthToken, 
+  removeAuthToken, 
+  getMyBarberProfile,
+  isTokenExpired,
+  getTokenExpiry,
+  decodeJWT,
+  handleSessionExpiry,
+  getStoredUser
+} from '@/lib/api';
 
 // Super admin email - special handling
 const SUPER_ADMIN_EMAIL = 'navedahmad9012@gmail.com';
@@ -10,6 +20,7 @@ export interface UserProfile {
   email: string;
   full_name?: string;
   role: UserRole;
+  id?: string;
 }
 
 interface AuthContextType {
@@ -36,27 +47,40 @@ export const useAuth = () => {
   return context;
 };
 
-// Helper to decode JWT payload (without verification - backend handles that)
-function decodeToken(token: string): { email?: string; role?: string } | null {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch {
-    return null;
-  }
-}
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [barberStatusChecked, setBarberStatusChecked] = useState(false);
+  const logoutTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Setup auto-logout timer
+  const setupAutoLogoutTimer = useCallback(() => {
+    // Clear any existing timer
+    if (logoutTimerRef.current) {
+      clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = null;
+    }
+
+    const expiresAt = getTokenExpiry();
+    if (!expiresAt) return;
+
+    const timeUntilExpiry = expiresAt - Date.now();
+    
+    // If already expired, logout immediately
+    if (timeUntilExpiry <= 0) {
+      handleSessionExpiry(true);
+      setUser(null);
+      return;
+    }
+
+    // Set timer for auto-logout (trigger 10 seconds before actual expiry for safety)
+    const logoutTime = Math.max(timeUntilExpiry - 10000, 0);
+    
+    logoutTimerRef.current = setTimeout(() => {
+      handleSessionExpiry(true);
+      setUser(null);
+    }, logoutTime);
+  }, []);
 
   // Check barber status from backend API
   const refreshBarberStatus = useCallback(async () => {
@@ -90,29 +114,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Initialize user from stored token on mount
   useEffect(() => {
-    const initAuth = async () => {
+    const initAuth = () => {
       const token = getAuthToken();
-      if (token) {
-        const decoded = decodeToken(token);
-        if (decoded?.email) {
-          const email = decoded.email;
-          // Determine initial role - super admin gets special treatment
-          const role: UserRole = email === SUPER_ADMIN_EMAIL 
-            ? 'super_admin' 
-            : (decoded.role as UserRole) || 'user';
-          
-          setUser({
-            email,
-            full_name: email.split('@')[0],
-            role,
-          });
-        }
+      
+      // No token - not logged in
+      if (!token) {
+        setLoading(false);
+        return;
       }
+      
+      // Check if token is expired
+      if (isTokenExpired()) {
+        handleSessionExpiry(false); // Don't show toast on initial load
+        setLoading(false);
+        return;
+      }
+      
+      // Decode token and set user
+      const decoded = decodeJWT(token);
+      if (decoded?.email) {
+        const email = decoded.email;
+        const role: UserRole = email === SUPER_ADMIN_EMAIL 
+          ? 'super_admin' 
+          : (decoded.role as UserRole) || 'user';
+        
+        setUser({
+          email,
+          full_name: email.split('@')[0],
+          role,
+          id: decoded.id,
+        });
+        
+        // Setup auto-logout timer
+        setupAutoLogoutTimer();
+      } else {
+        // Invalid token format
+        removeAuthToken();
+      }
+      
       setLoading(false);
     };
 
     initAuth();
-  }, []);
+
+    // Cleanup timer on unmount
+    return () => {
+      if (logoutTimerRef.current) {
+        clearTimeout(logoutTimerRef.current);
+      }
+    };
+  }, [setupAutoLogoutTimer]);
 
   // Check barber status after user is set
   useEffect(() => {
@@ -133,7 +184,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Decode token to get user info
       const token = result.data?.token;
       if (token) {
-        const decoded = decodeToken(token);
+        const decoded = decodeJWT(token);
         const role: UserRole = email === SUPER_ADMIN_EMAIL 
           ? 'super_admin' 
           : (decoded?.role as UserRole) || 'user';
@@ -142,7 +193,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email,
           full_name: decoded?.email?.split('@')[0] || email.split('@')[0],
           role,
+          id: decoded?.id,
         });
+
+        // Setup auto-logout timer for new session
+        setupAutoLogoutTimer();
       }
 
       return { error: null };
@@ -152,6 +207,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    // Clear logout timer
+    if (logoutTimerRef.current) {
+      clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = null;
+    }
+    
     removeAuthToken();
     setUser(null);
     setBarberStatusChecked(false);
