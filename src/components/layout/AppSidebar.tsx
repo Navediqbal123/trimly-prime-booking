@@ -16,34 +16,38 @@ import {
   Menu,
   X,
   ChevronRight,
+  ChevronDown,
+  Clock,
 } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-interface NavItem {
+interface NavItemType {
   title: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const userNavItems: NavItem[] = [
+// Base user nav items (without Become a Barber - that's conditional)
+const baseUserNavItems: NavItemType[] = [
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { title: 'Discover Barbers', href: '/discover', icon: Search },
   { title: 'My Bookings', href: '/bookings', icon: Calendar },
   { title: 'My Profile', href: '/profile', icon: User },
-  { title: 'Become a Barber', href: '/become-barber', icon: Scissors },
 ];
 
-const barberNavItems: NavItem[] = [
-  { title: 'Barber Hub', href: '/barber/dashboard', icon: LayoutDashboard },
+// Barber Hub nested items
+const barberHubItems: NavItemType[] = [
+  { title: 'Dashboard', href: '/barber/dashboard', icon: LayoutDashboard },
   { title: 'My Shop', href: '/barber/shop', icon: Store },
   { title: 'Services', href: '/barber/services', icon: Settings },
   { title: 'Bookings', href: '/barber/bookings', icon: Calendar },
   { title: 'Profile', href: '/profile', icon: User },
 ];
 
-const adminNavItems: NavItem[] = [
+const adminNavItems: NavItemType[] = [
   { title: 'Admin Dashboard', href: '/admin/dashboard', icon: Shield },
   { title: 'Users', href: '/admin/users', icon: Users },
   { title: 'Barber Requests', href: '/admin/requests', icon: ClipboardList },
@@ -53,21 +57,14 @@ const adminNavItems: NavItem[] = [
 
 export function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [barberHubOpen, setBarberHubOpen] = useState(true);
   const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending } = useProtectedUser();
   const location = useLocation();
 
-  const getNavItems = (): NavItem[] => {
-    // Show barber menu if user is an approved barber OR pending barber
-    if (isBarber || isBarberPending) {
-      return barberNavItems;
-    }
-    // For regular users (after barber status is checked), show full menu
-    return userNavItems;
-  };
+  // Determine user state
+  const hasNoBarberRecord = !isBarber && !isBarberPending;
 
-  const navItems = getNavItems();
-
-  const NavLink = ({ item }: { item: NavItem }) => {
+  const NavLink = ({ item, nested = false }: { item: NavItemType; nested?: boolean }) => {
     const isActive = location.pathname === item.href;
     
     return (
@@ -75,17 +72,20 @@ export function AppSidebar() {
         to={item.href}
         onClick={() => setIsOpen(false)}
         className={cn(
-          'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+          'flex items-center gap-3 rounded-lg transition-all duration-200',
           'hover:bg-secondary/80 group',
+          nested ? 'px-4 py-2.5 ml-4' : 'px-4 py-3',
           isActive && 'bg-primary/10 text-primary glow-primary'
         )}
       >
         <item.icon className={cn(
-          'w-5 h-5 transition-colors',
+          'transition-colors',
+          nested ? 'w-4 h-4' : 'w-5 h-5',
           isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
         )} />
         <span className={cn(
-          'font-medium transition-colors',
+          'transition-colors',
+          nested ? 'text-sm' : 'font-medium',
           isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
         )}>
           {item.title}
@@ -95,6 +95,26 @@ export function AppSidebar() {
         )}
       </Link>
     );
+  };
+
+  // Collapsible animation variants
+  const collapsibleVariants = {
+    open: {
+      height: 'auto',
+      opacity: 1,
+      transition: {
+        height: { duration: 0.25, ease: [0.4, 0, 0.2, 1] as const },
+        opacity: { duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }
+      }
+    },
+    closed: {
+      height: 0,
+      opacity: 0,
+      transition: {
+        height: { duration: 0.25, ease: [0.4, 0, 0.2, 1] as const },
+        opacity: { duration: 0.15, ease: [0.4, 0, 0.2, 1] as const }
+      }
+    }
   };
 
   return (
@@ -155,7 +175,7 @@ export function AppSidebar() {
             <div className="flex-1 min-w-0">
               <p className="font-medium truncate">{user?.full_name || 'User'}</p>
               <p className="text-xs text-muted-foreground truncate capitalize">
-                {user?.role?.replace('_', ' ') || 'User'}
+                {isBarber ? 'Barber' : isBarberPending ? 'Pending Barber' : user?.role?.replace('_', ' ') || 'User'}
               </p>
             </div>
           </div>
@@ -163,9 +183,78 @@ export function AppSidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
+          {/* Base user navigation items */}
+          {baseUserNavItems.map((item) => (
             <NavLink key={item.href} item={item} />
           ))}
+
+          {/* Become a Barber - only if no barber record */}
+          {hasNoBarberRecord && (
+            <NavLink 
+              item={{ title: 'Become a Barber', href: '/become-barber', icon: Scissors }} 
+            />
+          )}
+
+          {/* Pending Barber Badge */}
+          {isBarberPending && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="px-4 py-3"
+            >
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                <Clock className="w-4 h-4 text-yellow-500" />
+                <span className="text-sm text-yellow-500 font-medium">Waiting for approval</span>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Barber Hub - only for approved barbers */}
+          {isBarber && (
+            <>
+              <div className="my-4 border-t border-border" />
+              
+              {/* Collapsible Barber Hub Header */}
+              <button
+                onClick={() => setBarberHubOpen(!barberHubOpen)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                  'hover:bg-secondary/80 group'
+                )}
+              >
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Scissors className="w-4 h-4 text-primary" />
+                </div>
+                <span className="font-semibold text-foreground">Barber Hub</span>
+                <motion.div
+                  animate={{ rotate: barberHubOpen ? 180 : 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  className="ml-auto"
+                >
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                </motion.div>
+              </button>
+
+              {/* Collapsible Content */}
+              <AnimatePresence initial={false}>
+                {barberHubOpen && (
+                  <motion.div
+                    initial="closed"
+                    animate="open"
+                    exit="closed"
+                    variants={collapsibleVariants}
+                    className="overflow-hidden"
+                  >
+                    <div className="space-y-1 pt-1">
+                      {barberHubItems.map((item) => (
+                        <NavLink key={item.href} item={item} nested />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
 
           {/* Admin Panel Link - Only for admin/super_admin */}
           {(isAdmin || isSuperAdmin) && (
