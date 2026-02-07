@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import { registerBarber } from '@/lib/api';
 
 export default function BecomeBarber() {
-  const { updateLocalRole, isBarberPending, refreshBarberStatus } = useAuth();
+  const { updateLocalRole, isBarber, isBarberPending, refreshBarberStatus } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   // ONLY 2 fields as required by backend: shop_name and location
@@ -25,6 +25,18 @@ export default function BecomeBarber() {
     shopName: '',
     location: '',
   });
+
+  // Redirect approved barbers to their dashboard
+  useEffect(() => {
+    if (isBarber) {
+      navigate('/barber/dashboard', { replace: true });
+    }
+  }, [isBarber, navigate]);
+
+  // If user is already approved, don't render anything (redirect will happen)
+  if (isBarber) {
+    return null;
+  }
 
   // If user is already pending, show status
   if (isBarberPending) {
