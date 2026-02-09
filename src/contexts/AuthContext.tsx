@@ -3,7 +3,8 @@ import {
   login as apiLogin, 
   getAuthToken, 
   removeAuthToken, 
-  getMyBarberProfile,
+  getApprovedBarbers,
+  getPendingBarbers,
   isTokenExpired,
   getTokenExpiry,
   decodeJWT
@@ -89,9 +90,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, logoutTime);
   }, []);
 
-  // Check barber status from backend API
+  // Check barber status from backend API - uses /api/barber/approved to find user
   const refreshBarberStatus = useCallback(async () => {
-    if (!user) return;
+    if (!user || !user.id) return;
     
     // Skip for admins
     if (user.email === SUPER_ADMIN_EMAIL || user.role === 'admin' || user.role === 'super_admin') {
@@ -100,29 +101,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const response = await getMyBarberProfile();
+      // First check approved barbers
+      const approvedResponse = await getApprovedBarbers();
       
-      if (response.success && response.data) {
-        const barberStatus = response.data.status;
+      if (approvedResponse.success && approvedResponse.data) {
+        const myApprovedBarber = approvedResponse.data.find(
+          (b) => b.user_id === user.id
+        );
         
-        // Store barber data on user object
-        setUser(prev => prev ? { 
-          ...prev, 
-          barber: {
-            status: barberStatus as 'pending' | 'approved',
-            id: response.data.id
-          },
-          role: barberStatus === 'approved' ? 'barber' : 'barber_pending'
-        } : null);
-      } else {
-        // No barber profile found - clear barber data
-        setUser(prev => {
-          if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
-            return { ...prev, role: 'user', barber: undefined };
-          }
-          return prev;
-        });
+        if (myApprovedBarber) {
+          // User is an approved barber
+          setUser(prev => prev ? { 
+            ...prev, 
+            barber: {
+              status: 'approved',
+              id: myApprovedBarber.id
+            },
+            role: 'barber'
+          } : null);
+          setBarberStatusChecked(true);
+          return;
+        }
       }
+
+      // Check pending barbers if not approved
+      const pendingResponse = await getPendingBarbers();
+      
+      if (pendingResponse.success && pendingResponse.data) {
+        const myPendingBarber = pendingResponse.data.find(
+          (b) => b.user_id === user.id
+        );
+        
+        if (myPendingBarber) {
+          // User is a pending barber
+          setUser(prev => prev ? { 
+            ...prev, 
+            barber: {
+              status: 'pending',
+              id: myPendingBarber.id
+            },
+            role: 'barber_pending'
+          } : null);
+          setBarberStatusChecked(true);
+          return;
+        }
+      }
+
+      // Not a barber at all - clear barber data
+      setUser(prev => {
+        if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
+          return { ...prev, role: 'user', barber: undefined };
+        }
+        return prev;
+      });
     } catch (error) {
       console.error('Failed to check barber status:', error);
     } finally {
