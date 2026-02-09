@@ -61,9 +61,12 @@ export function AppSidebar() {
   const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending } = useProtectedUser();
   const location = useLocation();
 
-  // Determine barber state from user.barber object
-  const isBarberApproved = user?.barber?.status === 'approved';
-  const hasNoBarber = !user?.barber;
+  // Strict role checks - ONLY rely on backend-derived state
+  // isBarber = role is 'barber' OR barber.status is 'approved'
+  // isBarberPending = role is 'barber_pending' OR barber.status is 'pending'
+  const isBarberApproved = isBarber;
+  const isPending = isBarberPending;
+  const hasNoBarber = !isBarber && !isBarberPending;
 
   const NavLink = ({ item, nested = false }: { item: NavItemType; nested?: boolean }) => {
     const isActive = location.pathname === item.href;
@@ -196,8 +199,8 @@ export function AppSidebar() {
           />
         )}
 
-        {/* Pending Barber Badge */}
-        {user?.barber?.status === 'pending' && (
+        {/* Pending Barber Badge - Show only if pending and NOT approved */}
+        {isPending && !isBarberApproved && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}

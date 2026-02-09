@@ -13,9 +13,6 @@ import {
 // Super admin email - special handling
 const SUPER_ADMIN_EMAIL = 'navedahmad9012@gmail.com';
 
-// Polling interval for barber status (3 seconds for real-time feel)
-const BARBER_STATUS_POLL_INTERVAL = 3000;
-
 export type UserRole = 'user' | 'barber_pending' | 'barber' | 'admin' | 'super_admin';
 
 export interface UserProfile {
@@ -59,7 +56,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [barberStatusChecked, setBarberStatusChecked] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const logoutTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const pollingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Setup auto-logout timer
   const setupAutoLogoutTimer = useCallback(() => {
@@ -90,7 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, logoutTime);
   }, []);
 
-  // Check barber status from backend API - uses /api/barber/approved to find user
+  // Check barber status from backend API - uses /api/barber/approved and /api/barber/pending
   const refreshBarberStatus = useCallback(async () => {
     if (!user || !user.id) return;
     
@@ -161,31 +157,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user?.id, user?.email]); // Only depend on user id and email, not the entire user object
 
-  // Start polling for barber status updates
-  const startBarberStatusPolling = useCallback(() => {
-    // Clear any existing polling
-    if (pollingTimerRef.current) {
-      clearInterval(pollingTimerRef.current);
-      pollingTimerRef.current = null;
-    }
-
-    // Only poll for non-admin users who might become barbers
-    pollingTimerRef.current = setInterval(() => {
-      refreshBarberStatus();
-    }, BARBER_STATUS_POLL_INTERVAL);
-  }, [refreshBarberStatus]);
-
-  // Stop polling
-  const stopBarberStatusPolling = useCallback(() => {
-    if (pollingTimerRef.current) {
-      clearInterval(pollingTimerRef.current);
-      pollingTimerRef.current = null;
-    }
-  }, []);
-
   // Initialize user from stored token on mount
   useEffect(() => {
-    const initAuth = () => {
+    const initAuth = async () => {
       try {
         const token = getAuthToken();
         
@@ -214,12 +188,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ? 'super_admin' 
             : (decoded.role as UserRole) || 'user';
           
-          setUser({
+          const initialUser: UserProfile = {
             email,
             full_name: email.split('@')[0],
             role,
             id: decoded.id,
-          });
+          };
+          
+          setUser(initialUser);
           
           // Setup auto-logout timer
           setupAutoLogoutTimer();
@@ -245,45 +221,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (logoutTimerRef.current) {
         clearTimeout(logoutTimerRef.current);
       }
-      stopBarberStatusPolling();
     };
-  }, [setupAutoLogoutTimer, stopBarberStatusPolling]);
+  }, [setupAutoLogoutTimer]);
 
-  // Check barber status after user is set and start polling
+  // Check barber status after user is set
   useEffect(() => {
-    if (user && !barberStatusChecked && isInitialized) {
+    if (user && user.id && !barberStatusChecked && isInitialized) {
       refreshBarberStatus();
     }
-  }, [user?.id, barberStatusChecked, isInitialized]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Start/stop polling based on user state
-  useEffect(() => {
-    if (user && isInitialized) {
-      // Only poll for users who might get barber status updates
-      const shouldPoll = user.role === 'user' || user.role === 'barber_pending';
-      if (shouldPoll) {
-        startBarberStatusPolling();
-      } else {
-        stopBarberStatusPolling();
-      }
-    } else {
-      stopBarberStatusPolling();
-    }
-
-    return () => stopBarberStatusPolling();
-  }, [user?.role, isInitialized, startBarberStatusPolling, stopBarberStatusPolling]);
+  }, [user?.id, barberStatusChecked, isInitialized, refreshBarberStatus]);
 
   // Window focus event - refresh barber status when user returns to tab
   useEffect(() => {
     const handleWindowFocus = () => {
-      if (user && isInitialized) {
+      if (user && user.id && isInitialized) {
         refreshBarberStatus();
       }
     };
 
     window.addEventListener('focus', handleWindowFocus);
     return () => window.removeEventListener('focus', handleWindowFocus);
-  }, [user?.id, isInitialized]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user?.id, isInitialized, refreshBarberStatus]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -340,8 +298,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const isSuperAdmin = user?.role === 'super_admin' || user?.email === SUPER_ADMIN_EMAIL;
   const isAdmin = isSuperAdmin || user?.role === 'admin';
-  const isBarber = user?.role === 'barber';
-  const isBarberPending = user?.role === 'barber_pending';
+  const isBarber = user?.role === 'barber' || user?.barber?.status === 'approved';
+  const isBarberPending = user?.role === 'barber_pending' || user?.barber?.status === 'pending';
 
   // Don't render children until auth is initialized
   if (!isInitialized) {
