@@ -61,8 +61,9 @@ export function AppSidebar() {
   const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending } = useProtectedUser();
   const location = useLocation();
 
-  // Determine user state
-  const hasNoBarberRecord = !isBarber && !isBarberPending;
+  // Determine barber state from user.barber object
+  const isBarberApproved = user?.barber?.status === 'approved';
+  const hasNoBarber = !user?.barber;
 
   const NavLink = ({ item, nested = false }: { item: NavItemType; nested?: boolean }) => {
     const isActive = location.pathname === item.href;
@@ -183,78 +184,78 @@ export function AppSidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {/* Base user navigation items */}
-          {baseUserNavItems.map((item) => (
-            <NavLink key={item.href} item={item} />
-          ))}
+        {/* Base user navigation items */}
+        {baseUserNavItems.map((item) => (
+          <NavLink key={item.href} item={item} />
+        ))}
 
-          {/* Become a Barber - only if no barber record */}
-          {hasNoBarberRecord && (
-            <NavLink 
-              item={{ title: 'Become a Barber', href: '/become-barber', icon: Scissors }} 
-            />
-          )}
+        {/* Become a Barber - only if no barber record */}
+        {hasNoBarber && (
+          <NavLink 
+            item={{ title: 'Become a Barber', href: '/become-barber', icon: Scissors }} 
+          />
+        )}
 
-          {/* Pending Barber Badge */}
-          {isBarberPending && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="px-4 py-3"
+        {/* Pending Barber Badge */}
+        {user?.barber?.status === 'pending' && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="px-4 py-3"
+          >
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/10 border border-accent/30">
+              <Clock className="w-4 h-4 text-accent" />
+              <span className="text-sm text-accent font-medium">Waiting for approval</span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Barber Hub - only for approved barbers */}
+        {isBarberApproved && (
+          <>
+            <div className="my-4 border-t border-border" />
+            
+            {/* Collapsible Barber Hub Header */}
+            <button
+              onClick={() => setBarberHubOpen(!barberHubOpen)}
+              className={cn(
+                'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                'hover:bg-secondary/80 group'
+              )}
             >
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                <Clock className="w-4 h-4 text-yellow-500" />
-                <span className="text-sm text-yellow-500 font-medium">Waiting for approval</span>
+              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                <Scissors className="w-4 h-4 text-primary" />
               </div>
-            </motion.div>
-          )}
-
-          {/* Barber Hub - only for approved barbers */}
-          {isBarber && (
-            <>
-              <div className="my-4 border-t border-border" />
-              
-              {/* Collapsible Barber Hub Header */}
-              <button
-                onClick={() => setBarberHubOpen(!barberHubOpen)}
-                className={cn(
-                  'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
-                  'hover:bg-secondary/80 group'
-                )}
+              <span className="font-semibold text-foreground">Barber Hub</span>
+              <motion.div
+                animate={{ rotate: barberHubOpen ? 180 : 0 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                className="ml-auto"
               >
-                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                  <Scissors className="w-4 h-4 text-primary" />
-                </div>
-                <span className="font-semibold text-foreground">Barber Hub</span>
-                <motion.div
-                  animate={{ rotate: barberHubOpen ? 180 : 0 }}
-                  transition={{ duration: 0.25, ease: 'easeInOut' }}
-                  className="ml-auto"
-                >
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                </motion.div>
-              </button>
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              </motion.div>
+            </button>
 
-              {/* Collapsible Content */}
-              <AnimatePresence initial={false}>
-                {barberHubOpen && (
-                  <motion.div
-                    initial="closed"
-                    animate="open"
-                    exit="closed"
-                    variants={collapsibleVariants}
-                    className="overflow-hidden"
-                  >
-                    <div className="space-y-1 pt-1">
-                      {barberHubItems.map((item) => (
-                        <NavLink key={item.href} item={item} nested />
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </>
-          )}
+            {/* Collapsible Content */}
+            <AnimatePresence initial={false}>
+              {barberHubOpen && (
+                <motion.div
+                  initial="closed"
+                  animate="open"
+                  exit="closed"
+                  variants={collapsibleVariants}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-1 pt-1">
+                    {barberHubItems.map((item) => (
+                      <NavLink key={item.href} item={item} nested />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
+        )}
 
           {/* Admin Panel Link - Only for admin/super_admin */}
           {(isAdmin || isSuperAdmin) && (

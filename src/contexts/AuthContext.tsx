@@ -22,6 +22,10 @@ export interface UserProfile {
   full_name?: string;
   role: UserRole;
   id?: string;
+  barber?: {
+    status: 'pending' | 'approved';
+    id?: string;
+  };
 }
 
 interface AuthContextType {
@@ -101,16 +105,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.success && response.data) {
         const barberStatus = response.data.status;
         
-        if (barberStatus === 'approved') {
-          setUser(prev => prev ? { ...prev, role: 'barber' } : null);
-        } else if (barberStatus === 'pending') {
-          setUser(prev => prev ? { ...prev, role: 'barber_pending' } : null);
-        }
+        // Store barber data on user object
+        setUser(prev => prev ? { 
+          ...prev, 
+          barber: {
+            status: barberStatus as 'pending' | 'approved',
+            id: response.data.id
+          },
+          role: barberStatus === 'approved' ? 'barber' : 'barber_pending'
+        } : null);
       } else {
-        // No barber profile found - ensure user role is 'user'
+        // No barber profile found - clear barber data
         setUser(prev => {
           if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
-            return { ...prev, role: 'user' };
+            return { ...prev, role: 'user', barber: undefined };
           }
           return prev;
         });
