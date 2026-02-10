@@ -231,17 +231,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user?.id, barberStatusChecked, isInitialized, refreshBarberStatus]);
 
-  // Window focus event - refresh barber status when user returns to tab
+  // Poll barber status every 10 seconds + refresh on window focus
   useEffect(() => {
-    const handleWindowFocus = () => {
-      if (user && user.id && isInitialized) {
-        refreshBarberStatus();
-      }
-    };
+    if (!user || !user.id || !isInitialized) return;
 
+    // Skip polling for admins
+    if (user.email === SUPER_ADMIN_EMAIL || user.role === 'admin' || user.role === 'super_admin') return;
+
+    const poll = () => refreshBarberStatus();
+
+    // Poll every 10 seconds for near-realtime approval detection
+    const interval = setInterval(poll, 10000);
+
+    // Also refresh on window focus
+    const handleWindowFocus = () => poll();
     window.addEventListener('focus', handleWindowFocus);
-    return () => window.removeEventListener('focus', handleWindowFocus);
-  }, [user?.id, isInitialized, refreshBarberStatus]);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [user?.id, user?.email, isInitialized, refreshBarberStatus]);
 
   const signIn = async (email: string, password: string) => {
     try {

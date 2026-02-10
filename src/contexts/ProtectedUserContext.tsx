@@ -4,6 +4,7 @@ import { UserProfile } from './AuthContext';
 interface ProtectedUserContextType {
   user: UserProfile;
   signOut: () => Promise<void>;
+  refreshBarberStatus: () => Promise<void>;
   isSuperAdmin: boolean;
   isAdmin: boolean;
   isBarber: boolean;
