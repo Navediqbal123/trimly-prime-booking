@@ -87,6 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Check barber status from backend API - uses /api/barber/approved and /api/barber/pending
+  // Persists verified status to localStorage so it survives page refreshes
   const refreshBarberStatus = useCallback(async () => {
     if (!user || !user.id) return;
     
@@ -106,13 +107,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         );
         
         if (myApprovedBarber) {
-          // User is an approved barber
+          localStorage.setItem('barber_status', JSON.stringify({ status: 'approved', id: myApprovedBarber.id }));
           setUser(prev => prev ? { 
             ...prev, 
-            barber: {
-              status: 'approved',
-              id: myApprovedBarber.id
-            },
+            barber: { status: 'approved', id: myApprovedBarber.id },
             role: 'barber'
           } : null);
           setBarberStatusChecked(true);
@@ -129,13 +127,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         );
         
         if (myPendingBarber) {
-          // User is a pending barber
+          localStorage.setItem('barber_status', JSON.stringify({ status: 'pending', id: myPendingBarber.id }));
           setUser(prev => prev ? { 
             ...prev, 
-            barber: {
-              status: 'pending',
-              id: myPendingBarber.id
-            },
+            barber: { status: 'pending', id: myPendingBarber.id },
             role: 'barber_pending'
           } : null);
           setBarberStatusChecked(true);
@@ -143,7 +138,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      // Not a barber at all - clear barber data
+      // Not a barber at all - clear cached data
+      localStorage.removeItem('barber_status');
       setUser(prev => {
         if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
           return { ...prev, role: 'user', barber: undefined };
@@ -155,7 +151,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setBarberStatusChecked(true);
     }
-  }, [user?.id, user?.email]); // Only depend on user id and email, not the entire user object
+  }, [user?.id, user?.email]);
 
   // Initialize user from stored token on mount
   useEffect(() => {
@@ -180,19 +176,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
         
-        // Decode token and set user
+        // Decode token and set user, restoring cached barber status
         const decoded = decodeJWT(token);
         if (decoded?.email) {
           const email = decoded.email;
-          const role: UserRole = email === SUPER_ADMIN_EMAIL 
+          let role: UserRole = email === SUPER_ADMIN_EMAIL 
             ? 'super_admin' 
             : (decoded.role as UserRole) || 'user';
+          
+          // Restore cached barber status so role doesn't revert on refresh
+          let barberData: UserProfile['barber'] | undefined;
+          try {
+            const cached = localStorage.getItem('barber_status');
+            if (cached) {
+              const parsed = JSON.parse(cached);
+              if (parsed.status === 'approved') {
+                role = 'barber';
+                barberData = { status: 'approved', id: parsed.id };
+              } else if (parsed.status === 'pending') {
+                role = 'barber_pending';
+                barberData = { status: 'pending', id: parsed.id };
+              }
+            }
+          } catch {}
           
           const initialUser: UserProfile = {
             email,
             full_name: email.split('@')[0],
             role,
             id: decoded.id,
+            barber: barberData,
           };
           
           setUser(initialUser);
@@ -295,6 +308,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     removeAuthToken();
+    localStorage.removeItem('barber_status');
     setUser(null);
     setBarberStatusChecked(false);
   };
