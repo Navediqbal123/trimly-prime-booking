@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading, signOut, isSuperAdmin, isAdmin, isBarber, isBarberPending, barberStatusChecked } = useAuth();
+  const { user, loading, signOut, refreshBarberStatus, isSuperAdmin, isAdmin, isBarber, isBarberPending, barberStatusChecked } = useAuth();
   const location = useLocation();
 
   // Show loader while auth is being checked
@@ -30,6 +30,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     <ProtectedUserProvider value={{ 
       user, 
       signOut, 
+      refreshBarberStatus,
       isSuperAdmin, 
       isAdmin, 
       isBarber, 
