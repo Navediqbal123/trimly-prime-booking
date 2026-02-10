@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
+import { BarberHubLayout } from "@/components/layout/BarberHubLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
@@ -57,18 +58,26 @@ function AppRoutes() {
         <Route path="/become-barber" element={<BecomeBarber />} />
         <Route path="/book/:shopId" element={<BookingPage />} />
         
-        {/* Barber Routes */}
-        <Route path="/barber/dashboard" element={<BarberDashboard />} />
-        <Route path="/barber/shop" element={<MyShop />} />
-        <Route path="/barber/services" element={<Services />} />
-        <Route path="/barber/bookings" element={<BarberBookings />} />
-        
         {/* Admin Routes */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/requests" element={<BarberRequests />} />
         <Route path="/admin/barbers" element={<AdminBarbers />} />
         <Route path="/admin/bookings" element={<AdminBookings />} />
+      </Route>
+
+      {/* Barber Hub - separate layout */}
+      <Route
+        element={
+          <ProtectedRoute>
+            <BarberHubLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/barber-hub" element={<BarberDashboard />} />
+        <Route path="/barber-hub/shop" element={<MyShop />} />
+        <Route path="/barber-hub/services" element={<Services />} />
+        <Route path="/barber-hub/bookings" element={<BarberBookings />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

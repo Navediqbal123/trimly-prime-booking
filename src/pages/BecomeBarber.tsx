@@ -29,7 +29,7 @@ export default function BecomeBarber() {
   // Redirect approved barbers to their dashboard
   useEffect(() => {
     if (isBarber) {
-      navigate('/barber/dashboard', { replace: true });
+      navigate('/barber-hub', { replace: true });
     }
   }, [isBarber, navigate]);
 
