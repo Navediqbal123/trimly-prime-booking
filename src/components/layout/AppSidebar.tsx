@@ -7,8 +7,6 @@ import {
   Calendar,
   User,
   Scissors,
-  Store,
-  Settings,
   Shield,
   Users,
   ClipboardList,
@@ -16,12 +14,10 @@ import {
   Menu,
   X,
   ChevronRight,
-  ChevronDown,
   Clock,
 } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 interface NavItemType {
@@ -38,14 +34,7 @@ const baseUserNavItems: NavItemType[] = [
   { title: 'My Profile', href: '/profile', icon: User },
 ];
 
-// Barber Hub nested items
-const barberHubItems: NavItemType[] = [
-  { title: 'Dashboard', href: '/barber/dashboard', icon: LayoutDashboard },
-  { title: 'My Shop', href: '/barber/shop', icon: Store },
-  { title: 'Services', href: '/barber/services', icon: Settings },
-  { title: 'Bookings', href: '/barber/bookings', icon: Calendar },
-  { title: 'Profile', href: '/profile', icon: User },
-];
+// No more inline barber hub items - barber hub is a separate layout now
 
 const adminNavItems: NavItemType[] = [
   { title: 'Admin Dashboard', href: '/admin/dashboard', icon: Shield },
@@ -57,7 +46,6 @@ const adminNavItems: NavItemType[] = [
 
 export function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [barberHubOpen, setBarberHubOpen] = useState(true);
   const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending } = useProtectedUser();
   const location = useLocation();
 
@@ -99,26 +87,6 @@ export function AppSidebar() {
         )}
       </Link>
     );
-  };
-
-  // Collapsible animation variants
-  const collapsibleVariants = {
-    open: {
-      height: 'auto',
-      opacity: 1,
-      transition: {
-        height: { duration: 0.25, ease: [0.4, 0, 0.2, 1] as const },
-        opacity: { duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }
-      }
-    },
-    closed: {
-      height: 0,
-      opacity: 0,
-      transition: {
-        height: { duration: 0.25, ease: [0.4, 0, 0.2, 1] as const },
-        opacity: { duration: 0.15, ease: [0.4, 0, 0.2, 1] as const }
-      }
-    }
   };
 
   return (
@@ -213,50 +181,13 @@ export function AppSidebar() {
           </motion.div>
         )}
 
-        {/* Barber Hub - only for approved barbers */}
+        {/* Barber Hub link - only for approved barbers */}
         {isBarberApproved && (
           <>
             <div className="my-4 border-t border-border" />
-            
-            {/* Collapsible Barber Hub Header */}
-            <button
-              onClick={() => setBarberHubOpen(!barberHubOpen)}
-              className={cn(
-                'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
-                'hover:bg-secondary/80 group'
-              )}
-            >
-              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                <Scissors className="w-4 h-4 text-primary" />
-              </div>
-              <span className="font-semibold text-foreground">Barber Hub</span>
-              <motion.div
-                animate={{ rotate: barberHubOpen ? 180 : 0 }}
-                transition={{ duration: 0.25, ease: 'easeInOut' }}
-                className="ml-auto"
-              >
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              </motion.div>
-            </button>
-
-            {/* Collapsible Content */}
-            <AnimatePresence initial={false}>
-              {barberHubOpen && (
-                <motion.div
-                  initial="closed"
-                  animate="open"
-                  exit="closed"
-                  variants={collapsibleVariants}
-                  className="overflow-hidden"
-                >
-                  <div className="space-y-1 pt-1">
-                    {barberHubItems.map((item) => (
-                      <NavLink key={item.href} item={item} nested />
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <NavLink 
+              item={{ title: 'Barber Hub', href: '/barber-hub', icon: Scissors }} 
+            />
           </>
         )}
 
