@@ -38,8 +38,10 @@ export default function BarberRequests() {
     const response = await approveBarber(request.id, request.user_id);
     
     if (response.success) {
-      setRequests((prev) => prev.filter((r) => r.id !== request.id));
       toast.success('Barber approved successfully');
+      // Reload to fetch fresh data from database
+      window.location.reload();
+      return;
     } else {
       toast.error(response.error || 'Failed to approve barber');
     }
