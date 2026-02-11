@@ -244,9 +244,10 @@ export async function registerBarber(data: BarberRegisterData): Promise<ApiRespo
   });
 }
 
-export async function approveBarber(barberId: string): Promise<ApiResponse> {
-  return apiCall(`/api/barber/approve/${barberId}`, {
+export async function approveBarber(requestId: string, userId: string): Promise<ApiResponse> {
+  return apiCall(`/api/barbers/approve/${requestId}`, {
     method: 'POST',
+    body: JSON.stringify({ user_id: userId }),
   });
 }
 

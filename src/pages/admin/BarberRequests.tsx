@@ -26,19 +26,18 @@ export default function BarberRequests() {
     fetchPendingBarbers();
   }, []);
 
-  const handleApprove = async (id: string) => {
-    // Validate UUID format before sending
+  const handleApprove = async (request: PendingBarberData) => {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(id)) {
-      toast.error('Invalid barber ID format');
+    if (!uuidRegex.test(request.id) || !uuidRegex.test(request.user_id)) {
+      toast.error('Invalid ID format');
       return;
     }
 
-    setLoadingId(id);
-    const response = await approveBarber(id);
+    setLoadingId(request.id);
+    const response = await approveBarber(request.id, request.user_id);
     
     if (response.success) {
-      setRequests((prev) => prev.filter((r) => r.id !== id));
+      setRequests((prev) => prev.filter((r) => r.id !== request.id));
       toast.success('Barber approved successfully');
     } else {
       toast.error(response.error || 'Failed to approve barber');
@@ -118,7 +117,7 @@ export default function BarberRequests() {
                   </Button>
                   <Button 
                     className="flex-1" 
-                    onClick={() => handleApprove(request.id)} 
+                    onClick={() => handleApprove(request)} 
                     disabled={loadingId === request.id}
                   >
                     {loadingId === request.id ? (
