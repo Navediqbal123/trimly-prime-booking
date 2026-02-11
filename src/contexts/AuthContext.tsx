@@ -3,8 +3,7 @@ import {
   login as apiLogin, 
   getAuthToken, 
   removeAuthToken, 
-  getApprovedBarbers,
-  getPendingBarbers,
+  getMyBarberProfile,
   isTokenExpired,
   getTokenExpiry,
   decodeJWT
@@ -86,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, logoutTime);
   }, []);
 
-  // Check barber status from backend API - uses /api/barber/approved and /api/barber/pending
+  // Check barber status using /api/barber/me (JWT-authenticated, no user_id matching needed)
   // Persists verified status to localStorage so it survives page refreshes
   const refreshBarberStatus = useCallback(async () => {
     if (!user || !user.id) return;
@@ -98,54 +97,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      // First check approved barbers
-      const approvedResponse = await getApprovedBarbers();
+      const response = await getMyBarberProfile();
       
-      if (approvedResponse.success && approvedResponse.data) {
-        const myApprovedBarber = approvedResponse.data.find(
-          (b) => b.user_id === user.id
-        );
+      if (response.success && response.data) {
+        const profile = response.data;
         
-        if (myApprovedBarber) {
-          localStorage.setItem('barber_status', JSON.stringify({ status: 'approved', id: myApprovedBarber.id }));
+        if (profile.status === 'approved') {
+          localStorage.setItem('barber_status', JSON.stringify({ status: 'approved', id: profile.id }));
           setUser(prev => prev ? { 
             ...prev, 
-            barber: { status: 'approved', id: myApprovedBarber.id },
+            barber: { status: 'approved', id: profile.id },
             role: 'barber'
           } : null);
-          setBarberStatusChecked(true);
-          return;
-        }
-      }
-
-      // Check pending barbers if not approved
-      const pendingResponse = await getPendingBarbers();
-      
-      if (pendingResponse.success && pendingResponse.data) {
-        const myPendingBarber = pendingResponse.data.find(
-          (b) => b.user_id === user.id
-        );
-        
-        if (myPendingBarber) {
-          localStorage.setItem('barber_status', JSON.stringify({ status: 'pending', id: myPendingBarber.id }));
+        } else if (profile.status === 'pending') {
+          localStorage.setItem('barber_status', JSON.stringify({ status: 'pending', id: profile.id }));
           setUser(prev => prev ? { 
             ...prev, 
-            barber: { status: 'pending', id: myPendingBarber.id },
+            barber: { status: 'pending', id: profile.id },
             role: 'barber_pending'
           } : null);
-          setBarberStatusChecked(true);
-          return;
+        } else {
+          localStorage.removeItem('barber_status');
+          setUser(prev => {
+            if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
+              return { ...prev, role: 'user', barber: undefined };
+            }
+            return prev;
+          });
+        }
+      } else {
+        // No barber profile or network error - only clear cache if not a network error
+        if (!response.error?.includes('Network error')) {
+          localStorage.removeItem('barber_status');
+          setUser(prev => {
+            if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
+              return { ...prev, role: 'user', barber: undefined };
+            }
+            return prev;
+          });
         }
       }
-
-      // Not a barber at all - clear cached data
-      localStorage.removeItem('barber_status');
-      setUser(prev => {
-        if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
-          return { ...prev, role: 'user', barber: undefined };
-        }
-        return prev;
-      });
     } catch (error) {
       console.error('Failed to check barber status:', error);
     } finally {
@@ -253,8 +244,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const poll = () => refreshBarberStatus();
 
-    // Poll every 10 seconds for near-realtime approval detection
-    const interval = setInterval(poll, 10000);
+    // Poll every 5 seconds for near-realtime approval detection
+    const interval = setInterval(poll, 5000);
 
     // Also refresh on window focus
     const handleWindowFocus = () => poll();
