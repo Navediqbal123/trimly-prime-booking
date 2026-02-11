@@ -15,7 +15,8 @@ export default function BarberRequests() {
     const response = await getPendingBarbers();
     
     if (response.success && response.data) {
-      setRequests(response.data);
+      // Only show pending requests - filter out any approved ones
+      setRequests(response.data.filter((r: any) => r.status === 'pending' || !r.status));
     } else {
       toast.error(response.error || 'Failed to fetch pending requests');
     }
