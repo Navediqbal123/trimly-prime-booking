@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Scissors, Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Scissors, Mail, Lock, Loader2, Eye, EyeOff, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,19 +15,26 @@ const loginSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
+const signupSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
 export default function Auth() {
+  const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { signIn, user } = useAuth();
+  const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (user && isAuthenticated()) {
       navigate('/dashboard', { replace: true });
@@ -49,33 +56,60 @@ export default function Auth() {
     setErrors({});
 
     try {
-      const result = loginSchema.safeParse(formData);
-      if (!result.success) {
-        const fieldErrors: Record<string, string> = {};
-        result.error.errors.forEach((err) => {
-          if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
-        });
-        setErrors(fieldErrors);
-        return;
-      }
+      if (isSignUp) {
+        const result = signupSchema.safeParse(formData);
+        if (!result.success) {
+          const fieldErrors: Record<string, string> = {};
+          result.error.errors.forEach((err) => {
+            if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+          });
+          setErrors(fieldErrors);
+          return;
+        }
 
-      setLoading(true);
-      const { error } = await signIn(formData.email, formData.password);
-      
-      if (error) {
-        if (error.message.includes('Invalid login credentials') || error.message.includes('Invalid')) {
-          toast.error('Invalid email or password');
-        } else {
+        setLoading(true);
+        const { error } = await signUp(formData.name, formData.email, formData.password);
+
+        if (error) {
           toast.error(error.message);
+        } else {
+          toast.success('Account created successfully!');
         }
       } else {
-        toast.success('Welcome back!');
+        const result = loginSchema.safeParse(formData);
+        if (!result.success) {
+          const fieldErrors: Record<string, string> = {};
+          result.error.errors.forEach((err) => {
+            if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+          });
+          setErrors(fieldErrors);
+          return;
+        }
+
+        setLoading(true);
+        const { error } = await signIn(formData.email, formData.password);
+
+        if (error) {
+          if (error.message.includes('Invalid login credentials') || error.message.includes('Invalid')) {
+            toast.error('Invalid email or password');
+          } else {
+            toast.error(error.message);
+          }
+        } else {
+          toast.success('Welcome back!');
+        }
       }
     } catch (err) {
       toast.error('An unexpected error occurred');
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleMode = () => {
+    setIsSignUp(!isSignUp);
+    setErrors({});
+    setFormData({ name: '', email: '', password: '' });
   };
 
   return (
@@ -104,7 +138,6 @@ export default function Auth() {
             Your premium barber booking experience. Discover skilled barbers, book appointments, and look your best.
           </p>
         </div>
-        {/* Decorative Elements */}
         <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute -top-20 -left-20 w-60 h-60 rounded-full bg-primary/10 blur-3xl" />
       </motion.div>
@@ -130,14 +163,35 @@ export default function Auth() {
           <div className="bg-card border border-border rounded-2xl p-8 glow-card">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-display font-bold mb-2">
-                Welcome Back
+                {isSignUp ? 'Create Account' : 'Welcome Back'}
               </h2>
               <p className="text-muted-foreground">
-                Sign in to your account
+                {isSignUp ? 'Sign up to get started' : 'Sign in to your account'}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {isSignUp && (
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="pl-10"
+                    />
+                  </div>
+                  {errors.name && (
+                    <p className="text-sm text-destructive">{errors.name}</p>
+                  )}
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -191,10 +245,23 @@ export default function Auth() {
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  'Sign In'
+                  isSignUp ? 'Sign Up' : 'Sign In'
                 )}
               </Button>
             </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+                <button
+                  type="button"
+                  onClick={toggleMode}
+                  className="text-primary hover:underline font-medium"
+                >
+                  {isSignUp ? 'Sign In' : 'Sign Up'}
+                </button>
+              </p>
+            </div>
           </div>
         </motion.div>
       </div>

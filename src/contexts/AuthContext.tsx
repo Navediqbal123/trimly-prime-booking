@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { 
   login as apiLogin, 
+  register as apiRegister,
   getAuthToken, 
   removeAuthToken, 
   getMyBarberProfile,
@@ -30,6 +31,7 @@ interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (name: string, email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   updateLocalRole: (role: UserRole) => void;
   refreshBarberStatus: () => Promise<void>;
@@ -59,7 +61,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Setup auto-logout timer
   const setupAutoLogoutTimer = useCallback(() => {
-    // Clear any existing timer
     if (logoutTimerRef.current) {
       clearTimeout(logoutTimerRef.current);
       logoutTimerRef.current = null;
@@ -70,14 +71,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const timeUntilExpiry = expiresAt - Date.now();
     
-    // If already expired, logout immediately
     if (timeUntilExpiry <= 0) {
       removeAuthToken();
       setUser(null);
       return;
     }
 
-    // Set timer for auto-logout (trigger 10 seconds before actual expiry for safety)
     const logoutTime = Math.max(timeUntilExpiry - 10000, 0);
     
     logoutTimerRef.current = setTimeout(() => {
@@ -104,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   }, []);
 
-  // Check barber status using /api/barber/me AND Supabase profiles table
+  // Check barber status using Supabase profiles table as source of truth
   const refreshBarberStatus = useCallback(async () => {
     if (!user || !user.id) return;
     
@@ -115,12 +114,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      // First, check Supabase profiles table for the authoritative role
+      // Fetch authoritative role from Supabase profiles table
       const dbRole = await fetchProfileRole(user.id);
       
       if (dbRole === 'barber') {
-        // Database says barber - update immediately, no need for API check
-        localStorage.setItem('barber_status', JSON.stringify({ status: 'approved' }));
         setUser(prev => prev ? { 
           ...prev, 
           barber: { status: 'approved' },
@@ -131,7 +128,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       if (dbRole === 'barber_pending') {
-        localStorage.setItem('barber_status', JSON.stringify({ status: 'pending' }));
         setUser(prev => prev ? { 
           ...prev, 
           barber: { status: 'pending' },
@@ -141,28 +137,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      // Fallback: also check /api/barber/me for barber-specific data
+      if (dbRole === 'user') {
+        setUser(prev => prev ? { 
+          ...prev, 
+          barber: undefined,
+          role: 'user'
+        } : null);
+        setBarberStatusChecked(true);
+        return;
+      }
+
+      // Fallback: check /api/barber/me
       const response = await getMyBarberProfile();
       
       if (response.success && response.data) {
         const profile = response.data;
         
         if (profile.status === 'approved') {
-          localStorage.setItem('barber_status', JSON.stringify({ status: 'approved', id: profile.id }));
           setUser(prev => prev ? { 
             ...prev, 
             barber: { status: 'approved', id: profile.id },
             role: 'barber'
           } : null);
         } else if (profile.status === 'pending') {
-          localStorage.setItem('barber_status', JSON.stringify({ status: 'pending', id: profile.id }));
           setUser(prev => prev ? { 
             ...prev, 
             barber: { status: 'pending', id: profile.id },
             role: 'barber_pending'
           } : null);
         } else {
-          localStorage.removeItem('barber_status');
           setUser(prev => {
             if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
               return { ...prev, role: 'user', barber: undefined };
@@ -172,7 +175,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } else {
         if (!response.error?.includes('Network error')) {
-          localStorage.removeItem('barber_status');
           setUser(prev => {
             if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
               return { ...prev, role: 'user', barber: undefined };
@@ -194,7 +196,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const token = getAuthToken();
         
-        // No token - not logged in
         if (!token) {
           setUser(null);
           setLoading(false);
@@ -202,7 +203,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
         
-        // Check if token is expired
         if (isTokenExpired()) {
           removeAuthToken();
           setUser(null);
@@ -211,44 +211,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
         
-        // Decode token and set user, restoring cached barber status
+        // Decode token to get basic user info
         const decoded = decodeJWT(token);
         if (decoded?.email) {
           const email = decoded.email;
+          const userId = decoded.id;
+          
+          // Determine role: fetch from DB (source of truth), not localStorage
           let role: UserRole = email === SUPER_ADMIN_EMAIL 
             ? 'super_admin' 
-            : (decoded.role as UserRole) || 'user';
+            : 'user'; // default, will be overridden by DB
           
-          // Restore cached barber status so role doesn't revert on refresh
           let barberData: UserProfile['barber'] | undefined;
-          try {
-            const cached = localStorage.getItem('barber_status');
-            if (cached) {
-              const parsed = JSON.parse(cached);
-              if (parsed.status === 'approved') {
-                role = 'barber';
-                barberData = { status: 'approved', id: parsed.id };
-              } else if (parsed.status === 'pending') {
-                role = 'barber_pending';
-                barberData = { status: 'pending', id: parsed.id };
+
+          if (userId && email !== SUPER_ADMIN_EMAIL) {
+            const dbRole = await fetchProfileRole(userId);
+            if (dbRole) {
+              role = dbRole;
+              if (dbRole === 'barber') {
+                barberData = { status: 'approved' };
+              } else if (dbRole === 'barber_pending') {
+                barberData = { status: 'pending' };
               }
             }
-          } catch {}
+          }
           
           const initialUser: UserProfile = {
             email,
             full_name: email.split('@')[0],
             role,
-            id: decoded.id,
+            id: userId,
             barber: barberData,
           };
           
           setUser(initialUser);
-          
-          // Setup auto-logout timer
           setupAutoLogoutTimer();
         } else {
-          // Invalid token format
           removeAuthToken();
           setUser(null);
         }
@@ -264,13 +262,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initAuth();
 
-    // Cleanup timers on unmount
     return () => {
       if (logoutTimerRef.current) {
         clearTimeout(logoutTimerRef.current);
       }
     };
-  }, [setupAutoLogoutTimer]);
+  }, [setupAutoLogoutTimer, fetchProfileRole]);
 
   // Check barber status after user is set
   useEffect(() => {
@@ -279,19 +276,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user?.id, barberStatusChecked, isInitialized, refreshBarberStatus]);
 
-  // Poll barber status every 10 seconds + refresh on window focus
+  // Poll barber status every 5 seconds + refresh on window focus
   useEffect(() => {
     if (!user || !user.id || !isInitialized) return;
-
-    // Skip polling for admins
     if (user.email === SUPER_ADMIN_EMAIL || user.role === 'admin' || user.role === 'super_admin') return;
 
     const poll = () => refreshBarberStatus();
-
-    // Poll every 5 seconds for near-realtime approval detection
     const interval = setInterval(poll, 5000);
 
-    // Also refresh on window focus
     const handleWindowFocus = () => poll();
     window.addEventListener('focus', handleWindowFocus);
 
@@ -310,22 +302,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error: new Error(result.error || 'Login failed') };
       }
 
-      // Decode token to get user info
       const token = result.data?.token;
       if (token) {
         const decoded = decodeJWT(token);
-        const role: UserRole = email === SUPER_ADMIN_EMAIL 
+        const userId = decoded?.id;
+        
+        // Fetch role from DB immediately after login
+        let role: UserRole = email === SUPER_ADMIN_EMAIL 
           ? 'super_admin' 
-          : (decoded?.role as UserRole) || 'user';
+          : 'user';
+
+        if (userId && email !== SUPER_ADMIN_EMAIL) {
+          const dbRole = await fetchProfileRole(userId);
+          if (dbRole) role = dbRole;
+        }
 
         setUser({
           email,
           full_name: decoded?.email?.split('@')[0] || email.split('@')[0],
           role,
+          id: userId,
+          barber: role === 'barber' ? { status: 'approved' } : role === 'barber_pending' ? { status: 'pending' } : undefined,
+        });
+
+        setupAutoLogoutTimer();
+      }
+
+      return { error: null };
+    } catch (err) {
+      return { error: err as Error };
+    }
+  };
+
+  const signUp = async (name: string, email: string, password: string) => {
+    try {
+      setBarberStatusChecked(false);
+      const result = await apiRegister({ name, email, password });
+
+      if (!result.success) {
+        return { error: new Error(result.error || 'Registration failed') };
+      }
+
+      const token = result.data?.token;
+      if (token) {
+        const decoded = decodeJWT(token);
+
+        setUser({
+          email,
+          full_name: name,
+          role: 'user',
           id: decoded?.id,
         });
 
-        // Setup auto-logout timer for new session
         setupAutoLogoutTimer();
       }
 
@@ -336,7 +364,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    // Clear logout timer
     if (logoutTimerRef.current) {
       clearTimeout(logoutTimerRef.current);
       logoutTimerRef.current = null;
@@ -348,7 +375,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setBarberStatusChecked(false);
   };
 
-  // Update local role (for UI purposes after becoming barber, etc.)
   const updateLocalRole = (role: UserRole) => {
     if (user) {
       setUser({ ...user, role });
@@ -360,7 +386,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isBarber = user?.role === 'barber' || user?.barber?.status === 'approved';
   const isBarberPending = user?.role === 'barber_pending' || user?.barber?.status === 'pending';
 
-  // Don't render children until auth is initialized
   if (!isInitialized) {
     return null;
   }
@@ -371,6 +396,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         loading,
         signIn,
+        signUp,
         signOut,
         updateLocalRole,
         refreshBarberStatus,
