@@ -8,6 +8,7 @@ import {
   getTokenExpiry,
   decodeJWT
 } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 
 // Super admin email - special handling
 const SUPER_ADMIN_EMAIL = 'navedahmad9012@gmail.com';
@@ -85,8 +86,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, logoutTime);
   }, []);
 
-  // Check barber status using /api/barber/me (JWT-authenticated, no user_id matching needed)
-  // Persists verified status to localStorage so it survives page refreshes
+  // Fetch role directly from Supabase profiles table (source of truth)
+  const fetchProfileRole = useCallback(async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .maybeSingle();
+      
+      if (!error && data?.role) {
+        return data.role as UserRole;
+      }
+    } catch (err) {
+      console.error('Failed to fetch profile role from Supabase:', err);
+    }
+    return null;
+  }, []);
+
+  // Check barber status using /api/barber/me AND Supabase profiles table
   const refreshBarberStatus = useCallback(async () => {
     if (!user || !user.id) return;
     
@@ -97,6 +115,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
+      // First, check Supabase profiles table for the authoritative role
+      const dbRole = await fetchProfileRole(user.id);
+      
+      if (dbRole === 'barber') {
+        // Database says barber - update immediately, no need for API check
+        localStorage.setItem('barber_status', JSON.stringify({ status: 'approved' }));
+        setUser(prev => prev ? { 
+          ...prev, 
+          barber: { status: 'approved' },
+          role: 'barber'
+        } : null);
+        setBarberStatusChecked(true);
+        return;
+      }
+      
+      if (dbRole === 'barber_pending') {
+        localStorage.setItem('barber_status', JSON.stringify({ status: 'pending' }));
+        setUser(prev => prev ? { 
+          ...prev, 
+          barber: { status: 'pending' },
+          role: 'barber_pending'
+        } : null);
+        setBarberStatusChecked(true);
+        return;
+      }
+
+      // Fallback: also check /api/barber/me for barber-specific data
       const response = await getMyBarberProfile();
       
       if (response.success && response.data) {
@@ -126,7 +171,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         }
       } else {
-        // No barber profile or network error - only clear cache if not a network error
         if (!response.error?.includes('Network error')) {
           localStorage.removeItem('barber_status');
           setUser(prev => {
@@ -142,7 +186,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setBarberStatusChecked(true);
     }
-  }, [user?.id, user?.email]);
+  }, [user?.id, user?.email, fetchProfileRole]);
 
   // Initialize user from stored token on mount
   useEffect(() => {
