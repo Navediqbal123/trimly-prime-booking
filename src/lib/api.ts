@@ -194,6 +194,40 @@ export interface LoginResponse {
   token: string;
 }
 
+export interface RegisterData {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export async function register(data: RegisterData): Promise<ApiResponse<LoginResponse>> {
+  const result = await apiCall<LoginResponse>('/api/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }, false);
+
+  // Store token on successful registration
+  if (result.success && result.data?.token) {
+    const token = result.data.token;
+    const decoded = decodeJWT(token);
+    
+    let expiresAt: number;
+    if (decoded?.exp) {
+      expiresAt = decoded.exp * 1000;
+    } else {
+      expiresAt = Date.now() + (7 * 24 * 60 * 60 * 1000);
+    }
+    
+    setAuthToken(token, expiresAt);
+    
+    if (decoded?.email && decoded?.id) {
+      setStoredUser({ email: decoded.email, id: decoded.id });
+    }
+  }
+
+  return result;
+}
+
 export async function login(data: LoginData): Promise<ApiResponse<LoginResponse>> {
   const result = await apiCall<LoginResponse>('/api/auth/login', {
     method: 'POST',
