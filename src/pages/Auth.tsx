@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Scissors, Mail, Lock, Loader2, Eye, EyeOff, User } from 'lucide-react';
+import { Scissors, Mail, Lock, Loader2, Eye, EyeOff, User, Phone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,7 @@ const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
+  phone: z.string().optional(),
 });
 
 export default function Auth() {
@@ -29,6 +30,7 @@ export default function Auth() {
     name: '',
     email: '',
     password: '',
+    phone: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -68,12 +70,13 @@ export default function Auth() {
         }
 
         setLoading(true);
-        const { error } = await signUp(formData.name, formData.email, formData.password);
+        const { error } = await signUp(formData.name, formData.email, formData.password, formData.phone);
 
         if (error) {
           toast.error(error.message);
         } else {
           toast.success('Account created successfully!');
+          navigate('/dashboard', { replace: true });
         }
       } else {
         const result = loginSchema.safeParse(formData);
@@ -109,7 +112,7 @@ export default function Auth() {
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
     setErrors({});
-    setFormData({ name: '', email: '', password: '' });
+    setFormData({ name: '', email: '', password: '', phone: '' });
   };
 
   return (
@@ -189,6 +192,24 @@ export default function Auth() {
                   {errors.name && (
                     <p className="text-sm text-destructive">{errors.name}</p>
                   )}
+                </div>
+              )}
+
+              {isSignUp && (
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="+91 9876543210"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
               )}
 

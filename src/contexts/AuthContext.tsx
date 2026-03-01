@@ -31,7 +31,7 @@ interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (name: string, email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (name: string, email: string, password: string, phone?: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   updateLocalRole: (role: UserRole) => void;
   refreshBarberStatus: () => Promise<void>;
@@ -273,10 +273,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (name: string, email: string, password: string) => {
+  const signUp = async (name: string, email: string, password: string, phone?: string) => {
     try {
       setBarberStatusChecked(false);
-      const result = await apiRegister({ name, email, password });
+      const result = await apiRegister({ name, email, password, phone, role: 'user' });
 
       if (!result.success) {
         return { error: new Error(result.error || 'Registration failed') };
