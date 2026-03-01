@@ -5,11 +5,11 @@ import {
   getAuthToken, 
   removeAuthToken, 
   getMyBarberProfile,
+  getMyRole,
   isTokenExpired,
   getTokenExpiry,
   decodeJWT
 } from '@/lib/api';
-import { supabase } from '@/lib/supabase';
 
 // Super admin email - special handling
 const SUPER_ADMIN_EMAIL = 'navedahmad9012@gmail.com';
@@ -85,25 +85,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, logoutTime);
   }, []);
 
-  // Fetch role directly from Supabase profiles table (source of truth)
-  const fetchProfileRole = useCallback(async (userId: string) => {
+  // Fetch role from backend API (NOT localStorage, NOT Supabase)
+  const fetchBackendRole = useCallback(async (): Promise<UserRole> => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .maybeSingle();
-      
-      if (!error && data?.role) {
-        return data.role as UserRole;
+      const result = await getMyRole();
+      if (result.success && result.data?.role) {
+        return result.data.role as UserRole;
       }
     } catch (err) {
-      console.error('Failed to fetch profile role from Supabase:', err);
+      console.error('Failed to fetch role from backend:', err);
     }
-    return null;
+    return 'user';
   }, []);
 
-  // Check barber status using Supabase profiles table as source of truth
+  // Check barber status using backend API as source of truth
   const refreshBarberStatus = useCallback(async () => {
     if (!user || !user.id) return;
     
@@ -114,81 +109,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      // Fetch authoritative role from Supabase profiles table
-      const dbRole = await fetchProfileRole(user.id);
+      const backendRole = await fetchBackendRole();
       
-      if (dbRole === 'barber') {
+      if (backendRole === 'barber') {
         setUser(prev => prev ? { 
           ...prev, 
           barber: { status: 'approved' },
           role: 'barber'
         } : null);
-        setBarberStatusChecked(true);
-        return;
-      }
-      
-      if (dbRole === 'barber_pending') {
+      } else if (backendRole === 'barber_pending') {
         setUser(prev => prev ? { 
           ...prev, 
           barber: { status: 'pending' },
           role: 'barber_pending'
         } : null);
-        setBarberStatusChecked(true);
-        return;
-      }
-
-      if (dbRole === 'user') {
-        setUser(prev => prev ? { 
-          ...prev, 
-          barber: undefined,
-          role: 'user'
-        } : null);
-        setBarberStatusChecked(true);
-        return;
-      }
-
-      // Fallback: check /api/barber/me
-      const response = await getMyBarberProfile();
-      
-      if (response.success && response.data) {
-        const profile = response.data;
-        
-        if (profile.status === 'approved') {
-          setUser(prev => prev ? { 
-            ...prev, 
-            barber: { status: 'approved', id: profile.id },
-            role: 'barber'
-          } : null);
-        } else if (profile.status === 'pending') {
-          setUser(prev => prev ? { 
-            ...prev, 
-            barber: { status: 'pending', id: profile.id },
-            role: 'barber_pending'
-          } : null);
-        } else {
-          setUser(prev => {
-            if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
-              return { ...prev, role: 'user', barber: undefined };
-            }
-            return prev;
-          });
-        }
       } else {
-        if (!response.error?.includes('Network error')) {
-          setUser(prev => {
-            if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
-              return { ...prev, role: 'user', barber: undefined };
-            }
-            return prev;
-          });
-        }
+        setUser(prev => {
+          if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
+            return { ...prev, role: 'user', barber: undefined };
+          }
+          return prev;
+        });
       }
     } catch (error) {
       console.error('Failed to check barber status:', error);
     } finally {
       setBarberStatusChecked(true);
     }
-  }, [user?.id, user?.email, fetchProfileRole]);
+  }, [user?.id, user?.email, fetchBackendRole]);
 
   // Initialize user from stored token on mount
   useEffect(() => {
@@ -211,40 +159,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
         
-        // Decode token to get basic user info
         const decoded = decodeJWT(token);
         if (decoded?.email) {
           const email = decoded.email;
           const userId = decoded.id;
           
-          // Determine role: fetch from DB (source of truth), not localStorage
-          let role: UserRole = email === SUPER_ADMIN_EMAIL 
-            ? 'super_admin' 
-            : 'user'; // default, will be overridden by DB
-          
+          let role: UserRole = email === SUPER_ADMIN_EMAIL ? 'super_admin' : 'user';
           let barberData: UserProfile['barber'] | undefined;
 
-          if (userId && email !== SUPER_ADMIN_EMAIL) {
-            const dbRole = await fetchProfileRole(userId);
-            if (dbRole) {
-              role = dbRole;
-              if (dbRole === 'barber') {
-                barberData = { status: 'approved' };
-              } else if (dbRole === 'barber_pending') {
-                barberData = { status: 'pending' };
-              }
+          // Fetch role from backend API (not localStorage)
+          if (email !== SUPER_ADMIN_EMAIL) {
+            const backendRole = await fetchBackendRole();
+            role = backendRole;
+            if (backendRole === 'barber') {
+              barberData = { status: 'approved' };
+            } else if (backendRole === 'barber_pending') {
+              barberData = { status: 'pending' };
             }
           }
           
-          const initialUser: UserProfile = {
+          setUser({
             email,
             full_name: email.split('@')[0],
             role,
             id: userId,
             barber: barberData,
-          };
+          });
           
-          setUser(initialUser);
           setupAutoLogoutTimer();
         } else {
           removeAuthToken();
@@ -267,7 +208,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clearTimeout(logoutTimerRef.current);
       }
     };
-  }, [setupAutoLogoutTimer, fetchProfileRole]);
+  }, [setupAutoLogoutTimer, fetchBackendRole]);
 
   // Check barber status after user is set
   useEffect(() => {
@@ -307,14 +248,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const decoded = decodeJWT(token);
         const userId = decoded?.id;
         
-        // Fetch role from DB immediately after login
-        let role: UserRole = email === SUPER_ADMIN_EMAIL 
-          ? 'super_admin' 
-          : 'user';
+        let role: UserRole = email === SUPER_ADMIN_EMAIL ? 'super_admin' : 'user';
 
-        if (userId && email !== SUPER_ADMIN_EMAIL) {
-          const dbRole = await fetchProfileRole(userId);
-          if (dbRole) role = dbRole;
+        // Fetch fresh role from backend after login
+        if (email !== SUPER_ADMIN_EMAIL) {
+          const backendRole = await fetchBackendRole();
+          role = backendRole;
         }
 
         setUser({

@@ -156,7 +156,7 @@ async function apiCall<T>(
 
     return { success: true, data };
   } catch (error) {
-    console.error('API call error:', error);
+    console.error('API call error:', error, '| URL:', `${BASE_URL}${endpoint}`);
     return { success: false, error: 'Network error. Please try again.' };
   }
 }
@@ -469,4 +469,26 @@ export async function getAdminUsers(): Promise<ApiResponse<UserData[]>> {
   return apiCall<UserData[]>('/api/admin/users', {
     method: 'GET',
   });
+}
+
+// ==========================================
+// USER ROLE FETCH (from backend)
+// ==========================================
+
+export async function getMyRole(): Promise<ApiResponse<{ role: string }>> {
+  // Use barber/me to determine role from backend
+  const barberResult = await apiCall<BarberProfileData>('/api/barber/me', {
+    method: 'GET',
+  });
+  
+  if (barberResult.success && barberResult.data) {
+    if (barberResult.data.status === 'approved') {
+      return { success: true, data: { role: 'barber' } };
+    }
+    if (barberResult.data.status === 'pending') {
+      return { success: true, data: { role: 'barber_pending' } };
+    }
+  }
+  
+  return { success: true, data: { role: 'user' } };
 }
