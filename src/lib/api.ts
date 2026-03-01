@@ -198,12 +198,20 @@ export interface RegisterData {
   email: string;
   password: string;
   name: string;
+  phone?: string;
+  role?: string;
 }
 
 export async function register(data: RegisterData): Promise<ApiResponse<LoginResponse>> {
-  const result = await apiCall<LoginResponse>('/api/auth/register', {
+  const result = await apiCall<LoginResponse>('/api/auth/signup', {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      email: data.email,
+      password: data.password,
+      name: data.name,
+      phone: data.phone || '',
+      role: data.role || 'user',
+    }),
   }, false);
 
   // Store token on successful registration
