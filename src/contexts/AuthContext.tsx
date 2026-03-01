@@ -282,18 +282,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error: new Error(result.error || 'Registration failed') };
       }
 
+      // Backend doesn't return token on signup, so auto-login after successful registration
       const token = result.data?.token;
       if (token) {
         const decoded = decodeJWT(token);
-
         setUser({
           email,
           full_name: name,
           role: 'user',
           id: decoded?.id,
         });
-
         setupAutoLogoutTimer();
+      } else {
+        // Auto-login with the same credentials
+        const loginResult = await apiLogin({ email, password });
+        if (loginResult.success && loginResult.data?.token) {
+          const decoded = decodeJWT(loginResult.data.token);
+          setUser({
+            email,
+            full_name: name,
+            role: 'user',
+            id: decoded?.id,
+          });
+          setupAutoLogoutTimer();
+        } else {
+          // Login failed (e.g. email not confirmed) — account is created, user needs to confirm or sign in later
+          return { error: null, needsConfirmation: true } as any;
+        }
       }
 
       return { error: null };

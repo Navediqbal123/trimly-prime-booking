@@ -70,10 +70,14 @@ export default function Auth() {
         }
 
         setLoading(true);
-        const { error } = await signUp(formData.name, formData.email, formData.password, formData.phone);
+        const signUpResult = await signUp(formData.name, formData.email, formData.password, formData.phone);
 
-        if (error) {
-          toast.error(error.message);
+        if (signUpResult.error) {
+          toast.error(signUpResult.error.message);
+        } else if ((signUpResult as any).needsConfirmation) {
+          toast.success('Account created! Please check your email to confirm, then sign in.');
+          setIsSignUp(false);
+          setFormData({ name: '', email: '', password: '', phone: '' });
         } else {
           toast.success('Account created successfully!');
           navigate('/dashboard', { replace: true });
