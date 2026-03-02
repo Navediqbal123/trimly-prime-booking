@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { isAuthenticated } from '@/lib/api';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -37,13 +36,8 @@ export default function Auth() {
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (user && isAuthenticated()) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [user, navigate]);
-
-  if (user && isAuthenticated()) {
+  // If already authenticated (session cookie valid), redirect to dashboard
+  if (user) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -104,6 +98,7 @@ export default function Auth() {
           }
         } else {
           toast.success('Welcome back!');
+          navigate('/dashboard', { replace: true });
         }
       }
     } catch (err) {
