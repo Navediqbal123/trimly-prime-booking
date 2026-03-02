@@ -131,11 +131,17 @@ async function apiCall<T>(
       return { success: false, error: 'Session expired' };
     }
 
-    const data = await response.json();
+    let data: any;
+    try {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
 
     // Check for token-related error messages
     if (!response.ok) {
-      const errorMessage = data.message || data.error || 'Request failed';
+      const errorMessage = data.message || data.error || data.msg || data.detail || JSON.stringify(data) || `Request failed with status ${response.status}`;
+      console.error('API error response:', { status: response.status, url: `${BASE_URL}${endpoint}`, body: data });
       
       // Check for token expiry/invalid messages
       if (
