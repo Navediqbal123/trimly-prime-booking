@@ -1,14 +1,11 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { 
   login as apiLogin, 
   register as apiRegister,
-  getAuthToken, 
-  removeAuthToken, 
+  getMe,
+  logout as apiLogout,
   getMyBarberProfile,
   getMyRole,
-  isTokenExpired,
-  getTokenExpiry,
-  decodeJWT
 } from '@/lib/api';
 
 // Super admin email - special handling
@@ -57,35 +54,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [barberStatusChecked, setBarberStatusChecked] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const logoutTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Setup auto-logout timer
-  const setupAutoLogoutTimer = useCallback(() => {
-    if (logoutTimerRef.current) {
-      clearTimeout(logoutTimerRef.current);
-      logoutTimerRef.current = null;
-    }
-
-    const expiresAt = getTokenExpiry();
-    if (!expiresAt) return;
-
-    const timeUntilExpiry = expiresAt - Date.now();
-    
-    if (timeUntilExpiry <= 0) {
-      removeAuthToken();
-      setUser(null);
-      return;
-    }
-
-    const logoutTime = Math.max(timeUntilExpiry - 10000, 0);
-    
-    logoutTimerRef.current = setTimeout(() => {
-      removeAuthToken();
-      setUser(null);
-    }, logoutTime);
-  }, []);
-
-  // Fetch role from backend API (NOT localStorage, NOT Supabase)
+  // Fetch role from backend API
   const fetchBackendRole = useCallback(async (): Promise<UserRole> => {
     try {
       const result = await getMyRole();
@@ -98,11 +68,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return 'user';
   }, []);
 
-  // Check barber status using backend API as source of truth
+  // Build UserProfile from backend user data
+  const buildUserProfile = useCallback(async (userData: { id: string; email: string; name?: string; role?: string }): Promise<UserProfile> => {
+    const email = userData.email;
+    let role: UserRole = email === SUPER_ADMIN_EMAIL ? 'super_admin' : 'user';
+    let barberData: UserProfile['barber'] | undefined;
+
+    if (email !== SUPER_ADMIN_EMAIL) {
+      const backendRole = await fetchBackendRole();
+      role = backendRole;
+      if (backendRole === 'barber') {
+        barberData = { status: 'approved' };
+      } else if (backendRole === 'barber_pending') {
+        barberData = { status: 'pending' };
+      }
+    }
+
+    return {
+      email,
+      full_name: userData.name || email.split('@')[0],
+      role,
+      id: userData.id,
+      barber: barberData,
+    };
+  }, [fetchBackendRole]);
+
+  // Check barber status
   const refreshBarberStatus = useCallback(async () => {
     if (!user || !user.id) return;
-    
-    // Skip for admins
     if (user.email === SUPER_ADMIN_EMAIL || user.role === 'admin' || user.role === 'super_admin') {
       setBarberStatusChecked(true);
       return;
@@ -110,19 +103,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       const backendRole = await fetchBackendRole();
-      
       if (backendRole === 'barber') {
-        setUser(prev => prev ? { 
-          ...prev, 
-          barber: { status: 'approved' },
-          role: 'barber'
-        } : null);
+        setUser(prev => prev ? { ...prev, barber: { status: 'approved' }, role: 'barber' } : null);
       } else if (backendRole === 'barber_pending') {
-        setUser(prev => prev ? { 
-          ...prev, 
-          barber: { status: 'pending' },
-          role: 'barber_pending'
-        } : null);
+        setUser(prev => prev ? { ...prev, barber: { status: 'pending' }, role: 'barber_pending' } : null);
       } else {
         setUser(prev => {
           if (prev && prev.role !== 'admin' && prev.role !== 'super_admin') {
@@ -138,62 +122,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user?.id, user?.email, fetchBackendRole]);
 
-  // Initialize user from stored token on mount
+  // Initialize: check session via GET /api/auth/me
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const token = getAuthToken();
+        const result = await getMe();
         
-        if (!token) {
-          setUser(null);
-          setLoading(false);
-          setIsInitialized(true);
-          return;
-        }
-        
-        if (isTokenExpired()) {
-          removeAuthToken();
-          setUser(null);
-          setLoading(false);
-          setIsInitialized(true);
-          return;
-        }
-        
-        const decoded = decodeJWT(token);
-        if (decoded?.email) {
-          const email = decoded.email;
-          const userId = decoded.id;
-          
-          let role: UserRole = email === SUPER_ADMIN_EMAIL ? 'super_admin' : 'user';
-          let barberData: UserProfile['barber'] | undefined;
-
-          // Fetch role from backend API (not localStorage)
-          if (email !== SUPER_ADMIN_EMAIL) {
-            const backendRole = await fetchBackendRole();
-            role = backendRole;
-            if (backendRole === 'barber') {
-              barberData = { status: 'approved' };
-            } else if (backendRole === 'barber_pending') {
-              barberData = { status: 'pending' };
-            }
-          }
-          
-          setUser({
-            email,
-            full_name: email.split('@')[0],
-            role,
-            id: userId,
-            barber: barberData,
-          });
-          
-          setupAutoLogoutTimer();
+        if (result.success && result.data?.id && result.data?.email) {
+          const profile = await buildUserProfile(result.data);
+          setUser(profile);
         } else {
-          removeAuthToken();
           setUser(null);
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        removeAuthToken();
         setUser(null);
       } finally {
         setLoading(false);
@@ -202,13 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     initAuth();
-
-    return () => {
-      if (logoutTimerRef.current) {
-        clearTimeout(logoutTimerRef.current);
-      }
-    };
-  }, [setupAutoLogoutTimer, fetchBackendRole]);
+  }, [buildUserProfile]);
 
   // Check barber status after user is set
   useEffect(() => {
@@ -224,7 +160,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const poll = () => refreshBarberStatus();
     const interval = setInterval(poll, 5000);
-
     const handleWindowFocus = () => poll();
     window.addEventListener('focus', handleWindowFocus);
 
@@ -243,28 +178,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error: new Error(result.error || 'Login failed') };
       }
 
-      const token = result.data?.token;
-      if (token) {
-        const decoded = decodeJWT(token);
-        const userId = decoded?.id;
-        
-        let role: UserRole = email === SUPER_ADMIN_EMAIL ? 'super_admin' : 'user';
-
-        // Fetch fresh role from backend after login
-        if (email !== SUPER_ADMIN_EMAIL) {
-          const backendRole = await fetchBackendRole();
-          role = backendRole;
+      // After login, backend sets HTTP-only cookie. Fetch user via /api/auth/me
+      const meResult = await getMe();
+      if (meResult.success && meResult.data?.id && meResult.data?.email) {
+        const profile = await buildUserProfile(meResult.data);
+        setUser(profile);
+      } else {
+        // Fallback: use login response data if available
+        if (result.data?.id && result.data?.email) {
+          const profile = await buildUserProfile(result.data);
+          setUser(profile);
         }
-
-        setUser({
-          email,
-          full_name: decoded?.email?.split('@')[0] || email.split('@')[0],
-          role,
-          id: userId,
-          barber: role === 'barber' ? { status: 'approved' } : role === 'barber_pending' ? { status: 'pending' } : undefined,
-        });
-
-        setupAutoLogoutTimer();
       }
 
       return { error: null };
@@ -282,49 +206,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error: new Error(result.error || 'Registration failed') };
       }
 
-      // Backend doesn't return token on signup, so auto-login after successful registration
-      const token = result.data?.token;
-      if (token) {
-        const decoded = decodeJWT(token);
-        setUser({
-          email,
-          full_name: name,
-          role: 'user',
-          id: decoded?.id,
-        });
-        setupAutoLogoutTimer();
-      } else {
-        // Auto-login with the same credentials
-        const loginResult = await apiLogin({ email, password });
-        if (loginResult.success && loginResult.data?.token) {
-          const decoded = decodeJWT(loginResult.data.token);
-          setUser({
-            email,
-            full_name: name,
-            role: 'user',
-            id: decoded?.id,
-          });
-          setupAutoLogoutTimer();
-        } else {
-          // Login failed (e.g. email not confirmed) — account is created, user needs to confirm or sign in later
-          return { error: null, needsConfirmation: true } as any;
+      // Try auto-login after signup
+      const loginResult = await apiLogin({ email, password });
+      if (loginResult.success) {
+        const meResult = await getMe();
+        if (meResult.success && meResult.data?.id && meResult.data?.email) {
+          const profile = await buildUserProfile(meResult.data);
+          setUser(profile);
+        } else if (loginResult.data?.id && loginResult.data?.email) {
+          const profile = await buildUserProfile(loginResult.data);
+          setUser(profile);
         }
+        return { error: null };
+      } else {
+        // Login failed after signup - might need email confirmation
+        return { error: null, needsConfirmation: true } as any;
       }
-
-      return { error: null };
     } catch (err) {
       return { error: err as Error };
     }
   };
 
   const signOut = async () => {
-    if (logoutTimerRef.current) {
-      clearTimeout(logoutTimerRef.current);
-      logoutTimerRef.current = null;
-    }
-    
-    removeAuthToken();
-    localStorage.removeItem('barber_status');
+    await apiLogout();
     setUser(null);
     setBarberStatusChecked(false);
   };
