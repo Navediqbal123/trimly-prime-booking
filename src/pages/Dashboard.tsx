@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, Star, MapPin, Scissors, Loader2 } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
-import { supabase } from '@/lib/supabase';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { getApprovedBarbers, ApprovedBarberData } from '@/lib/api';
@@ -27,14 +27,6 @@ export default function Dashboard() {
   const { user } = useProtectedUser();
   const navigate = useNavigate();
 
-  // Verify session on mount — redirect if no session
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        window.location.href = '/auth';
-      }
-    });
-  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [barbers, setBarbers] = useState<ApprovedBarberData[]>([]);
   const [filteredBarbers, setFilteredBarbers] = useState<ApprovedBarberData[]>([]);
