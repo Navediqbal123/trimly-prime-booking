@@ -1,4 +1,4 @@
-// API service for backend endpoints
+// API service for backend endpoints (data only — auth is handled by Supabase client)
 import { toast } from 'sonner';
 
 const BASE_URL = 'https://saloon-backend-gp4v.onrender.com';
@@ -9,25 +9,9 @@ interface ApiResponse<T = unknown> {
   error?: string;
 }
 
-// ==========================================
-// SESSION AUTH - No localStorage, cookies only
-// ==========================================
-
-// Handle session expiry
-export function handleSessionExpiry(showToast = true): void {
-  if (showToast) {
-    toast.error('Session expired. Please login again.');
-  }
-}
-
-// ==========================================
-// API INTERCEPTOR - credentials: 'include' on ALL requests
-// ==========================================
-
 async function apiCall<T>(
   endpoint: string,
   options: RequestInit = {},
-  requiresAuth = true
 ): Promise<ApiResponse<T>> {
   try {
     const headers: Record<string, string> = {
@@ -38,15 +22,11 @@ async function apiCall<T>(
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       ...options,
       headers,
-      credentials: 'include', // Send HTTP-only cookies with every request
+      credentials: 'include',
     });
 
-    // Handle 401 Unauthorized responses
     if (response.status === 401) {
-      if (requiresAuth) {
-        handleSessionExpiry(true);
-      }
-      return { success: false, error: 'Session expired' };
+      return { success: false, error: 'Unauthorized' };
     }
 
     let data: any;
@@ -57,8 +37,7 @@ async function apiCall<T>(
     }
 
     if (!response.ok) {
-      const errorMessage = data.message || data.error || data.msg || data.detail || JSON.stringify(data) || `Request failed with status ${response.status}`;
-      console.error('API error response:', { status: response.status, url: `${BASE_URL}${endpoint}`, body: data });
+      const errorMessage = data.message || data.error || data.msg || data.detail || `Request failed with status ${response.status}`;
       return { success: false, error: errorMessage };
     }
 
@@ -67,66 +46,6 @@ async function apiCall<T>(
     console.error('API call error:', error, '| URL:', `${BASE_URL}${endpoint}`);
     return { success: false, error: 'Network error. Please try again.' };
   }
-}
-
-// ==========================================
-// AUTH ENDPOINTS
-// ==========================================
-
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface AuthUserData {
-  id: string;
-  email: string;
-  name?: string;
-  role?: string;
-}
-
-export interface RegisterData {
-  email: string;
-  password: string;
-  name: string;
-  phone?: string;
-  role?: string;
-}
-
-// POST /api/auth/signup
-export async function register(data: RegisterData): Promise<ApiResponse<AuthUserData>> {
-  return apiCall<AuthUserData>('/api/auth/signup', {
-    method: 'POST',
-    body: JSON.stringify({
-      email: data.email,
-      password: data.password,
-      name: data.name,
-      phone: data.phone || '',
-      role: data.role || 'user',
-    }),
-  }, false);
-}
-
-// POST /api/auth/login
-export async function login(data: LoginData): Promise<ApiResponse<AuthUserData>> {
-  return apiCall<AuthUserData>('/api/auth/login', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  }, false);
-}
-
-// GET /api/auth/me - Check current session
-export async function getMe(): Promise<ApiResponse<AuthUserData>> {
-  return apiCall<AuthUserData>('/api/auth/me', {
-    method: 'GET',
-  }, false);
-}
-
-// POST /api/auth/logout
-export async function logout(): Promise<ApiResponse> {
-  return apiCall('/api/auth/logout', {
-    method: 'POST',
-  }, false);
 }
 
 // ==========================================
@@ -317,21 +236,3 @@ export async function getAdminUsers(): Promise<ApiResponse<UserData[]>> {
   return apiCall<UserData[]>('/api/admin/users', { method: 'GET' });
 }
 
-// ==========================================
-// USER ROLE FETCH (from backend)
-// ==========================================
-
-export async function getMyRole(): Promise<ApiResponse<{ role: string }>> {
-  const barberResult = await apiCall<BarberProfileData>('/api/barber/me', { method: 'GET' });
-  
-  if (barberResult.success && barberResult.data) {
-    if (barberResult.data.status === 'approved') {
-      return { success: true, data: { role: 'barber' } };
-    }
-    if (barberResult.data.status === 'pending') {
-      return { success: true, data: { role: 'barber_pending' } };
-    }
-  }
-  
-  return { success: true, data: { role: 'user' } };
-}
