@@ -33,11 +33,11 @@ export default function Auth() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // If already authenticated (session cookie valid), redirect to dashboard
-  if (user) {
+  // If already authenticated, redirect to dashboard
+  if (!authLoading && user) {
     return <Navigate to="/dashboard" replace />;
   }
 
