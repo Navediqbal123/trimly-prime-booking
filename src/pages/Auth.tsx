@@ -36,12 +36,12 @@ export default function Auth() {
   const { signIn, signUp, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // If already authenticated, force full page redirect
+  // If already authenticated, redirect to dashboard (only from /auth)
   useEffect(() => {
     if (!authLoading && user) {
-      window.location.href = '/dashboard';
+      navigate('/dashboard', { replace: true });
     }
-  }, [authLoading, user]);
+  }, [authLoading, user, navigate]);
 
   if (!authLoading && user) {
     return null;
@@ -80,8 +80,7 @@ export default function Auth() {
           setFormData({ name: '', email: '', password: '', phone: '' });
         } else {
           toast.success('Account created successfully!');
-          window.location.href = '/dashboard';
-          return;
+          navigate('/dashboard', { replace: true });
         }
       } else {
         const result = loginSchema.safeParse(formData);
@@ -105,8 +104,7 @@ export default function Auth() {
           }
         } else {
           toast.success('Welcome back!');
-          window.location.href = '/dashboard';
-          return;
+          navigate('/dashboard', { replace: true });
         }
       }
     } catch (err) {
