@@ -36,9 +36,15 @@ export default function Auth() {
   const { signIn, signUp, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // If already authenticated, redirect to dashboard
+  // If already authenticated, force full page redirect
+  useEffect(() => {
+    if (!authLoading && user) {
+      window.location.href = '/dashboard';
+    }
+  }, [authLoading, user]);
+
   if (!authLoading && user) {
-    return <Navigate to="/dashboard" replace />;
+    return null;
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +80,8 @@ export default function Auth() {
           setFormData({ name: '', email: '', password: '', phone: '' });
         } else {
           toast.success('Account created successfully!');
-          navigate('/dashboard', { replace: true });
+          window.location.href = '/dashboard';
+          return;
         }
       } else {
         const result = loginSchema.safeParse(formData);
@@ -98,7 +105,8 @@ export default function Auth() {
           }
         } else {
           toast.success('Welcome back!');
-          navigate('/dashboard', { replace: true });
+          window.location.href = '/dashboard';
+          return;
         }
       }
     } catch (err) {
