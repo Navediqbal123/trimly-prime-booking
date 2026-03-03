@@ -1,5 +1,6 @@
 // API service for backend endpoints (data only — auth is handled by Supabase client)
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 
 const BASE_URL = 'https://saloon-backend-gp4v.onrender.com';
 
@@ -14,8 +15,13 @@ async function apiCall<T>(
   options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   try {
+    // Get Supabase session token
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers as Record<string, string>),
     };
 
