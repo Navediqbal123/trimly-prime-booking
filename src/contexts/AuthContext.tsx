@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { supabase, SUPER_ADMIN_EMAIL } from '@/lib/supabase';
+import { getApprovedBarbers, getPendingBarbers } from '@/lib/api';
 import type { User, Session } from '@supabase/supabase-js';
 
 export type UserRole = 'user' | 'barber_pending' | 'barber' | 'admin' | 'super_admin';
@@ -77,9 +78,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
+  // Auto-check barber status when user is set and not super_admin
+  useEffect(() => {
+    if (user?.id && user.role !== 'super_admin') {
+      refreshBarberStatus();
+    }
+  }, [user?.id]);
+
   const refreshBarberStatus = useCallback(async () => {
-    setBarberStatusChecked(true);
-  }, []);
+    if (!user?.id) {
+      setBarberStatusChecked(true);
+      return;
+    }
+    try {
+      const [approvedRes, pendingRes] = await Promise.all([
+        getApprovedBarbers(),
+        getPendingBarbers(),
+      ]);
+
+      const userId = user.id;
+      const isApproved = approvedRes.success && approvedRes.data?.some(b => b.user_id === userId);
+      const isPending = pendingRes.success && pendingRes.data?.some(b => b.user_id === userId);
+
+      if (isApproved) {
+        setUser(prev => prev ? { ...prev, role: 'barber' } : prev);
+      } else if (isPending) {
+        setUser(prev => prev ? { ...prev, role: 'barber_pending' } : prev);
+      }
+    } catch (err) {
+      console.error('Failed to refresh barber status:', err);
+    } finally {
+      setBarberStatusChecked(true);
+    }
+  }, [user?.id]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
