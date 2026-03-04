@@ -57,8 +57,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [barberStatusChecked, setBarberStatusChecked] = useState(false);
 
-  // Initialize auth state
+  // Initialize auth state — force sign-out once to clear stale tokens
   useEffect(() => {
+    const FORCE_RELOGIN_KEY = 'trimly_force_relogin_v2';
+    const didForce = sessionStorage.getItem(FORCE_RELOGIN_KEY);
+
+    if (!didForce) {
+      sessionStorage.setItem(FORCE_RELOGIN_KEY, '1');
+      supabase.auth.signOut().then(() => {
+        setUser(null);
+        setLoading(false);
+      });
+      return;
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser(buildProfile(session.user));
