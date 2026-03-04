@@ -62,15 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const FORCE_RELOGIN_KEY = 'trimly_force_relogin_v2';
     const didForce = sessionStorage.getItem(FORCE_RELOGIN_KEY);
 
-    if (!didForce) {
-      sessionStorage.setItem(FORCE_RELOGIN_KEY, '1');
-      supabase.auth.signOut().then(() => {
-        setUser(null);
-        setLoading(false);
-      });
-      return;
-    }
-
+    // Always subscribe to auth changes FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser(buildProfile(session.user));
@@ -80,12 +72,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUser(buildProfile(session.user));
-      }
-      setLoading(false);
-    });
+    if (!didForce) {
+      // Force one sign-out to clear stale tokens, but listener is already active
+      sessionStorage.setItem(FORCE_RELOGIN_KEY, '1');
+      supabase.auth.signOut().then(() => {
+        setUser(null);
+        setLoading(false);
+      });
+    } else {
+      // Normal init — check existing session
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          setUser(buildProfile(session.user));
+        }
+        setLoading(false);
+      });
+    }
 
     return () => subscription.unsubscribe();
   }, []);
