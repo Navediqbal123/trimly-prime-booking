@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Initialize auth state — force sign-out once to clear stale tokens
   useEffect(() => {
-    const FORCE_RELOGIN_KEY = 'trimly_force_relogin_v2';
+    const FORCE_RELOGIN_KEY = 'trimly_force_relogin_v3';
     const didForce = sessionStorage.getItem(FORCE_RELOGIN_KEY);
 
     // Always subscribe to auth changes FIRST
