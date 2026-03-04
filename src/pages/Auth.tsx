@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Scissors, Mail, Lock, Loader2, Eye, EyeOff, User, Phone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -34,17 +34,10 @@ export default function Auth() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const { signIn, signUp, user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
 
-  // If already authenticated, redirect to dashboard (only from /auth)
-  useEffect(() => {
-    if (!authLoading && user) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [authLoading, user, navigate]);
-
+  // If already authenticated, redirect to dashboard
   if (!authLoading && user) {
-    return null;
+    return <Navigate to="/dashboard" replace />;
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,7 +73,7 @@ export default function Auth() {
           setFormData({ name: '', email: '', password: '', phone: '' });
         } else {
           toast.success('Account created successfully!');
-          navigate('/dashboard', { replace: true });
+          // <Navigate> component will handle redirect when user state updates
         }
       } else {
         const result = loginSchema.safeParse(formData);
@@ -104,7 +97,7 @@ export default function Auth() {
           }
         } else {
           toast.success('Welcome back!');
-          navigate('/dashboard', { replace: true });
+          // <Navigate> component will handle redirect when user state updates
         }
       }
     } catch (err) {
