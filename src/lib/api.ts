@@ -31,10 +31,6 @@ async function apiCall<T>(
       credentials: 'include',
     });
 
-    if (response.status === 401) {
-      return { success: false, error: 'Unauthorized' };
-    }
-
     let data: any;
     try {
       data = await response.json();
@@ -44,7 +40,8 @@ async function apiCall<T>(
 
     if (!response.ok) {
       const errorMessage = data.message || data.error || data.msg || data.detail || `Request failed with status ${response.status}`;
-      return { success: false, error: errorMessage };
+      console.error(`API ${response.status} on ${endpoint}:`, JSON.stringify(data));
+      return { success: false, error: `[${response.status}] ${errorMessage}` };
     }
 
     return { success: true, data };
