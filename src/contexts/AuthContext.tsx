@@ -57,6 +57,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [barberStatusChecked, setBarberStatusChecked] = useState(false);
 
+  // Restore cached barber role on mount (prevents sidebar flicker)
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem('trimly_barber_status');
+      if (cached) {
+        const { role } = JSON.parse(cached);
+        if (role === 'barber' || role === 'barber_pending') {
+          setUser(prev => prev ? { ...prev, role } : prev);
+        }
+      }
+    } catch {}
+  }, [user?.id]);
+
   // Initialize auth state — force sign-out once to clear stale tokens
   useEffect(() => {
     const FORCE_RELOGIN_KEY = 'trimly_force_relogin_v6';
@@ -116,8 +129,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (isApproved) {
         setUser(prev => prev ? { ...prev, role: 'barber' } : prev);
+        localStorage.setItem('trimly_barber_status', JSON.stringify({ role: 'barber' }));
       } else if (isPending) {
         setUser(prev => prev ? { ...prev, role: 'barber_pending' } : prev);
+        localStorage.setItem('trimly_barber_status', JSON.stringify({ role: 'barber_pending' }));
+      } else {
+        localStorage.removeItem('trimly_barber_status');
       }
     } catch (err) {
       console.error('Failed to refresh barber status:', err);
@@ -148,6 +165,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
     setUser(null);
     setBarberStatusChecked(false);
+    localStorage.removeItem('trimly_barber_status');
   };
 
   const updateLocalRole = (role: UserRole) => {
