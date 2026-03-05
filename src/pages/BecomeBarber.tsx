@@ -80,21 +80,28 @@ export default function BecomeBarber() {
       return;
     }
 
-    // Call backend API to register barber
-    // Send ONLY shop_name and location as per API spec
-    const response = await registerBarber({
-      shop_name: formData.shopName,
-      location: formData.location,
-    });
+    try {
+      // Call backend API to register barber
+      const response = await registerBarber({
+        shop_name: formData.shopName,
+        location: formData.location,
+      });
 
-    if (response.success) {
-      // Update local role to barber_pending
-      updateLocalRole('barber_pending');
-      // Refresh barber status from backend
-      await refreshBarberStatus();
-      toast.success('Request submitted, waiting for admin approval');
-    } else {
-      toast.error(response.error || 'Failed to submit application');
+      // Backend may return 200/201 with various shapes — treat any non-error as success
+      if (response.success || response.data) {
+        // Update local role to barber_pending
+        updateLocalRole('barber_pending');
+        // Cache pending status in localStorage
+        localStorage.setItem('trimly_barber_status', JSON.stringify({ role: 'barber_pending' }));
+        // Refresh barber status from backend
+        await refreshBarberStatus();
+        toast.success('Request submitted, waiting for admin approval');
+      } else {
+        toast.error(response.error || 'Failed to submit application');
+      }
+    } catch (err) {
+      console.error('Barber registration error:', err);
+      toast.error('Something went wrong. Please try again.');
     }
 
     setLoading(false);
