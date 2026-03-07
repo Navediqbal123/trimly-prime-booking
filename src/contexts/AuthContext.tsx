@@ -106,11 +106,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Auto-check barber status when user is set and not super_admin
+  // Includes polling every 10s and re-check on window focus
   useEffect(() => {
-    if (user?.id && user.role !== 'super_admin') {
+    if (!user?.id || user.role === 'super_admin') return;
+
+    // Initial check
+    refreshBarberStatus();
+
+    // Poll every 10 seconds
+    const interval = setInterval(() => {
       refreshBarberStatus();
-    }
-  }, [user?.id]);
+    }, 10_000);
+
+    // Re-check on window focus
+    const onFocus = () => refreshBarberStatus();
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [user?.id, refreshBarberStatus]);
 
   const refreshBarberStatus = useCallback(async () => {
     if (!user?.id) {
