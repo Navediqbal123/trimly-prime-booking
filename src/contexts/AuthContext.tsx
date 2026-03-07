@@ -105,29 +105,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  // Auto-check barber status when user is set and not super_admin
-  // Includes polling every 10s and re-check on window focus
-  useEffect(() => {
-    if (!user?.id || user.role === 'super_admin') return;
-
-    // Initial check
-    refreshBarberStatus();
-
-    // Poll every 10 seconds
-    const interval = setInterval(() => {
-      refreshBarberStatus();
-    }, 10_000);
-
-    // Re-check on window focus
-    const onFocus = () => refreshBarberStatus();
-    window.addEventListener('focus', onFocus);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('focus', onFocus);
-    };
-  }, [user?.id, refreshBarberStatus]);
-
   const refreshBarberStatus = useCallback(async () => {
     if (!user?.id) {
       setBarberStatusChecked(true);
@@ -158,6 +135,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setBarberStatusChecked(true);
     }
   }, [user?.id]);
+
+  // Auto-check barber status with polling (10s) and window focus
+  useEffect(() => {
+    if (!user?.id || user.role === 'super_admin') return;
+
+    refreshBarberStatus();
+
+    const interval = setInterval(refreshBarberStatus, 10_000);
+    const onFocus = () => refreshBarberStatus();
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [user?.id, refreshBarberStatus]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
