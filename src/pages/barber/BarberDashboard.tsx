@@ -60,10 +60,12 @@ export default function BarberDashboard() {
     const profileResponse = await getMyBarberProfile();
     
     if (!profileResponse.success) {
-      if (profileResponse.error?.includes('403') || 
+      if (profileResponse.error?.includes('404') ||
+          profileResponse.error?.includes('403') || 
           profileResponse.error?.toLowerCase().includes('unauthorized') || 
           profileResponse.error?.toLowerCase().includes('forbidden') ||
-          profileResponse.error?.toLowerCase().includes('pending')) {
+          profileResponse.error?.toLowerCase().includes('pending') ||
+          profileResponse.error?.toLowerCase().includes('not found')) {
         setError('pending');
       } else {
         setError(profileResponse.error || 'Failed to load profile');
