@@ -62,9 +62,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const cached = localStorage.getItem('trimly_barber_status');
       if (cached) {
-        const { role } = JSON.parse(cached);
+        const parsed = JSON.parse(cached);
+        const role = parsed.role;
+        const status = parsed.status;
         if (role === 'barber' || role === 'barber_pending') {
-          setUser(prev => prev ? { ...prev, role } : prev);
+          setUser(prev => {
+            if (!prev) return prev;
+            // For super_admin, keep their role but add barber info
+            const newRole = prev.email === SUPER_ADMIN_EMAIL ? 'super_admin' : role;
+            return { ...prev, role: newRole, barber: status ? { status } : undefined };
+          });
         }
       }
     } catch {}
@@ -121,13 +128,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const isPending = pendingRes.success && pendingRes.data?.some(b => b.user_id === userId);
 
       if (isApproved) {
-        setUser(prev => prev ? { ...prev, role: 'barber' } : prev);
-        localStorage.setItem('trimly_barber_status', JSON.stringify({ role: 'barber' }));
+        setUser(prev => {
+          if (!prev) return prev;
+          // For super_admin, keep the role but add barber info
+          const baseRole = prev.email === SUPER_ADMIN_EMAIL ? 'super_admin' : 'barber';
+          return { ...prev, role: baseRole, barber: { status: 'approved' } };
+        });
+        localStorage.setItem('trimly_barber_status', JSON.stringify({ role: 'barber', status: 'approved' }));
       } else if (isPending) {
-        setUser(prev => prev ? { ...prev, role: 'barber_pending' } : prev);
-        localStorage.setItem('trimly_barber_status', JSON.stringify({ role: 'barber_pending' }));
+        setUser(prev => {
+          if (!prev) return prev;
+          const baseRole = prev.email === SUPER_ADMIN_EMAIL ? 'super_admin' : 'barber_pending';
+          return { ...prev, role: baseRole, barber: { status: 'pending' } };
+        });
+        localStorage.setItem('trimly_barber_status', JSON.stringify({ role: 'barber_pending', status: 'pending' }));
       } else {
-        localStorage.removeItem('trimly_barber_status');
+        // Don't clear if we just submitted - only clear if both API calls succeeded
+        if (approvedRes.success && pendingRes.success) {
+          localStorage.removeItem('trimly_barber_status');
+          setUser(prev => prev ? { ...prev, barber: undefined } : prev);
+        }
       }
     } catch (err) {
       console.error('Failed to refresh barber status:', err);
@@ -138,7 +158,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Auto-check barber status with polling (10s) and window focus
   useEffect(() => {
-    if (!user?.id || user.role === 'super_admin') return;
+    if (!user?.id) return;
 
     refreshBarberStatus();
 
@@ -184,7 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isSuperAdmin = user?.role === 'super_admin' || user?.email === SUPER_ADMIN_EMAIL;
   const isAdmin = isSuperAdmin || user?.role === 'admin';
   const isBarber = user?.role === 'barber' || user?.barber?.status === 'approved';
-  const isBarberPending = user?.role === 'barber_pending' || user?.barber?.status === 'pending';
+  const isBarberPending = (user?.role === 'barber_pending' || user?.barber?.status === 'pending') && !isBarber;
 
   return (
     <AuthContext.Provider

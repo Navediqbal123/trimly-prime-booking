@@ -89,13 +89,13 @@ export default function BecomeBarber() {
 
       // Backend may return 200/201 with various shapes — treat any non-error as success
       if (response.success || response.data) {
-        // Update local role to barber_pending
+        // Update local role to barber_pending immediately
         updateLocalRole('barber_pending');
         // Cache pending status in localStorage
-        localStorage.setItem('trimly_barber_status', JSON.stringify({ role: 'barber_pending' }));
-        // Refresh barber status from backend
-        await refreshBarberStatus();
+        localStorage.setItem('trimly_barber_status', JSON.stringify({ role: 'barber_pending', status: 'pending' }));
         toast.success('Request submitted, waiting for admin approval');
+        // Refresh after a short delay to let backend process
+        setTimeout(() => refreshBarberStatus(), 3000);
       } else {
         toast.error(response.error || 'Failed to submit application');
       }
