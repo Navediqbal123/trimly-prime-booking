@@ -62,9 +62,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const cached = localStorage.getItem('trimly_barber_status');
       if (cached) {
-        const { role } = JSON.parse(cached);
+        const parsed = JSON.parse(cached);
+        const role = parsed.role;
+        const status = parsed.status;
         if (role === 'barber' || role === 'barber_pending') {
-          setUser(prev => prev ? { ...prev, role } : prev);
+          setUser(prev => {
+            if (!prev) return prev;
+            // For super_admin, keep their role but add barber info
+            const newRole = prev.email === SUPER_ADMIN_EMAIL ? 'super_admin' : role;
+            return { ...prev, role: newRole, barber: status ? { status } : undefined };
+          });
         }
       }
     } catch {}
