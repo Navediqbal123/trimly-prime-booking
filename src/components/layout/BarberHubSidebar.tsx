@@ -11,6 +11,10 @@ import {
   ChevronRight,
   ChevronLeft,
   LogOut,
+  Clock,
+  Users,
+  DollarSign,
+  Star,
 } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
@@ -18,10 +22,13 @@ import { cn } from '@/lib/utils';
 
 const barberNavItems = [
   { title: 'Dashboard', href: '/barber-hub', icon: LayoutDashboard },
+  { title: 'My Services & Pricing', href: '/barber-hub/services', icon: Settings },
+  { title: 'My Appointments', href: '/barber-hub/bookings', icon: Calendar },
+  { title: 'My Schedule', href: '/barber-hub/schedule', icon: Clock },
+  { title: 'My Clients', href: '/barber-hub/clients', icon: Users },
+  { title: 'My Earnings', href: '/barber-hub/earnings', icon: DollarSign },
+  { title: 'My Reviews', href: '/barber-hub/reviews', icon: Star },
   { title: 'My Shop', href: '/barber-hub/shop', icon: Store },
-  { title: 'Services', href: '/barber-hub/services', icon: Settings },
-  { title: 'Bookings', href: '/barber-hub/bookings', icon: Calendar },
-  { title: 'Profile', href: '/profile', icon: User },
 ];
 
 export function BarberHubSidebar() {

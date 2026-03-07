@@ -19,6 +19,10 @@ import BarberDashboard from "./pages/barber/BarberDashboard";
 import MyShop from "./pages/barber/MyShop";
 import Services from "./pages/barber/Services";
 import BarberBookings from "./pages/barber/BarberBookings";
+import BarberSchedule from "./pages/barber/BarberSchedule";
+import BarberClients from "./pages/barber/BarberClients";
+import BarberEarnings from "./pages/barber/BarberEarnings";
+import BarberReviews from "./pages/barber/BarberReviews";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import BarberRequests from "./pages/admin/BarberRequests";
@@ -78,6 +82,10 @@ function AppRoutes() {
         <Route path="/barber-hub/shop" element={<MyShop />} />
         <Route path="/barber-hub/services" element={<Services />} />
         <Route path="/barber-hub/bookings" element={<BarberBookings />} />
+        <Route path="/barber-hub/schedule" element={<BarberSchedule />} />
+        <Route path="/barber-hub/clients" element={<BarberClients />} />
+        <Route path="/barber-hub/earnings" element={<BarberEarnings />} />
+        <Route path="/barber-hub/reviews" element={<BarberReviews />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
