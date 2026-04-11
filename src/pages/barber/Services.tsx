@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { addService, getMyBarberProfile, getBarberServices, ServiceData } from '@/lib/api';
+import { addService, updateService, getMyBarberProfile, getBarberServices, ServiceData } from '@/lib/api';
 
 export default function Services() {
   const [services, setServices] = useState<ServiceData[]>([]);
@@ -71,24 +71,24 @@ export default function Services() {
     }
 
     if (editingService) {
-      // Editing - no backend route, just update local UI
-      setServices((prev) =>
-        prev.map((s) =>
-          s.id === editingService.id
-            ? {
-                ...s,
-                name: formData.name,
-                duration: parseInt(formData.duration),
-                price: parseFloat(formData.price),
-                home_service: formData.home_service,
-              }
-            : s
-        )
-      );
-      toast.success('Service updated locally');
-      setIsOpen(false);
-      setEditingService(null);
-      setFormData({ name: '', duration: '', price: '', home_service: false });
+      setSubmitting(true);
+      const response = await updateService(editingService.id, {
+        name: formData.name,
+        duration: parseInt(formData.duration),
+        price: parseFloat(formData.price),
+        home_service: formData.home_service,
+      });
+
+      if (response.success) {
+        toast.success('Service updated successfully');
+        setIsOpen(false);
+        setEditingService(null);
+        setFormData({ name: '', duration: '', price: '', home_service: false });
+        await fetchServices();
+      } else {
+        toast.error(response.error || 'Failed to update service');
+      }
+      setSubmitting(false);
     } else {
       // Adding new service - call backend API
       setSubmitting(true);
