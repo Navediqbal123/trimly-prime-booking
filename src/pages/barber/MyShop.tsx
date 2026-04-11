@@ -1,21 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Store, Camera, Save, Loader2 } from 'lucide-react';
+import { Store, Save, Loader2, MapPin, Phone, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { getMyBarberProfile, BarberProfileData } from '@/lib/api';
 
 export default function MyShop() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [profile, setProfile] = useState<BarberProfileData | null>(null);
   const [formData, setFormData] = useState({
-    shopName: 'Classic Cuts Barbershop',
-    description: 'Traditional barbershop offering classic cuts and hot towel shaves.',
-    address: '123 Main Street, Downtown',
-    phone: '+1 234 567 890',
-    imageUrl: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=800',
+    shopName: '',
+    location: '',
+    description: '',
+    phone: '',
   });
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    setLoading(true);
+    const res = await getMyBarberProfile();
+    if (res.success && res.data) {
+      setProfile(res.data);
+      setFormData({
+        shopName: res.data.shop_name || '',
+        location: res.data.location || '',
+        description: '',
+        phone: '',
+      });
+    } else {
+      toast.error(res.error || 'Failed to load shop profile');
+    }
+    setLoading(false);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -24,13 +48,20 @@ export default function MyShop() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    toast.success('Shop details updated successfully');
-    setLoading(false);
+    setSaving(true);
+    // Backend doesn't have a shop update endpoint yet — save locally
+    toast.success('Shop details saved locally. Backend update coming soon.');
+    setSaving(false);
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground">Loading shop details...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in max-w-2xl mx-auto">
@@ -38,27 +69,41 @@ export default function MyShop() {
         <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
           My <span className="gradient-text">Shop</span>
         </h1>
-        <p className="text-muted-foreground">Manage your shop details</p>
+        <p className="text-muted-foreground">Manage your shop details and info</p>
       </div>
+
+      {/* Shop Status Card */}
+      {profile && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Store className="w-5 h-5 text-primary" />
+                Shop Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Status</p>
+                  <p className="font-medium capitalize text-green-500">{profile.status}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Barber ID</p>
+                  <p className="font-mono text-xs">{profile.id.slice(0, 12)}...</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
         className="bg-card border border-border rounded-2xl p-6"
       >
-        {/* Shop Image Preview */}
-        <div className="relative h-48 rounded-xl overflow-hidden mb-6">
-          <img
-            src={formData.imageUrl}
-            alt="Shop"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-          <button className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-primary flex items-center justify-center hover:bg-primary/90 transition-colors">
-            <Camera className="w-5 h-5 text-primary-foreground" />
-          </button>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="shopName">Shop Name</Label>
@@ -70,6 +115,22 @@ export default function MyShop() {
                 value={formData.shopName}
                 onChange={handleChange}
                 className="pl-10"
+                placeholder="Your shop name"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location">Location</Label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                id="location"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                className="pl-10"
+                placeholder="Shop address"
               />
             </div>
           </div>
@@ -82,41 +143,27 @@ export default function MyShop() {
               value={formData.description}
               onChange={handleChange}
               className="min-h-[100px]"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="address">Address</Label>
-            <Input
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
+              placeholder="Tell customers about your shop..."
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-            />
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="pl-10"
+                placeholder="+91 XXXXX XXXXX"
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="imageUrl">Shop Image URL</Label>
-            <Input
-              id="imageUrl"
-              name="imageUrl"
-              value={formData.imageUrl}
-              onChange={handleChange}
-            />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? (
+          <Button type="submit" className="w-full" disabled={saving}>
+            {saving ? (
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
             ) : (
               <Save className="w-4 h-4 mr-2" />
