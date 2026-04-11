@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { addService, getMyBarberProfile, getBarberServices, ServiceData } from '@/lib/api';
+import { addService, updateService, getMyBarberProfile, getBarberServices, ServiceData } from '@/lib/api';
 
 export default function Services() {
   const [services, setServices] = useState<ServiceData[]>([]);
