@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { addService, updateService, getMyBarberProfile, getBarberServices, ServiceData } from '@/lib/api';
+import { addService, updateService, getMyServices, ServiceData } from '@/lib/api';
 
 export default function Services() {
   const [services, setServices] = useState<ServiceData[]>([]);
@@ -31,25 +31,12 @@ export default function Services() {
 
   const fetchServices = async () => {
     setLoading(true);
-    
-    // First get the barber's profile to get their ID
-    const profileResponse = await getMyBarberProfile();
-    
-    if (profileResponse.success && profileResponse.data) {
-      const myBarberId = profileResponse.data.id;
-      setBarberId(myBarberId);
-      
-      // Now fetch services for this barber
-      const servicesResponse = await getBarberServices(myBarberId);
-      
-      if (servicesResponse.success && servicesResponse.data) {
-        setServices(servicesResponse.data);
-      }
+    const response = await getMyServices();
+    if (response.success && response.data) {
+      setServices(Array.isArray(response.data) ? response.data : []);
     } else {
-      // Barber not found or not approved yet
-      toast.error(profileResponse.error || 'Unable to load barber profile');
+      toast.error(response.error || 'Unable to load services');
     }
-    
     setLoading(false);
   };
 
