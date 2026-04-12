@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, Clock, DollarSign, Scissors, Loader2, Home, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,12 +17,11 @@ import { toast } from 'sonner';
 import { addService, updateService, getMyServices, ServiceData } from '@/lib/api';
 
 export default function Services() {
-  const [services, setServices] = useState<ServiceData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [editingService, setEditingService] = useState<ServiceData | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     duration: '',
@@ -29,20 +29,22 @@ export default function Services() {
     home_service: false,
   });
 
-  const fetchServices = async () => {
-    setLoading(true);
-    const response = await getMyServices();
-    if (response.success && response.data) {
-      setServices(Array.isArray(response.data) ? response.data : []);
-    } else {
-      toast.error(response.error || 'Unable to load services');
-    }
-    setLoading(false);
-  };
+  const { data: services = [], isLoading: loading, refetch } = useQuery({
+    queryKey: ['myServices'],
+    queryFn: async () => {
+      const response = await getMyServices();
+      if (response.success && response.data) {
+        return Array.isArray(response.data) ? response.data : [];
+      }
+      return [];
+    },
+  });
 
-  useEffect(() => {
-    fetchServices();
-  }, []);
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ['myServices'] });
+    queryClient.invalidateQueries({ queryKey: ['barberServices'] });
+    queryClient.invalidateQueries({ queryKey: ['approvedBarbers'] });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,8 +59,9 @@ export default function Services() {
       return;
     }
 
+    setSubmitting(true);
+
     if (editingService) {
-      setSubmitting(true);
       const response = await updateService(editingService.id, {
         name: formData.name,
         duration: parseInt(formData.duration),
@@ -71,14 +74,11 @@ export default function Services() {
         setIsOpen(false);
         setEditingService(null);
         setFormData({ name: '', duration: '', price: '', home_service: false });
-        await fetchServices();
+        invalidateAll();
       } else {
         toast.error(response.error || 'Failed to update service');
       }
-      setSubmitting(false);
     } else {
-      // Adding new service - call backend API
-      setSubmitting(true);
       const response = await addService({
         name: formData.name,
         duration: parseInt(formData.duration),
@@ -90,13 +90,13 @@ export default function Services() {
         toast.success('Service added successfully');
         setIsOpen(false);
         setFormData({ name: '', duration: '', price: '', home_service: false });
-        // Refetch services to get the real data from backend
-        await fetchServices();
+        invalidateAll();
       } else {
         toast.error(response.error || 'Failed to add service');
       }
-      setSubmitting(false);
     }
+
+    setSubmitting(false);
   };
 
   const handleEdit = (service: ServiceData) => {
@@ -111,8 +111,9 @@ export default function Services() {
   };
 
   const handleDelete = (id: string) => {
-    // No backend route for delete - just update local UI
-    setServices((prev) => prev.filter((s) => s.id !== id));
+    queryClient.setQueryData(['myServices'], (old: ServiceData[] | undefined) =>
+      old ? old.filter((s) => s.id !== id) : []
+    );
     toast.success('Service removed locally');
   };
 
@@ -141,16 +142,15 @@ export default function Services() {
         </div>
 
         <div className="flex gap-2">
-          <Button variant="outline" onClick={fetchServices} disabled={loading}>
+          <Button variant="outline" onClick={() => refetch()} disabled={loading}>
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
-          
+
           <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Service
+                <Plus className="w-4 h-4 mr-2" /> Add Service
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -160,62 +160,26 @@ export default function Services() {
               <form onSubmit={handleSubmit} className="space-y-4 mt-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Service Name</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="e.g., Classic Haircut"
-                  />
+                  <Input id="name" name="name" value={formData.name} onChange={handleChange} placeholder="e.g., Classic Haircut" />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="duration">Duration (minutes)</Label>
-                  <Input
-                    id="duration"
-                    name="duration"
-                    type="number"
-                    value={formData.duration}
-                    onChange={handleChange}
-                    placeholder="30"
-                  />
+                  <Input id="duration" name="duration" type="number" value={formData.duration} onChange={handleChange} placeholder="30" />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="price">Price (₹)</Label>
-                  <Input
-                    id="price"
-                    name="price"
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="250"
-                  />
+                  <Input id="price" name="price" type="number" step="0.01" value={formData.price} onChange={handleChange} placeholder="250" />
                 </div>
-
                 <div className="flex items-center justify-between">
                   <Label htmlFor="home_service">Home Service Available</Label>
                   <Switch
                     id="home_service"
                     checked={formData.home_service}
-                    onCheckedChange={(checked) =>
-                      setFormData((prev) => ({ ...prev, home_service: checked }))
-                    }
+                    onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, home_service: checked }))}
                   />
                 </div>
-
                 <Button type="submit" className="w-full" disabled={submitting}>
-                  {submitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Adding...
-                    </>
-                  ) : editingService ? (
-                    'Update Service'
-                  ) : (
-                    'Add Service'
-                  )}
+                  {submitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</> : editingService ? 'Update Service' : 'Add Service'}
                 </Button>
               </form>
             </DialogContent>
@@ -224,18 +188,9 @@ export default function Services() {
       </div>
 
       {services.length > 0 ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {services.map((service) => (
-            <motion.div
-              key={service.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-card border border-border rounded-2xl p-5"
-            >
+            <motion.div key={service.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-card border border-border rounded-2xl p-5">
               <div className="flex items-start justify-between mb-4">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Scissors className="w-6 h-6 text-primary" />
@@ -249,22 +204,16 @@ export default function Services() {
                   </Button>
                 </div>
               </div>
-
               <div className="flex items-center gap-2 mb-2">
                 <h3 className="font-semibold text-lg">{service.name}</h3>
-                {service.home_service && (
-                  <Home className="w-4 h-4 text-green-500" />
-                )}
+                {service.home_service && <Home className="w-4 h-4 text-green-500" />}
               </div>
-
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  <span>{service.duration} min</span>
+                  <Clock className="w-4 h-4" /> <span>{service.duration} min</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <DollarSign className="w-4 h-4" />
-                  <span>₹{service.price}</span>
+                  <DollarSign className="w-4 h-4" /> <span>₹{service.price}</span>
                 </div>
               </div>
             </motion.div>
