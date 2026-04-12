@@ -21,7 +21,7 @@ export default function Services() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingService, setEditingService] = useState<ServiceData | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [barberId, setBarberId] = useState<string | null>(null);
+  
   const [formData, setFormData] = useState({
     name: '',
     duration: '',
