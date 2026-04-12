@@ -87,10 +87,14 @@ export interface AddServiceData {
 }
 
 export async function addService(data: AddServiceData): Promise<ApiResponse> {
-  return apiCall('/api/barber/add-service', {
+  return apiCall('/api/services', {
     method: 'POST',
     body: JSON.stringify(data),
   });
+}
+
+export async function getMyServices(): Promise<ApiResponse<ServiceData[]>> {
+  return apiCall<ServiceData[]>('/api/services', { method: 'GET' });
 }
 
 // ==========================================
@@ -201,9 +205,7 @@ export async function getBarberBookings(): Promise<ApiResponse<BookingData[]>> {
   return apiCall<BookingData[]>('/api/booking/barber', { method: 'GET' });
 }
 
-export async function getMyServices(): Promise<ApiResponse<ServiceData[]>> {
-  return apiCall<ServiceData[]>('/api/barber/my-services', { method: 'GET' });
-}
+// getMyServices moved above near addService
 
 export interface UpdateServiceData {
   name?: string;
