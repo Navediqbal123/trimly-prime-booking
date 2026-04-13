@@ -95,18 +95,14 @@ export async function addService(data: AddServiceData): Promise<ApiResponse> {
     // Auto-register barber profile if not found
     if (!profile.success || !profile.data?.id) {
       const regResult = await registerBarber({ shop_name: 'My Salon', location: 'Not set' });
-      if (!regResult.success) {
+      if (!regResult.success || !regResult.data?.barber_id) {
         return { success: false, error: regResult.error || 'Failed to auto-create barber profile.' };
       }
-      // Retry fetching profile up to 3 times with 500ms delay
-      for (let attempt = 0; attempt < 3; attempt++) {
-        await new Promise((r) => setTimeout(r, 500));
-        profile = await getMyBarberProfile();
-        if (profile.success && profile.data?.id) break;
-      }
-      if (!profile.success || !profile.data?.id) {
-        return { success: false, error: 'Barber profile created but could not be retrieved. Please try again.' };
-      }
+      data = { ...data, barber_id: regResult.data.barber_id };
+      return apiCall('/api/barber/add-service', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
     }
 
     data = { ...data, barber_id: profile.data.id };
