@@ -98,8 +98,12 @@ export async function addService(data: AddServiceData): Promise<ApiResponse> {
       if (!regResult.success) {
         return { success: false, error: regResult.error || 'Failed to auto-create barber profile.' };
       }
-      // Re-fetch profile after registration
-      profile = await getMyBarberProfile();
+      // Retry fetching profile up to 3 times with 500ms delay
+      for (let attempt = 0; attempt < 3; attempt++) {
+        await new Promise((r) => setTimeout(r, 500));
+        profile = await getMyBarberProfile();
+        if (profile.success && profile.data?.id) break;
+      }
       if (!profile.success || !profile.data?.id) {
         return { success: false, error: 'Barber profile created but could not be retrieved. Please try again.' };
       }
