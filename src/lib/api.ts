@@ -87,14 +87,24 @@ export interface AddServiceData {
   barber_id?: string;
 }
 
-/** Fetches the logged-in user's barber_id from /api/barber/me, then posts the service. */
+/** Fetches the logged-in user's barber_id from /api/barber/me; auto-registers if missing. */
 export async function addService(data: AddServiceData): Promise<ApiResponse> {
-  // If no barber_id provided, resolve it automatically
   if (!data.barber_id) {
-    const profile = await getMyBarberProfile();
+    let profile = await getMyBarberProfile();
+
+    // Auto-register barber profile if not found
     if (!profile.success || !profile.data?.id) {
-      return { success: false, error: profile.error || 'Could not resolve barber profile. Are you an approved barber?' };
+      const regResult = await registerBarber({ shop_name: 'My Salon', location: 'Not set' });
+      if (!regResult.success) {
+        return { success: false, error: regResult.error || 'Failed to auto-create barber profile.' };
+      }
+      // Re-fetch profile after registration
+      profile = await getMyBarberProfile();
+      if (!profile.success || !profile.data?.id) {
+        return { success: false, error: 'Barber profile created but could not be retrieved. Please try again.' };
+      }
     }
+
     data = { ...data, barber_id: profile.data.id };
   }
   return apiCall('/api/barber/add-service', {
