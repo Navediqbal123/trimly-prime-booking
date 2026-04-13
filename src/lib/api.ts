@@ -84,9 +84,19 @@ export interface AddServiceData {
   price: number;
   duration: number;
   home_service: boolean;
+  barber_id?: string;
 }
 
+/** Fetches the logged-in user's barber_id from /api/barber/me, then posts the service. */
 export async function addService(data: AddServiceData): Promise<ApiResponse> {
+  // If no barber_id provided, resolve it automatically
+  if (!data.barber_id) {
+    const profile = await getMyBarberProfile();
+    if (!profile.success || !profile.data?.id) {
+      return { success: false, error: profile.error || 'Could not resolve barber profile. Are you an approved barber?' };
+    }
+    data = { ...data, barber_id: profile.data.id };
+  }
   return apiCall('/api/services', {
     method: 'POST',
     body: JSON.stringify(data),
@@ -114,6 +124,12 @@ export async function createBooking(data: CreateBookingData): Promise<ApiRespons
     method: 'POST',
     body: JSON.stringify(data),
   });
+}
+
+/** Helper: resolve the current user's barber_id from /api/barber/me */
+export async function getMyBarberId(): Promise<string | null> {
+  const res = await getMyBarberProfile();
+  return res.success && res.data?.id ? res.data.id : null;
 }
 
 export interface BookingData {
