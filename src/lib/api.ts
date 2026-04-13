@@ -97,7 +97,7 @@ export async function addService(data: AddServiceData): Promise<ApiResponse> {
     }
     data = { ...data, barber_id: profile.data.id };
   }
-  return apiCall('/api/services', {
+  return apiCall('/api/barber/add-service', {
     method: 'POST',
     body: JSON.stringify(data),
   });
