@@ -12,7 +12,7 @@ import {
   LogOut,
   Clock,
   Users,
-  DollarSign,
+  IndianRupee,
   Star,
 } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
@@ -25,7 +25,7 @@ const barberNavItems = [
   { title: 'My Appointments', href: '/barber-hub/bookings', icon: Calendar },
   { title: 'My Schedule', href: '/barber-hub/schedule', icon: Clock },
   { title: 'My Clients', href: '/barber-hub/clients', icon: Users },
-  { title: 'My Earnings', href: '/barber-hub/earnings', icon: DollarSign },
+  { title: 'My Earnings', href: '/barber-hub/earnings', icon: IndianRupee },
   { title: 'My Reviews', href: '/barber-hub/reviews', icon: Star },
   { title: 'My Shop', href: '/barber-hub/shop', icon: Store },
 ];
