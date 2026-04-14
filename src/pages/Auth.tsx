@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Scissors, Mail, Lock, Loader2, Eye, EyeOff, User, Phone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,22 @@ const signupSchema = z.object({
   phone: z.string().optional(),
 });
 
+const fadeSlide = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
+  transition: { duration: 0.35, ease: 'easeOut' as const },
+};
+
+const staggerChildren = {
+  animate: { transition: { staggerChildren: 0.08 } },
+};
+
+const childFade = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+};
+
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,7 +51,6 @@ export default function Auth() {
 
   const { signIn, signUp, user, loading: authLoading } = useAuth();
 
-  // If already authenticated, redirect to dashboard
   if (!authLoading && user) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -73,7 +88,6 @@ export default function Auth() {
           setFormData({ name: '', email: '', password: '', phone: '' });
         } else {
           toast.success('Account created successfully!');
-          // <Navigate> component will handle redirect when user state updates
         }
       } else {
         const result = loginSchema.safeParse(formData);
@@ -97,7 +111,6 @@ export default function Auth() {
           }
         } else {
           toast.success('Welcome back!');
-          // <Navigate> component will handle redirect when user state updates
         }
       }
     } catch (err) {
@@ -117,27 +130,37 @@ export default function Auth() {
     <div className="min-h-screen flex bg-background">
       {/* Left Side - Branding */}
       <motion.div
-        initial={{ opacity: 0, x: -50 }}
+        initial={{ opacity: 0, x: -60 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
         className="hidden lg:flex lg:w-1/2 bg-card relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10" />
         <div className="relative z-10 flex flex-col justify-center items-center p-12 text-center">
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring' }}
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
             className="w-24 h-24 rounded-2xl bg-primary/20 flex items-center justify-center mb-8 glow-primary"
           >
             <Scissors className="w-12 h-12 text-primary" />
           </motion.div>
-          <h1 className="text-5xl font-display font-bold gradient-text mb-4">
-            Trimly
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-md">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+            className="text-5xl font-display font-bold gradient-text mb-4"
+          >
+            BarberLane
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65, duration: 0.4 }}
+            className="text-xl text-muted-foreground max-w-md"
+          >
             Your premium barber booking experience. Discover skilled barbers, book appointments, and look your best.
-          </p>
+          </motion.p>
         </div>
         <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute -top-20 -left-20 w-60 h-60 rounded-full bg-primary/10 blur-3xl" />
@@ -146,141 +169,164 @@ export default function Auth() {
       {/* Right Side - Form */}
       <div className="flex-1 flex items-center justify-center p-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
           className="w-full max-w-md"
         >
           {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+            className="lg:hidden flex items-center justify-center gap-3 mb-8"
+          >
             <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
               <Scissors className="w-6 h-6 text-primary" />
             </div>
             <span className="text-3xl font-display font-bold gradient-text">
-              Trimly
+              BarberLane
             </span>
-          </div>
+          </motion.div>
 
           <div className="bg-card border border-border rounded-2xl p-8 glow-card">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-display font-bold mb-2">
-                {isSignUp ? 'Create Account' : 'Welcome Back'}
-              </h2>
-              <p className="text-muted-foreground">
-                {isSignUp ? 'Sign up to get started' : 'Sign in to your account'}
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="name"
-                      name="name"
-                      type="text"
-                      placeholder="John Doe"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="pl-10"
-                    />
-                  </div>
-                  {errors.name && (
-                    <p className="text-sm text-destructive">{errors.name}</p>
-                  )}
-                </div>
-              )}
-
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      placeholder="+91 9876543210"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="pl-10"
-                  />
-                </div>
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="pl-10 pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password}</p>
-                )}
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full mt-6"
-                disabled={loading}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={isSignUp ? 'signup' : 'signin'}
+                initial={{ opacity: 0, x: isSignUp ? 30 : -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: isSignUp ? -30 : 30 }}
+                transition={{ duration: 0.3 }}
               >
-                {loading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  isSignUp ? 'Sign Up' : 'Sign In'
-                )}
-              </Button>
-            </form>
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-display font-bold mb-2">
+                    {isSignUp ? 'Create Account' : 'Welcome Back'}
+                  </h2>
+                  <p className="text-muted-foreground">
+                    {isSignUp ? 'Sign up to get started' : 'Sign in to your account'}
+                  </p>
+                </div>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-                <button
-                  type="button"
-                  onClick={toggleMode}
-                  className="text-primary hover:underline font-medium"
+                <motion.form
+                  onSubmit={handleSubmit}
+                  className="space-y-4"
+                  variants={staggerChildren}
+                  initial="initial"
+                  animate="animate"
                 >
-                  {isSignUp ? 'Sign In' : 'Sign Up'}
-                </button>
-              </p>
-            </div>
+                  {isSignUp && (
+                    <motion.div variants={childFade} className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="name"
+                          name="name"
+                          type="text"
+                          placeholder="John Doe"
+                          value={formData.name}
+                          onChange={handleChange}
+                          className="pl-10"
+                        />
+                      </div>
+                      {errors.name && (
+                        <motion.p {...fadeSlide} className="text-sm text-destructive">{errors.name}</motion.p>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {isSignUp && (
+                    <motion.div variants={childFade} className="space-y-2">
+                      <Label htmlFor="phone">Phone Number</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          placeholder="+91 9876543210"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          className="pl-10"
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+
+                  <motion.div variants={childFade} className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="pl-10"
+                      />
+                    </div>
+                    {errors.email && (
+                      <motion.p {...fadeSlide} className="text-sm text-destructive">{errors.email}</motion.p>
+                    )}
+                  </motion.div>
+
+                  <motion.div variants={childFade} className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="pl-10 pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {errors.password && (
+                      <motion.p {...fadeSlide} className="text-sm text-destructive">{errors.password}</motion.p>
+                    )}
+                  </motion.div>
+
+                  <motion.div variants={childFade}>
+                    <Button
+                      type="submit"
+                      className="w-full mt-6"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        isSignUp ? 'Sign Up' : 'Sign In'
+                      )}
+                    </Button>
+                  </motion.div>
+                </motion.form>
+
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+                    <button
+                      type="button"
+                      onClick={toggleMode}
+                      className="text-primary hover:underline font-medium transition-colors"
+                    >
+                      {isSignUp ? 'Sign In' : 'Sign Up'}
+                    </button>
+                  </p>
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </motion.div>
       </div>
