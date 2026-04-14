@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Clock, DollarSign, Scissors, Loader2, Home, AlertCircle, RefreshCw } from 'lucide-react';
+import { Plus, Edit2, Trash2, Clock, IndianRupee, Scissors, Loader2, Home, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -213,7 +213,7 @@ export default function Services() {
                   <Clock className="w-4 h-4" /> <span>{service.duration} min</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <DollarSign className="w-4 h-4" /> <span>₹{service.price}</span>
+                  <IndianRupee className="w-4 h-4" /> <span>₹{service.price}</span>
                 </div>
               </div>
             </motion.div>
