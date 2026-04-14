@@ -92,7 +92,7 @@ export default function BarberEarnings() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-green-500" />
+                <IndianRupee className="w-5 h-5 text-green-500" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Earnings</p>
@@ -151,7 +151,7 @@ export default function BarberEarnings() {
             </ResponsiveContainer>
           ) : (
             <div className="text-center py-12 text-muted-foreground">
-              <DollarSign className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <IndianRupee className="w-12 h-12 mx-auto mb-3 opacity-50" />
               <p>No completed bookings in the last 7 days</p>
               <p className="text-sm mt-1">Revenue will appear here once bookings are completed</p>
             </div>
