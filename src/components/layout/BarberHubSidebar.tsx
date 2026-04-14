@@ -91,7 +91,7 @@ function SidebarContent({ user, signOut, location, onNavigate }: {
           <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
             <Scissors className="w-6 h-6 text-primary" />
           </div>
-          <span className="text-xl font-display font-bold gradient-text">Barber Hub</span>
+          <span className="text-2xl font-display font-bold gradient-text">Barber Hub</span>
         </Link>
       </div>
 
