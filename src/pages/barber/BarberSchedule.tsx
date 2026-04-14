@@ -59,17 +59,11 @@ export default function BarberSchedule() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-display font-bold mb-2">
-            My <span className="gradient-text">Schedule</span>
-          </h1>
-          <p className="text-muted-foreground">Set your working hours and availability</p>
-        </div>
-        <Button onClick={handleSave} disabled={saving}>
-          {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-          Save Schedule
-        </Button>
+      <div>
+        <h1 className="text-3xl font-display font-bold mb-2">
+          My <span className="gradient-text">Schedule</span>
+        </h1>
+        <p className="text-muted-foreground">Set your working hours and availability</p>
       </div>
 
       <Card>
@@ -146,7 +140,14 @@ export default function BarberSchedule() {
             );
           })}
         </CardContent>
-      </Card>
+
+      {/* Fixed Save Button - Bottom Right */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <Button onClick={handleSave} disabled={saving} size="lg" className="shadow-lg">
+          {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+          Save Schedule
+        </Button>
+      </div>
     </motion.div>
   );
 }

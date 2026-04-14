@@ -29,7 +29,7 @@ export default function Services() {
     home_service: false,
   });
 
-  const { data: services = [], isLoading: loading, refetch } = useQuery({
+  const { data: services = [], isLoading: loading, isRefetching, refetch } = useQuery({
     queryKey: ['myServices'],
     queryFn: async () => {
       const response = await getMyServices();
@@ -142,9 +142,9 @@ export default function Services() {
         </div>
 
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => refetch()} disabled={loading}>
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+          <Button variant="outline" onClick={() => refetch()} disabled={isRefetching}>
+            <RefreshCw className={`w-4 h-4 mr-2 ${isRefetching ? 'animate-spin' : ''}`} />
+            {isRefetching ? 'Refreshing...' : 'Refresh'}
           </Button>
 
           <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
