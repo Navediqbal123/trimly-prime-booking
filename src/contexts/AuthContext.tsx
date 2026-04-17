@@ -86,6 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser(buildProfile(session.user));
+        fetchProfileFullName(session.user.id);
       } else {
         setUser(null);
       }
@@ -104,6 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session?.user) {
           setUser(buildProfile(session.user));
+          fetchProfileFullName(session.user.id);
         }
         setLoading(false);
       });
@@ -111,6 +113,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchProfileFullName = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', userId)
+        .maybeSingle();
+      if (data?.full_name) {
+        setUser(prev => (prev && prev.id === userId ? { ...prev, full_name: data.full_name } : prev));
+      }
+    } catch (err) {
+      console.error('Failed to fetch profile full_name:', err);
+    }
+  };
 
   const refreshBarberStatus = useCallback(async () => {
     if (!user?.id) {
