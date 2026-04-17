@@ -48,6 +48,7 @@ export default function Auth() {
     phone: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [emailExists, setEmailExists] = useState(false);
 
   const { signIn, signUp, user, loading: authLoading } = useAuth();
 
@@ -59,11 +60,13 @@ export default function Auth() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: '' }));
+    if (name === 'email') setEmailExists(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    setEmailExists(false);
 
     try {
       if (isSignUp) {
@@ -81,7 +84,20 @@ export default function Auth() {
         const signUpResult = await signUp(formData.name, formData.email, formData.password, formData.phone);
 
         if (signUpResult.error) {
-          toast.error(signUpResult.error.message);
+          const msg = signUpResult.error.message?.toLowerCase() || '';
+          if (
+            msg.includes('already registered') ||
+            msg.includes('already exists') ||
+            msg.includes('user already') ||
+            msg.includes('email address is already') ||
+            msg.includes('duplicate')
+          ) {
+            setEmailExists(true);
+            setErrors({ email: 'This email is already registered. Please login instead.' });
+            toast.error('This email is already registered. Please login instead.');
+          } else {
+            toast.error(signUpResult.error.message);
+          }
         } else if ((signUpResult as any).needsConfirmation) {
           toast.success('Account created! Please check your email to confirm, then sign in.');
           setIsSignUp(false);
@@ -123,7 +139,15 @@ export default function Auth() {
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
     setErrors({});
+    setEmailExists(false);
     setFormData({ name: '', email: '', password: '', phone: '' });
+  };
+
+  const switchToLogin = () => {
+    setIsSignUp(false);
+    setErrors({});
+    setEmailExists(false);
+    setFormData((prev) => ({ name: '', email: prev.email, password: '', phone: '' }));
   };
 
   return (
@@ -311,6 +335,32 @@ export default function Auth() {
                       )}
                     </Button>
                   </motion.div>
+
+                  <AnimatePresence>
+                    {isSignUp && emailExists && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8, height: 0 }}
+                        animate={{ opacity: 1, y: 0, height: 'auto' }}
+                        exit={{ opacity: 0, y: -8, height: 0 }}
+                        transition={{ duration: 0.25, ease: 'easeOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-4 space-y-3">
+                          <p className="text-sm text-destructive font-medium">
+                            This email is already registered. Please login instead.
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full border-primary/40 hover:bg-primary/10"
+                            onClick={switchToLogin}
+                          >
+                            Login Instead
+                          </Button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.form>
 
                 <div className="mt-6 text-center">
