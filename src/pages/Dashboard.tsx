@@ -2,11 +2,25 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Search, Star, MapPin, Scissors, Loader2 } from 'lucide-react';
+import { Search, MapPin, Scissors, Loader2, Clock } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { getApprovedBarbers } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
+
+interface ServiceWithBarber {
+  id: string;
+  barber_id: string;
+  name: string;
+  price: number;
+  duration: number;
+  home_service: boolean;
+  barbers: {
+    id: string;
+    shop_name: string;
+    location: string;
+  } | null;
+}
 
 const container = {
   hidden: { opacity: 0 },
@@ -23,21 +37,30 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: barbers = [], isLoading: loading } = useQuery({
-    queryKey: ['approvedBarbers'],
-    queryFn: async () => {
-      const response = await getApprovedBarbers();
-      return response.success && response.data ? response.data : [];
+  const { data: services = [], isLoading: loading } = useQuery({
+    queryKey: ['allServices'],
+    queryFn: async (): Promise<ServiceWithBarber[]> => {
+      const { data, error } = await supabase
+        .from('services')
+        .select('id, barber_id, name, price, duration, home_service, barbers(id, shop_name, location)')
+        .order('created_at', { ascending: false });
+      if (error) {
+        console.error('Failed to fetch services:', error);
+        return [];
+      }
+      return (data as unknown as ServiceWithBarber[]) ?? [];
     },
   });
 
-  const filteredBarbers = searchQuery
-    ? barbers.filter(
-        (barber) =>
-          barber.shop_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          barber.location.toLowerCase().includes(searchQuery.toLowerCase())
+  const q = searchQuery.toLowerCase();
+  const filteredServices = q
+    ? services.filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.barbers?.shop_name.toLowerCase().includes(q) ||
+          s.barbers?.location.toLowerCase().includes(q),
       )
-    : barbers;
+    : services;
 
   return (
     <div className="animate-fade-in">
@@ -49,14 +72,14 @@ export default function Dashboard() {
         >
           Welcome back, <span className="gradient-text">{user?.full_name?.split(' ')[0] || 'User'}</span>
         </motion.h1>
-        <p className="text-muted-foreground">Find your perfect barber and book an appointment today.</p>
+        <p className="text-muted-foreground">Browse services and book your next appointment.</p>
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
         <div className="relative max-w-xl">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
-            placeholder="Search barbers, locations..."
+            placeholder="Search services, shops, locations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-12 h-12 bg-card border-border"
@@ -67,43 +90,47 @@ export default function Dashboard() {
       {loading && (
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-          <p className="text-muted-foreground">Loading barbers...</p>
+          <p className="text-muted-foreground">Loading services...</p>
         </div>
       )}
 
       {!loading && (
         <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredBarbers.map((barber) => (
+          {filteredServices.map((service) => (
             <motion.div
-              key={barber.id}
+              key={service.id}
               variants={item}
               whileHover={{ y: -5, transition: { duration: 0.2 } }}
               className="bg-card border border-border rounded-2xl overflow-hidden group cursor-pointer hover:border-primary/50 transition-all duration-300 hover:glow-card"
-              onClick={() => navigate(`/book/${barber.id}`)}
+              onClick={() => service.barbers?.id && navigate(`/book/${service.barbers.id}`)}
             >
-              <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Scissors className="w-16 h-16 text-primary/30" />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                  <div className="flex items-center gap-1 bg-background/80 backdrop-blur-sm px-2 py-1 rounded-lg">
-                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    <span className="text-sm font-medium">New</span>
-                  </div>
-                </div>
+              <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                <Scissors className="w-12 h-12 text-primary/40" />
               </div>
               <div className="p-5">
-                <h3 className="text-xl font-display font-semibold mb-2 group-hover:text-primary transition-colors">
-                  {barber.shop_name}
+                <h3 className="text-xl font-display font-semibold mb-1 group-hover:text-primary transition-colors">
+                  {service.name}
                 </h3>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                  <MapPin className="w-4 h-4" />
-                  <span>{barber.location}</span>
+                {service.barbers && (
+                  <p className="text-sm font-medium text-foreground/80 mb-2">{service.barbers.shop_name}</p>
+                )}
+                {service.barbers?.location && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                    <MapPin className="w-4 h-4" />
+                    <span>{service.barbers.location}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-2xl font-display font-bold gradient-text">₹{service.price}</span>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4" />
+                    <span>{service.duration} min</span>
+                  </div>
                 </div>
                 <Button
                   className="w-full group-hover:glow-primary transition-all"
-                  onClick={(e) => { e.stopPropagation(); navigate(`/book/${barber.id}`); }}
+                  disabled={!service.barbers?.id}
+                  onClick={(e) => { e.stopPropagation(); service.barbers?.id && navigate(`/book/${service.barbers.id}`); }}
                 >
                   Book Now
                 </Button>
@@ -113,11 +140,11 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {!loading && filteredBarbers.length === 0 && (
+      {!loading && filteredServices.length === 0 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
           <Scissors className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
           <p className="text-muted-foreground">
-            {searchQuery ? 'No barbers found matching your search.' : 'No barbers available yet.'}
+            {searchQuery ? 'No services found matching your search.' : 'No services available yet.'}
           </p>
         </motion.div>
       )}
