@@ -108,7 +108,7 @@ export function AppSidebar() {
               transition={{ duration: 0.25, ease: 'easeOut' }}
               className="flex items-center"
             >
-              <span className="text-xl font-display font-bold gradient-text tracking-tight">
+              <span className="text-2xl font-display font-bold gradient-text tracking-tight">
                 Barber&nbsp;&nbsp;Lane
               </span>
             </motion.div>
