@@ -106,13 +106,10 @@ export function AppSidebar() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -8 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="flex items-center gap-2"
+              className="flex items-center"
             >
-              <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center">
-                <Scissors className="w-4 h-4 text-primary" />
-              </div>
               <span className="text-xl font-display font-bold gradient-text tracking-tight">
-                BarberLane
+                Barber&nbsp;&nbsp;Lane
               </span>
             </motion.div>
           )}
