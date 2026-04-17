@@ -155,7 +155,7 @@ export function AppSidebar() {
               <Scissors className="w-6 h-6 text-primary" />
             </div>
             <span className="text-2xl font-display font-bold gradient-text">
-              BarberLane
+              Barber&nbsp;&nbsp;Lane
             </span>
           </Link>
         </motion.div>
