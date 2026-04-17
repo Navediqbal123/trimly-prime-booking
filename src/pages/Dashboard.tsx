@@ -2,11 +2,25 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Search, Star, MapPin, Scissors, Loader2 } from 'lucide-react';
+import { Search, MapPin, Scissors, Loader2, Clock } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { getApprovedBarbers } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
+
+interface ServiceWithBarber {
+  id: string;
+  barber_id: string;
+  name: string;
+  price: number;
+  duration: number;
+  home_service: boolean;
+  barbers: {
+    id: string;
+    shop_name: string;
+    location: string;
+  } | null;
+}
 
 const container = {
   hidden: { opacity: 0 },
