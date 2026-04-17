@@ -48,6 +48,7 @@ export default function Auth() {
     phone: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [emailExists, setEmailExists] = useState(false);
 
   const { signIn, signUp, user, loading: authLoading } = useAuth();
 
@@ -59,11 +60,13 @@ export default function Auth() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: '' }));
+    if (name === 'email') setEmailExists(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    setEmailExists(false);
 
     try {
       if (isSignUp) {
@@ -81,7 +84,20 @@ export default function Auth() {
         const signUpResult = await signUp(formData.name, formData.email, formData.password, formData.phone);
 
         if (signUpResult.error) {
-          toast.error(signUpResult.error.message);
+          const msg = signUpResult.error.message?.toLowerCase() || '';
+          if (
+            msg.includes('already registered') ||
+            msg.includes('already exists') ||
+            msg.includes('user already') ||
+            msg.includes('email address is already') ||
+            msg.includes('duplicate')
+          ) {
+            setEmailExists(true);
+            setErrors({ email: 'This email is already registered. Please login instead.' });
+            toast.error('This email is already registered. Please login instead.');
+          } else {
+            toast.error(signUpResult.error.message);
+          }
         } else if ((signUpResult as any).needsConfirmation) {
           toast.success('Account created! Please check your email to confirm, then sign in.');
           setIsSignUp(false);
@@ -123,7 +139,15 @@ export default function Auth() {
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
     setErrors({});
+    setEmailExists(false);
     setFormData({ name: '', email: '', password: '', phone: '' });
+  };
+
+  const switchToLogin = () => {
+    setIsSignUp(false);
+    setErrors({});
+    setEmailExists(false);
+    setFormData((prev) => ({ name: '', email: prev.email, password: '', phone: '' }));
   };
 
   return (
