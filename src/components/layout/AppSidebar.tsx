@@ -90,15 +90,34 @@ export function AppSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-4 left-4 z-50 lg:hidden"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </Button>
+      {/* Mobile Menu Button + Brand */}
+      <div className="fixed top-4 left-4 z-50 lg:hidden flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </Button>
+        <AnimatePresence>
+          {!isOpen && (
+            <motion.div
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -8 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="flex items-center gap-2"
+            >
+              <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center">
+                <Scissors className="w-4 h-4 text-primary" />
+              </div>
+              <span className="text-xl font-display font-bold gradient-text tracking-tight">
+                BarberLane
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Mobile Overlay */}
       <AnimatePresence>
