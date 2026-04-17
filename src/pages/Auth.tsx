@@ -335,6 +335,32 @@ export default function Auth() {
                       )}
                     </Button>
                   </motion.div>
+
+                  <AnimatePresence>
+                    {isSignUp && emailExists && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8, height: 0 }}
+                        animate={{ opacity: 1, y: 0, height: 'auto' }}
+                        exit={{ opacity: 0, y: -8, height: 0 }}
+                        transition={{ duration: 0.25, ease: 'easeOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-4 space-y-3">
+                          <p className="text-sm text-destructive font-medium">
+                            This email is already registered. Please login instead.
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full border-primary/40 hover:bg-primary/10"
+                            onClick={switchToLogin}
+                          >
+                            Login Instead
+                          </Button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.form>
 
                 <div className="mt-6 text-center">
