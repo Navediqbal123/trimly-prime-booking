@@ -122,30 +122,31 @@ export function ServicesTable({ services, onRefresh, loading }: ServicesTablePro
 
   return (
     <Card className="border-border overflow-hidden">
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <CardHeader className="flex flex-col min-[480px]:flex-row min-[480px]:items-center justify-between gap-3">
         <CardTitle className="flex items-center gap-2">
           <Scissors className="w-5 h-5 text-primary" />
           My Services
         </CardTitle>
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full min-[480px]:w-auto">
           <Button 
             variant="outline" 
-            size="sm" 
+            size="icon"
             onClick={onRefresh} 
             disabled={loading}
-            className="flex-1 sm:flex-none transition-all duration-200 hover:scale-105 active:scale-95"
+            aria-label="Refresh"
+            className="shrink-0 min-[480px]:w-auto min-[480px]:px-3 transition-all duration-200 hover:scale-105 active:scale-95"
           >
-            <RefreshCw className={`w-4 h-4 sm:mr-2 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Refresh</span>
+            <RefreshCw className={`w-4 h-4 min-[480px]:mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <span className="hidden min-[480px]:inline text-sm">Refresh</span>
           </Button>
           <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
             <DialogTrigger asChild>
               <Button 
                 size="sm"
-                className="flex-1 sm:flex-none transition-all duration-200 hover:scale-105 active:scale-95"
+                className="flex-1 min-[480px]:flex-none transition-all duration-200 hover:scale-105 active:scale-95"
               >
-                <Plus className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Add Service</span>
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="text-sm">Add Service</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="animate-scale-in">
