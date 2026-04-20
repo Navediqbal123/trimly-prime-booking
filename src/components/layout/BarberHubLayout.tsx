@@ -18,10 +18,11 @@ export function BarberHubLayout() {
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(true)}
+              className="h-12 w-12 [&_svg]:size-7"
             >
-              <Menu className="w-5 h-5" />
+              <Menu />
             </Button>
-            <span className="font-display font-bold gradient-text">Barber Hub</span>
+            <span className="font-display font-bold gradient-text text-lg">Barber Hub</span>
           </div>
           <Outlet />
         </div>
