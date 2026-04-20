@@ -96,8 +96,9 @@ export function AppSidebar() {
           variant="ghost"
           size="icon"
           onClick={() => setIsOpen(!isOpen)}
+          className="h-12 w-12 [&_svg]:size-7"
         >
-          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {isOpen ? <X /> : <Menu />}
         </Button>
         <AnimatePresence>
           {!isOpen && (
