@@ -22,7 +22,7 @@ export function BarberHubLayout() {
             >
               <Menu />
             </Button>
-            <span className="font-display font-bold gradient-text text-lg">Barber Hub</span>
+            <span className="text-2xl font-display font-bold gradient-text tracking-tight">Barber&nbsp;&nbsp;Hub</span>
           </div>
           <Outlet />
         </div>
