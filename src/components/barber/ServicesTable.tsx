@@ -122,7 +122,7 @@ export function ServicesTable({ services, onRefresh, loading }: ServicesTablePro
 
   return (
     <Card className="border-border overflow-hidden">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <CardTitle className="flex items-center gap-2">
           <Scissors className="w-5 h-5 text-primary" />
           My Services
@@ -133,19 +133,19 @@ export function ServicesTable({ services, onRefresh, loading }: ServicesTablePro
             size="sm" 
             onClick={onRefresh} 
             disabled={loading}
-            className="transition-all duration-200 hover:scale-105 active:scale-95"
+            className="flex-1 sm:flex-none transition-all duration-200 hover:scale-105 active:scale-95"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            <RefreshCw className={`w-4 h-4 sm:mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
           <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
             <DialogTrigger asChild>
               <Button 
                 size="sm"
-                className="transition-all duration-200 hover:scale-105 active:scale-95"
+                className="flex-1 sm:flex-none transition-all duration-200 hover:scale-105 active:scale-95"
               >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Service
+                <Plus className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Add Service</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="animate-scale-in">
