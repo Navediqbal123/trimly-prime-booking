@@ -47,17 +47,36 @@ export default function Dashboard() {
   };
 
   const { data: services = [], isLoading: loading } = useQuery({
-    queryKey: ['allServices'],
+    queryKey: ['allServicesHome'],
     queryFn: async (): Promise<ServiceWithBarber[]> => {
-      const { data, error } = await supabase
-        .from('services')
-        .select('id, barber_id, name, price, duration, home_service, barbers(id, shop_name, location)')
-        .order('created_at', { ascending: false });
-      if (error) {
-        console.error('Failed to fetch services:', error);
-        return [];
-      }
-      return (data as unknown as ServiceWithBarber[]) ?? [];
+      // Fetch all barbers (approved + pending) so every shop's services appear
+      const [approvedRes, pendingRes] = await Promise.all([
+        getApprovedBarbers(),
+        getPendingBarbers(),
+      ]);
+      const barbers = [
+        ...(approvedRes.success && approvedRes.data ? approvedRes.data : []),
+        ...(pendingRes.success && pendingRes.data ? pendingRes.data : []),
+      ];
+
+      // Fetch services for each barber in parallel
+      const serviceLists = await Promise.all(
+        barbers.map(async (b) => {
+          const res = await getBarberServices(b.id);
+          const list = res.success && res.data ? res.data : [];
+          return list.map((s) => ({
+            id: s.id,
+            barber_id: s.barber_id,
+            name: s.name,
+            price: s.price,
+            duration: s.duration,
+            home_service: s.home_service,
+            barbers: { id: b.id, shop_name: b.shop_name, location: b.location },
+          }));
+        }),
+      );
+
+      return serviceLists.flat();
     },
   });
 
