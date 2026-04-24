@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { createBooking, getApprovedBarbers, getBarberServices, ApprovedBarberData, ServiceData } from '@/lib/api';
+import { createBooking, getApprovedBarbers, getPendingBarbers, getBarberServices } from '@/lib/api';
 
 const timeSlots = [
   '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
@@ -37,11 +37,15 @@ export default function BookingPage() {
   const { data: shop, isLoading: loadingShop } = useQuery({
     queryKey: ['barber', shopId],
     queryFn: async () => {
-      const res = await getApprovedBarbers();
-      if (res.success && res.data) {
-        return res.data.find(b => b.id === shopId) || null;
-      }
-      return null;
+      const [approvedRes, pendingRes] = await Promise.all([
+        getApprovedBarbers(),
+        getPendingBarbers(),
+      ]);
+      const all = [
+        ...(approvedRes.success && approvedRes.data ? approvedRes.data : []),
+        ...(pendingRes.success && pendingRes.data ? pendingRes.data : []),
+      ];
+      return all.find((b) => b.id === shopId) || null;
     },
     enabled: !!shopId,
   });
