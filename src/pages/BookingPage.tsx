@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { createBooking, getApprovedBarbers, getBarberServices, ApprovedBarberData, ServiceData } from '@/lib/api';
+import { createBooking, getApprovedBarbers, getPendingBarbers, getBarberServices } from '@/lib/api';
 
 const timeSlots = [
   '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
