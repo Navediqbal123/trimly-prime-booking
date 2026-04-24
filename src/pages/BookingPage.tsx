@@ -37,11 +37,15 @@ export default function BookingPage() {
   const { data: shop, isLoading: loadingShop } = useQuery({
     queryKey: ['barber', shopId],
     queryFn: async () => {
-      const res = await getApprovedBarbers();
-      if (res.success && res.data) {
-        return res.data.find(b => b.id === shopId) || null;
-      }
-      return null;
+      const [approvedRes, pendingRes] = await Promise.all([
+        getApprovedBarbers(),
+        getPendingBarbers(),
+      ]);
+      const all = [
+        ...(approvedRes.success && approvedRes.data ? approvedRes.data : []),
+        ...(pendingRes.success && pendingRes.data ? pendingRes.data : []),
+      ];
+      return all.find((b) => b.id === shopId) || null;
     },
     enabled: !!shopId,
   });
