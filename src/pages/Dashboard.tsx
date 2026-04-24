@@ -7,7 +7,7 @@ import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { supabase } from '@/lib/supabase';
+import { getApprovedBarbers, getPendingBarbers, getBarberServices } from '@/lib/api';
 
 interface ServiceWithBarber {
   id: string;
