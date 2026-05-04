@@ -7,7 +7,7 @@ import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { getApprovedBarbers, getPendingBarbers, getBarberServices } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 
 interface ServiceWithBarber {
   id: string;
@@ -49,34 +49,28 @@ export default function Dashboard() {
   const { data: services = [], isLoading: loading } = useQuery({
     queryKey: ['allServicesHome'],
     queryFn: async (): Promise<ServiceWithBarber[]> => {
-      // Fetch all barbers (approved + pending) so every shop's services appear
-      const [approvedRes, pendingRes] = await Promise.all([
-        getApprovedBarbers(),
-        getPendingBarbers(),
-      ]);
-      const barbers = [
-        ...(approvedRes.success && approvedRes.data ? approvedRes.data : []),
-        ...(pendingRes.success && pendingRes.data ? pendingRes.data : []),
-      ];
+      const { data, error } = await supabase
+        .from('services')
+        .select('id, barber_id, name, price, duration, home_service, barbers(id, shop_name, location, status)')
+        .eq('barbers.status', 'approved');
 
-      // Fetch services for each barber in parallel
-      const serviceLists = await Promise.all(
-        barbers.map(async (b) => {
-          const res = await getBarberServices(b.id);
-          const list = res.success && res.data ? res.data : [];
-          return list.map((s) => ({
-            id: s.id,
-            barber_id: s.barber_id,
-            name: s.name,
-            price: s.price,
-            duration: s.duration,
-            home_service: s.home_service,
-            barbers: { id: b.id, shop_name: b.shop_name, location: b.location },
-          }));
-        }),
-      );
+      if (error) throw error;
 
-      return serviceLists.flat();
+      return (data || [])
+        .filter((s: any) => s.barbers)
+        .map((s: any) => ({
+          id: s.id,
+          barber_id: s.barber_id,
+          name: s.name,
+          price: s.price,
+          duration: s.duration,
+          home_service: s.home_service,
+          barbers: {
+            id: s.barbers.id,
+            shop_name: s.barbers.shop_name,
+            location: s.barbers.location,
+          },
+        }));
     },
   });
 
