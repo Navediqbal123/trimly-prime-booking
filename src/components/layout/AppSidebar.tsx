@@ -62,9 +62,9 @@ export function AppSidebar() {
         onClick={() => setIsOpen(false)}
         className={cn(
           'flex items-center gap-3 rounded-lg transition-all duration-200',
-          'hover:bg-secondary/80 group',
+          'hover:bg-sidebar-accent/60 group',
           nested ? 'px-4 py-2.5 ml-4' : 'px-4 py-3',
-          isActive && 'bg-primary/10 text-primary glow-primary'
+          isActive && 'bg-primary/15 text-primary border border-primary/30 glow-primary'
         )}
       >
         <item.icon className={cn(
@@ -109,8 +109,8 @@ export function AppSidebar() {
               transition={{ duration: 0.25, ease: 'easeOut' }}
               className="flex items-center"
             >
-              <span className="text-2xl font-display font-bold gradient-text tracking-tight">
-                Barber&nbsp;&nbsp;Lane
+              <span className="text-2xl font-display font-bold gradient-gold-text tracking-wide">
+                Barber Lane
               </span>
             </motion.div>
           )}
@@ -139,7 +139,7 @@ export function AppSidebar() {
         }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         className={cn(
-          'fixed top-0 left-0 h-screen w-72 bg-card border-r border-border z-50',
+          'fixed top-0 left-0 h-screen w-72 glass-panel border-r border-sidebar-border z-50',
           'flex flex-col',
           'lg:translate-x-0 lg:static'
         )}
@@ -152,11 +152,11 @@ export function AppSidebar() {
           className="p-6 border-b border-border"
         >
           <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-              <Scissors className="w-6 h-6 text-primary" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center btn-gold">
+              <Scissors className="w-5 h-5" />
             </div>
-            <span className="text-2xl font-display font-bold gradient-text">
-              Barber&nbsp;&nbsp;Lane
+            <span className="text-2xl font-display font-bold gradient-gold-text tracking-wide">
+              Barber Lane
             </span>
           </Link>
         </motion.div>
