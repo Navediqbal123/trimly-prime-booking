@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Scissors, Loader2, Clock, Home } from 'lucide-react';
+import { MapPin, Scissors, Loader2, Clock, Home, ArrowRight, Star, Sparkles } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase';
 
@@ -23,20 +22,15 @@ interface ServiceWithBarber {
   } | null;
 }
 
-const container = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 },
-};
+interface Barber {
+  id: string;
+  shop_name: string;
+  location: string;
+}
 
 export default function Dashboard() {
   const { user } = useProtectedUser();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedService, setSelectedService] = useState<ServiceWithBarber | null>(null);
 
   const handleBookNow = () => {
@@ -46,16 +40,14 @@ export default function Dashboard() {
     }
   };
 
-  const { data: services = [], isLoading: loading } = useQuery({
+  const { data: services = [], isLoading: loadingServices } = useQuery({
     queryKey: ['allServicesHome'],
     queryFn: async (): Promise<ServiceWithBarber[]> => {
       const { data, error } = await supabase
         .from('services')
         .select('id, barber_id, name, price, duration, home_service, barbers(id, shop_name, location, status)')
         .eq('barbers.status', 'approved');
-
       if (error) throw error;
-
       return (data || [])
         .filter((s: any) => s.barbers)
         .map((s: any) => ({
@@ -74,102 +66,184 @@ export default function Dashboard() {
     },
   });
 
-  const q = searchQuery.toLowerCase();
-  const filteredServices = q
-    ? services.filter(
-        (s) =>
-          s.name.toLowerCase().includes(q) ||
-          s.barbers?.shop_name.toLowerCase().includes(q) ||
-          s.barbers?.location.toLowerCase().includes(q),
-      )
-    : services;
+  const { data: barbers = [], isLoading: loadingBarbers } = useQuery({
+    queryKey: ['approvedBarbersHome'],
+    queryFn: async (): Promise<Barber[]> => {
+      const { data, error } = await supabase
+        .from('barbers')
+        .select('id, shop_name, location')
+        .eq('status', 'approved')
+        .limit(10);
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const scrollToServices = () => {
+    document.getElementById('featured-services')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-8">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-3xl lg:text-4xl font-display font-bold mb-2"
-        >
-          Welcome back, <span className="gradient-text">{user?.full_name?.split(' ')[0] || 'User'}</span>
-        </motion.h1>
-        <p className="text-muted-foreground">Browse services and book your next appointment.</p>
-      </div>
-
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
-        <div className="relative max-w-xl">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            placeholder="Search services, shops, locations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-12 bg-card border-border"
-          />
+    <div className="animate-fade-in space-y-10">
+      {/* Hero Banner */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative overflow-hidden rounded-3xl glass-card p-6 lg:p-10"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/5 to-gold/20 opacity-90" />
+        <div
+          className="absolute -right-20 -top-20 w-72 h-72 rounded-full opacity-40 blur-3xl"
+          style={{ background: 'radial-gradient(circle, hsl(var(--gold) / 0.6), transparent 70%)' }}
+        />
+        <div
+          className="absolute -left-10 -bottom-10 w-72 h-72 rounded-full opacity-50 blur-3xl"
+          style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.7), transparent 70%)' }}
+        />
+        <div className="relative z-10 max-w-xl">
+          <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full glass-panel">
+            <Sparkles className="w-3.5 h-3.5 text-gold" />
+            <span className="text-xs font-medium tracking-wide text-gold">Premium Grooming</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold leading-tight mb-3">
+            Your Perfect <span className="gradient-gold-text">Trim</span>,
+            <br />
+            Anytime.
+          </h1>
+          <p className="text-sm sm:text-base text-foreground/80 mb-6 max-w-md">
+            {user?.full_name?.split(' ')[0] ? `Welcome back, ${user.full_name.split(' ')[0]}. ` : ''}
+            Book elite barbers near you in seconds.
+          </p>
+          <Button
+            onClick={scrollToServices}
+            className="btn-gold h-12 px-6 rounded-full font-semibold hover:scale-105 transition-transform"
+          >
+            Discover Now
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
         </div>
-      </motion.div>
+      </motion.section>
 
-      {loading && (
-        <div className="flex flex-col items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-          <p className="text-muted-foreground">Loading services...</p>
+      {/* Featured Services */}
+      <section id="featured-services">
+        <div className="flex items-end justify-between mb-4">
+          <div>
+            <h2 className="text-2xl font-display font-bold">Featured Services</h2>
+            <p className="text-sm text-muted-foreground">Swipe to explore</p>
+          </div>
         </div>
-      )}
 
-      {!loading && (
-        <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredServices.map((service) => (
-            <motion.div
-              key={service.id}
-              variants={item}
-              whileHover={{ y: -5, transition: { duration: 0.2 } }}
-              className="glass-card rounded-2xl overflow-hidden group cursor-pointer hover:border-gold/50 transition-all duration-300 hover:glow-card"
-              onClick={() => setSelectedService(service)}
-            >
-              <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/30 via-primary/10 to-gold/10 flex items-center justify-center">
-                <Scissors className="w-12 h-12 text-gold/60" />
-              </div>
-              <div className="p-5">
-                <h3 className="text-xl font-display font-semibold mb-1 group-hover:text-primary transition-colors">
+        {loadingServices ? (
+          <div className="flex items-center justify-center py-10">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        ) : services.length === 0 ? (
+          <div className="glass-card rounded-2xl p-8 text-center">
+            <Scissors className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <p className="text-muted-foreground text-sm">No services available yet.</p>
+          </div>
+        ) : (
+          <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-thin">
+            {services.map((service, i) => (
+              <motion.button
+                key={service.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06, duration: 0.3 }}
+                whileHover={{ y: -4 }}
+                onClick={() => setSelectedService(service)}
+                className="snap-start shrink-0 w-44 sm:w-52 glass-card rounded-2xl p-4 text-left group hover:border-gold/50 transition-all"
+              >
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-gradient-to-br from-primary/30 to-gold/20 border border-gold/20">
+                  <Scissors className="w-6 h-6 text-gold" />
+                </div>
+                <h3 className="font-display font-semibold text-base mb-1 line-clamp-1 group-hover:text-gold transition-colors">
                   {service.name}
                 </h3>
                 {service.barbers && (
-                  <p className="text-sm font-medium text-foreground/80 mb-2">{service.barbers.shop_name}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-1 mb-2">
+                    {service.barbers.shop_name}
+                  </p>
                 )}
-                {service.barbers?.location && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                    <MapPin className="w-4 h-4" />
-                    <span>{service.barbers.location}</span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl font-display font-bold gradient-gold-text">₹{service.price}</span>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Clock className="w-4 h-4" />
-                    <span>{service.duration} min</span>
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-lg font-display font-bold gradient-gold-text">₹{service.price}</span>
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                    <Clock className="w-3 h-3" />
+                    {service.duration}m
                   </div>
                 </div>
-                <Button
-                  className="w-full group-hover:glow-primary transition-all"
-                  onClick={(e) => { e.stopPropagation(); setSelectedService(service); }}
-                >
-                  View Details
-                </Button>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
+              </motion.button>
+            ))}
+          </div>
+        )}
+      </section>
 
-      {!loading && filteredServices.length === 0 && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
-          <Scissors className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">
-            {searchQuery ? 'No services found matching your search.' : 'No services available yet.'}
-          </p>
-        </motion.div>
-      )}
+      {/* Discover Barbers */}
+      <section>
+        <div className="flex items-end justify-between mb-4">
+          <div>
+            <h2 className="text-2xl font-display font-bold">Discover Barbers</h2>
+            <p className="text-sm text-muted-foreground">Top professionals near you</p>
+          </div>
+          <button
+            onClick={() => navigate('/discover')}
+            className="text-xs font-medium text-gold hover:underline"
+          >
+            See all
+          </button>
+        </div>
 
+        {loadingBarbers ? (
+          <div className="flex items-center justify-center py-10">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        ) : barbers.length === 0 ? (
+          <div className="glass-card rounded-2xl p-8 text-center">
+            <p className="text-muted-foreground text-sm">No barbers available yet.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            {barbers.map((b, i) => (
+              <motion.button
+                key={b.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.05, duration: 0.3 }}
+                whileHover={{ y: -4 }}
+                onClick={() => navigate(`/book/${b.id}`)}
+                className="glass-card rounded-2xl overflow-hidden text-left hover:border-gold/50 transition-all group"
+              >
+                <div className="relative h-28 bg-gradient-to-br from-primary/40 via-primary/20 to-gold/20 flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full glass-panel flex items-center justify-center">
+                    <span className="font-display font-bold text-lg gradient-gold-text">
+                      {b.shop_name?.[0]?.toUpperCase() || 'B'}
+                    </span>
+                  </div>
+                  <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full glass-panel">
+                    <Star className="w-3 h-3 text-gold fill-gold" />
+                    <span className="text-[10px] font-semibold">4.9</span>
+                  </div>
+                </div>
+                <div className="p-3">
+                  <h3 className="font-display font-semibold text-sm line-clamp-1 group-hover:text-gold transition-colors">
+                    {b.shop_name}
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Master Stylist</p>
+                  {b.location && (
+                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1">
+                      <MapPin className="w-3 h-3" />
+                      <span className="line-clamp-1">{b.location}</span>
+                    </div>
+                  )}
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Service Details Modal */}
       <Dialog open={!!selectedService} onOpenChange={(open) => !open && setSelectedService(null)}>
         <DialogContent className="sm:max-w-md border-border bg-card p-0 overflow-hidden">
           <AnimatePresence>
@@ -178,14 +252,14 @@ export default function Dashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
+                transition={{ duration: 0.25 }}
               >
-                <div className="relative h-40 bg-gradient-to-br from-primary/30 to-primary/5 flex items-center justify-center">
-                  <Scissors className="w-16 h-16 text-primary/50" />
+                <div className="relative h-40 bg-gradient-to-br from-primary/40 via-primary/10 to-gold/30 flex items-center justify-center">
+                  <Scissors className="w-16 h-16 text-gold/70" />
                 </div>
                 <div className="p-6">
                   <DialogHeader className="text-left mb-4">
-                    <DialogTitle className="text-2xl font-display gradient-text">
+                    <DialogTitle className="text-2xl font-display gradient-gold-text">
                       {selectedService.name}
                     </DialogTitle>
                     {selectedService.barbers && (
@@ -203,13 +277,13 @@ export default function Dashboard() {
                   )}
 
                   <div className="grid grid-cols-2 gap-3 mb-6">
-                    <div className="bg-background/50 border border-border rounded-xl p-4">
+                    <div className="glass-panel rounded-xl p-4">
                       <p className="text-xs text-muted-foreground mb-1">Price</p>
-                      <p className="text-2xl font-display font-bold gradient-text">
+                      <p className="text-2xl font-display font-bold gradient-gold-text">
                         ₹{selectedService.price}
                       </p>
                     </div>
-                    <div className="bg-background/50 border border-border rounded-xl p-4">
+                    <div className="glass-panel rounded-xl p-4">
                       <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
                         <Clock className="w-3 h-3" /> Duration
                       </p>
@@ -228,7 +302,7 @@ export default function Dashboard() {
                   )}
 
                   <Button
-                    className="w-full h-12 glow-primary"
+                    className="w-full h-12 btn-gold font-semibold"
                     disabled={!selectedService.barbers?.id}
                     onClick={handleBookNow}
                   >
