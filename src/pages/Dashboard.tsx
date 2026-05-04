@@ -123,11 +123,11 @@ export default function Dashboard() {
               key={service.id}
               variants={item}
               whileHover={{ y: -5, transition: { duration: 0.2 } }}
-              className="bg-card border border-border rounded-2xl overflow-hidden group cursor-pointer hover:border-primary/50 transition-all duration-300 hover:glow-card"
+              className="glass-card rounded-2xl overflow-hidden group cursor-pointer hover:border-gold/50 transition-all duration-300 hover:glow-card"
               onClick={() => setSelectedService(service)}
             >
-              <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                <Scissors className="w-12 h-12 text-primary/40" />
+              <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/30 via-primary/10 to-gold/10 flex items-center justify-center">
+                <Scissors className="w-12 h-12 text-gold/60" />
               </div>
               <div className="p-5">
                 <h3 className="text-xl font-display font-semibold mb-1 group-hover:text-primary transition-colors">
@@ -143,7 +143,7 @@ export default function Dashboard() {
                   </div>
                 )}
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl font-display font-bold gradient-text">₹{service.price}</span>
+                  <span className="text-2xl font-display font-bold gradient-gold-text">₹{service.price}</span>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Clock className="w-4 h-4" />
                     <span>{service.duration} min</span>
