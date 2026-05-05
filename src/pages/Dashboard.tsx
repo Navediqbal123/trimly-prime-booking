@@ -144,7 +144,7 @@ export default function Dashboard() {
             <p className="text-muted-foreground text-sm">No services available yet.</p>
           </div>
         ) : (
-          <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-thin">
+          <div className="flex gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 pl-1 pr-4 snap-x scrollbar-thin">
             {services.map((service, i) => (
               <motion.button
                 key={service.id}
