@@ -139,7 +139,7 @@ export function AppSidebar() {
         }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         className={cn(
-          'fixed top-0 left-0 h-screen w-72 glass-panel border-r border-sidebar-border z-50',
+          'fixed top-0 left-0 h-screen w-72 bg-sidebar border-r border-sidebar-border z-50 shadow-2xl',
           'flex flex-col',
           'lg:translate-x-0 lg:static'
         )}
