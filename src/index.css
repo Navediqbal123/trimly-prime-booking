@@ -127,10 +127,10 @@
   }
 
   .glass-panel {
-    background: hsl(270 35% 10% / 0.55);
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-    border: 1px solid hsl(270 40% 35% / 0.2);
+    background: hsl(270 40% 9% / 0.95);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid hsl(270 50% 40% / 0.35);
   }
 
   .gradient-border {
