@@ -12,6 +12,7 @@ import {
   Loader2,
   AlertCircle,
   Scissors,
+  Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -171,33 +172,66 @@ export default function BookingPage() {
       </Button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Shop Info */}
+        {/* Barber Profile */}
         <div className="lg:col-span-1">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-card border border-border rounded-2xl overflow-hidden sticky top-24"
+            className="glass-card rounded-2xl overflow-hidden sticky top-24"
           >
-            <div className="h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-              <Scissors className="w-16 h-16 text-primary/40" />
-            </div>
-            <div className="p-5">
-              <h2 className="text-xl font-semibold mb-2">{shop.shop_name}</h2>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-muted-foreground" />
-                  <span>{shop.location}</span>
+            <div className="relative h-56 bg-gradient-to-br from-primary/40 via-primary/20 to-background flex items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,hsl(270_70%_60%/0.4),transparent_70%)]" />
+              <div className="relative w-28 h-28 rounded-full btn-gold p-1 shadow-2xl">
+                <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
+                  <Scissors className="w-12 h-12 text-gold" />
                 </div>
-                {shop.user?.name && (
-                  <p className="text-muted-foreground">Owner: {shop.user.name}</p>
-                )}
               </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="text-center">
+                <h2 className="text-2xl font-display font-bold gradient-gold-text mb-1">{shop.shop_name}</h2>
+                <p className="text-sm text-muted-foreground">Master Stylist & Grooming Expert</p>
+                <div className="flex items-center justify-center gap-1 mt-3">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Star key={i} className={cn('w-4 h-4', i <= 4 ? 'fill-gold text-gold' : 'text-muted-foreground')} />
+                  ))}
+                  <span className="ml-2 text-sm font-medium">4.8</span>
+                  <span className="text-xs text-muted-foreground">(124)</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground justify-center pt-2 border-t border-border/40">
+                <MapPin className="w-4 h-4 text-gold" />
+                <span>{shop.location}</span>
+              </div>
+              <div className="pt-2">
+                <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Services</h4>
+                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                  {services.map((service) => (
+                    <div key={service.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/40 border border-border/40">
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm truncate">{service.name}</p>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          <span>{service.duration} min</span>
+                        </div>
+                      </div>
+                      <span className="text-sm font-bold gradient-gold-text">₹{service.price}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <Button
+                onClick={() => document.getElementById('booking-steps')?.scrollIntoView({ behavior: 'smooth' })}
+                className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:opacity-90 text-primary-foreground font-semibold h-12 rounded-xl shadow-lg shadow-primary/30 transition-all"
+              >
+                <Calendar className="w-4 h-4 mr-2" /> Book Now
+              </Button>
             </div>
           </motion.div>
         </div>
 
         {/* Booking Steps */}
-        <div className="lg:col-span-2">
+        <div id="booking-steps" className="lg:col-span-2">
           <div className="flex items-center gap-4 mb-8">
             {[1, 2, 3].map((s) => (
               <div key={s} className="flex items-center">
