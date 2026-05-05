@@ -14,7 +14,7 @@ export function BottomNav() {
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-3 pt-2">
-      <div className="glass-panel rounded-2xl flex items-center justify-around px-2 py-2 shadow-2xl border border-primary/20">
+      <div className="bg-sidebar rounded-2xl flex items-center justify-around px-2 py-3 shadow-2xl border border-primary/30">
         {items.map((item) => {
           const active = pathname === item.href;
           const Icon = item.icon;
@@ -23,12 +23,12 @@ export function BottomNav() {
               key={item.href}
               to={item.href}
               className={cn(
-                'flex flex-col items-center justify-center gap-0.5 px-4 py-1.5 rounded-xl transition-all duration-200',
-                active ? 'text-gold' : 'text-muted-foreground hover:text-foreground',
+                'flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-all duration-200',
+                active ? 'text-gold bg-gold/10' : 'text-foreground/70 hover:text-foreground',
               )}
             >
-              <Icon className={cn('w-5 h-5', active && 'drop-shadow-[0_0_6px_hsl(var(--gold))]')} />
-              <span className="text-[10px] font-medium">{item.title}</span>
+              <Icon className={cn('w-7 h-7', active && 'drop-shadow-[0_0_6px_hsl(var(--gold))]')} />
+              <span className="text-xs font-semibold">{item.title}</span>
             </NavLink>
           );
         })}
