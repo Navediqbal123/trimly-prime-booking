@@ -71,26 +71,31 @@ export default function DiscoverBarbers() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -5 }}
-              className="bg-card border border-border rounded-2xl overflow-hidden group cursor-pointer hover:border-primary/50 transition-all duration-300"
+              className="glass-card rounded-2xl overflow-hidden group cursor-pointer hover:border-gold/50 transition-all duration-300"
               onClick={() => navigate(`/book/${barber.id}`)}
             >
-              <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                <Scissors className="w-16 h-16 text-primary/40" />
+              <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-background flex items-center justify-center">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,hsl(270_70%_60%/0.35),transparent_70%)]" />
+                <Scissors className="relative w-16 h-16 text-gold drop-shadow-[0_0_12px_hsl(var(--gold)/0.6)]" />
               </div>
               <div className="p-5">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-display font-semibold group-hover:text-primary transition-colors">
+                  <h3 className="text-lg font-display font-bold gradient-gold-text group-hover:opacity-90 transition-opacity">
                     {barber.shop_name}
                   </h3>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                  <MapPin className="w-4 h-4" />
-                  <span>{barber.location}</span>
+                <div className="flex items-center gap-2 text-sm text-foreground/80 mb-3">
+                  <MapPin className="w-4 h-4 text-gold" />
+                  <span className="font-medium">{barber.location}</span>
                 </div>
                 {barber.user?.name && (
-                  <p className="text-sm text-muted-foreground mb-4">Owner: {barber.user.name}</p>
+                  <p className="text-sm text-foreground/70 mb-4 font-medium">
+                    Owner: <span className="text-foreground">{barber.user.name}</span>
+                  </p>
                 )}
-                <Button className="w-full">Book Appointment</Button>
+                <Button className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:opacity-90 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/30">
+                  Book Appointment
+                </Button>
               </div>
             </motion.div>
           ))}
