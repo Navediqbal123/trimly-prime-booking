@@ -1,20 +1,23 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { format } from 'date-fns';
 import {
   MapPin,
   Clock,
-  Calendar,
+  Calendar as CalendarIcon,
   ArrowLeft,
-  Check,
   Home,
   Loader2,
   AlertCircle,
   Scissors,
   Star,
+  Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { createBooking, getApprovedBarbers, getPendingBarbers, getBarberServices } from '@/lib/api';
@@ -28,9 +31,8 @@ const timeSlots = [
 export default function BookingPage() {
   const { shopId } = useParams();
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [homeService, setHomeService] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -63,44 +65,28 @@ export default function BookingPage() {
   const loadingData = loadingShop || loadingServices;
   const selectedServiceData = services.find((s) => s.id === selectedService);
 
-  const generateDates = () => {
-    const dates = [];
-    for (let i = 0; i < 14; i++) {
-      const date = new Date();
-      date.setDate(date.getDate() + i);
-      dates.push(date);
-    }
-    return dates;
-  };
-
   const handleBook = async () => {
     if (!selectedService || !selectedDate || !selectedTime) {
-      toast.error('Please complete all steps');
+      toast.error('Please select a service, date and time');
       return;
     }
-
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!shopId || !uuidRegex.test(shopId)) {
-      toast.error('Invalid barber ID. Please select a valid barber.');
-      return;
-    }
-    if (!uuidRegex.test(selectedService)) {
-      toast.error('Invalid service ID. Please select a valid service.');
+    if (!shopId || !uuidRegex.test(shopId) || !uuidRegex.test(selectedService)) {
+      toast.error('Invalid IDs');
       return;
     }
 
     setLoading(true);
-    const formattedDate = selectedDate.toISOString().split('T')[0];
     const response = await createBooking({
       barber_id: shopId,
       service_id: selectedService,
-      date: formattedDate,
+      date: selectedDate.toISOString().split('T')[0],
       time_slot: selectedTime,
       home_service: homeService,
     });
 
     if (response.success) {
-      toast.success('Booking confirmed! Check your bookings for details.');
+      toast.success('Booking confirmed!');
       navigate('/bookings');
     } else {
       toast.error(response.error || 'Failed to create booking');
@@ -108,23 +94,11 @@ export default function BookingPage() {
     setLoading(false);
   };
 
-  const handleNext = () => {
-    if (step === 1 && !selectedService) {
-      toast.error('Please select a service');
-      return;
-    }
-    if (step === 2 && (!selectedDate || !selectedTime)) {
-      toast.error('Please select date and time');
-      return;
-    }
-    setStep(step + 1);
-  };
-
   if (loadingData) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-        <p className="text-muted-foreground">Loading barber details...</p>
+        <p className="text-foreground">Loading...</p>
       </div>
     );
   }
@@ -132,15 +106,12 @@ export default function BookingPage() {
   if (!shopId || !shop) {
     return (
       <div className="animate-fade-in">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 text-foreground">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back
         </Button>
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <AlertCircle className="w-16 h-16 text-muted-foreground mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Barber Not Found</h3>
-          <p className="text-muted-foreground max-w-md mb-6">
-            The barber you're looking for doesn't exist or hasn't been approved yet.
-          </p>
+          <AlertCircle className="w-16 h-16 text-foreground/60 mb-4" />
+          <h3 className="text-xl font-semibold mb-2 text-foreground">Barber Not Found</h3>
           <Button onClick={() => navigate('/discover')}>Discover Barbers</Button>
         </div>
       </div>
@@ -150,15 +121,13 @@ export default function BookingPage() {
   if (services.length === 0) {
     return (
       <div className="animate-fade-in">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 text-foreground">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back
         </Button>
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Scissors className="w-16 h-16 text-muted-foreground mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No Services Available</h3>
-          <p className="text-muted-foreground max-w-md mb-6">
-            {shop.shop_name} hasn't added any services yet. Please check back later.
-          </p>
+          <Scissors className="w-16 h-16 text-foreground/60 mb-4" />
+          <h3 className="text-xl font-semibold mb-2 text-foreground">No Services Available</h3>
+          <p className="text-foreground/70 mb-6">{shop.shop_name} hasn't added services yet.</p>
           <Button onClick={() => navigate('/discover')}>Browse Other Barbers</Button>
         </div>
       </div>
@@ -166,235 +135,209 @@ export default function BookingPage() {
   }
 
   return (
-    <div className="animate-fade-in">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
+    <div className="animate-fade-in max-w-3xl mx-auto pb-8">
+      <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4 text-foreground">
         <ArrowLeft className="w-4 h-4 mr-2" /> Back
       </Button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Barber Profile */}
-        <div className="lg:col-span-1">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="glass-card rounded-2xl overflow-hidden sticky top-24"
-          >
-            <div className="relative h-56 bg-gradient-to-br from-primary/40 via-primary/20 to-background flex items-center justify-center overflow-hidden">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,hsl(270_70%_60%/0.4),transparent_70%)]" />
-              <div className="relative w-28 h-28 rounded-full btn-gold p-1 shadow-2xl">
-                <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                  <Scissors className="w-12 h-12 text-gold" />
-                </div>
-              </div>
-            </div>
-            <div className="p-5 space-y-4">
-              <div className="text-center">
-                <h2 className="text-2xl font-display font-bold gradient-gold-text mb-1">{shop.shop_name}</h2>
-                <p className="text-sm text-muted-foreground">Master Stylist & Grooming Expert</p>
-                <div className="flex items-center justify-center gap-1 mt-3">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star key={i} className={cn('w-4 h-4', i <= 4 ? 'fill-gold text-gold' : 'text-muted-foreground')} />
-                  ))}
-                  <span className="ml-2 text-sm font-medium">4.8</span>
-                  <span className="text-xs text-muted-foreground">(124)</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground justify-center pt-2 border-t border-border/40">
-                <MapPin className="w-4 h-4 text-gold" />
-                <span>{shop.location}</span>
-              </div>
-              <div className="pt-2">
-                <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Services</h4>
-                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                  {services.map((service) => (
-                    <div key={service.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/40 border border-border/40">
-                      <div className="min-w-0">
-                        <p className="font-medium text-sm truncate">{service.name}</p>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          <span>{service.duration} min</span>
-                        </div>
-                      </div>
-                      <span className="text-sm font-bold gradient-gold-text">₹{service.price}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <Button
-                onClick={() => document.getElementById('booking-steps')?.scrollIntoView({ behavior: 'smooth' })}
-                className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:opacity-90 text-primary-foreground font-semibold h-12 rounded-xl shadow-lg shadow-primary/30 transition-all"
-              >
-                <Calendar className="w-4 h-4 mr-2" /> Book Now
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Booking Steps */}
-        <div id="booking-steps" className="lg:col-span-2">
-          <div className="flex items-center gap-4 mb-8">
-            {[1, 2, 3].map((s) => (
-              <div key={s} className="flex items-center">
-                <div className={cn(
-                  'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors',
-                  step >= s ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
-                )}>
-                  {step > s ? <Check className="w-4 h-4" /> : s}
-                </div>
-                {s < 3 && <div className={cn('w-16 h-0.5 mx-2', step > s ? 'bg-primary' : 'bg-secondary')} />}
-              </div>
-            ))}
+      {/* Barber Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass-card rounded-2xl p-5 mb-6 flex items-center gap-4"
+      >
+        <div className="w-16 h-16 rounded-full btn-gold p-1 shrink-0">
+          <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
+            <Scissors className="w-7 h-7 text-gold" />
           </div>
-
-          <AnimatePresence mode="wait">
-            {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <h3 className="text-xl font-semibold mb-4">Select a Service</h3>
-                <div className="space-y-3">
-                  {services.map((service) => (
-                    <motion.div
-                      key={service.id}
-                      whileHover={{ scale: 1.01 }}
-                      onClick={() => {
-                        setSelectedService(service.id);
-                        if (!service.home_service) setHomeService(false);
-                      }}
-                      className={cn(
-                        'p-4 rounded-xl border cursor-pointer transition-all',
-                        selectedService === service.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/50'
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-medium">{service.name}</h4>
-                            {service.home_service && <Home className="w-4 h-4 text-green-500" />}
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{service.duration} min</span>
-                          </div>
-                        </div>
-                        <span className="text-xl font-bold text-primary">₹{service.price}</span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-                <Button className="w-full mt-6" disabled={!selectedService} onClick={() => setStep(2)}>Continue</Button>
-              </motion.div>
-            )}
-
-            {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <h3 className="text-xl font-semibold mb-4">Select Date & Time</h3>
-                {selectedServiceData?.home_service && (
-                  <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Home className="w-5 h-5 text-green-500" />
-                        <span className="font-medium">Home Service Available</span>
-                      </div>
-                      <Button variant={homeService ? 'default' : 'outline'} size="sm" onClick={() => setHomeService(!homeService)}>
-                        {homeService ? 'Selected' : 'Select'}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                <div className="mb-6">
-                  <h4 className="text-sm font-medium mb-3">Select Date</h4>
-                  <div className="flex gap-2 overflow-x-auto pb-2">
-                    {generateDates().map((date) => (
-                      <motion.button
-                        key={date.toISOString()}
-                        whileHover={{ scale: 1.05 }}
-                        onClick={() => setSelectedDate(date)}
-                        className={cn(
-                          'flex-shrink-0 w-16 py-3 rounded-xl text-center transition-colors',
-                          selectedDate?.toDateString() === date.toDateString()
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-secondary hover:bg-secondary/80'
-                        )}
-                      >
-                        <div className="text-xs font-medium">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                        <div className="text-lg font-bold">{date.getDate()}</div>
-                        <div className="text-xs">{date.toLocaleDateString('en-US', { month: 'short' })}</div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium mb-3">Select Time</h4>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                    {timeSlots.map((time) => (
-                      <motion.button
-                        key={time}
-                        whileHover={{ scale: 1.05 }}
-                        onClick={() => setSelectedTime(time)}
-                        className={cn(
-                          'py-2 px-3 rounded-lg text-sm transition-colors',
-                          selectedTime === time ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'
-                        )}
-                      >
-                        {time}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-3 mt-6">
-                  <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
-                  <Button className="flex-1" disabled={!selectedDate || !selectedTime} onClick={handleNext}>Continue</Button>
-                </div>
-              </motion.div>
-            )}
-
-            {step === 3 && (
-              <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <h3 className="text-xl font-semibold mb-4">Confirm Booking</h3>
-                <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
-                  <div className="flex justify-between items-center pb-4 border-b border-border">
-                    <span className="text-muted-foreground">Service</span>
-                    <span className="font-medium">{selectedServiceData?.name}</span>
-                  </div>
-                  <div className="flex justify-between items-center pb-4 border-b border-border">
-                    <span className="text-muted-foreground">Date</span>
-                    <span className="font-medium">
-                      {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center pb-4 border-b border-border">
-                    <span className="text-muted-foreground">Time</span>
-                    <span className="font-medium">{selectedTime}</span>
-                  </div>
-                  <div className="flex justify-between items-center pb-4 border-b border-border">
-                    <span className="text-muted-foreground">Duration</span>
-                    <span className="font-medium">{selectedServiceData?.duration} min</span>
-                  </div>
-                  {homeService && (
-                    <div className="flex justify-between items-center pb-4 border-b border-border">
-                      <span className="text-muted-foreground">Service Type</span>
-                      <span className="font-medium text-green-500 flex items-center gap-1">
-                        <Home className="w-4 h-4" /> Home Service
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-lg font-semibold">Total</span>
-                    <span className="text-2xl font-bold text-primary">₹{selectedServiceData?.price}</span>
-                  </div>
-                </div>
-                <div className="flex gap-3 mt-6">
-                  <Button variant="outline" onClick={() => setStep(2)} disabled={loading}>Back</Button>
-                  <Button className="flex-1" onClick={handleBook} disabled={loading}>
-                    {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Booking...</> : <>
-                      <Calendar className="w-4 h-4 mr-2" /> Confirm Booking
-                    </>}
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
-      </div>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl font-display font-bold gradient-gold-text truncate">{shop.shop_name}</h1>
+          <div className="flex items-center gap-1 text-xs text-foreground/80 mt-1">
+            <MapPin className="w-3 h-3 text-gold" />
+            <span className="truncate">{shop.location}</span>
+          </div>
+          <div className="flex items-center gap-1 mt-1">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Star key={i} className={cn('w-3 h-3', i <= 4 ? 'fill-gold text-gold' : 'text-foreground/30')} />
+            ))}
+            <span className="ml-1 text-xs text-foreground">4.8</span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Service Selection */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="glass-card rounded-2xl p-5 mb-6"
+      >
+        <h2 className="text-lg font-display font-bold text-foreground mb-4">Select Service</h2>
+        <div className="space-y-2">
+          {services.map((service) => (
+            <button
+              key={service.id}
+              onClick={() => {
+                setSelectedService(service.id);
+                if (!service.home_service) setHomeService(false);
+              }}
+              className={cn(
+                'w-full flex items-center justify-between p-3 rounded-xl border transition-all',
+                selectedService === service.id
+                  ? 'bg-primary/20 border-primary'
+                  : 'bg-secondary/40 border-border hover:border-primary/50'
+              )}
+            >
+              <div className="text-left">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-sm text-foreground">{service.name}</span>
+                  {service.home_service && <Home className="w-3 h-3 text-gold" />}
+                </div>
+                <div className="flex items-center gap-1 text-xs text-foreground/70 mt-0.5">
+                  <Clock className="w-3 h-3" /> {service.duration} min
+                </div>
+              </div>
+              <span className="text-base font-bold gradient-gold-text">₹{service.price}</span>
+            </button>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Date Picker */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="glass-card rounded-2xl p-5 mb-6"
+      >
+        <h2 className="text-lg font-display font-bold text-foreground mb-4">Select Date</h2>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                'w-full justify-start text-left font-normal h-12 bg-secondary/40 border-border text-foreground hover:bg-secondary/60',
+                !selectedDate && 'text-foreground/60'
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4 text-gold" />
+              {selectedDate ? format(selectedDate, 'PPP') : 'Pick a date'}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+              initialFocus
+              className={cn('p-3 pointer-events-auto')}
+            />
+          </PopoverContent>
+        </Popover>
+      </motion.div>
+
+      {/* Time Slots */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="glass-card rounded-2xl p-5 mb-6"
+      >
+        <h2 className="text-lg font-display font-bold text-foreground mb-4">Select Time</h2>
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          {timeSlots.map((time) => (
+            <button
+              key={time}
+              onClick={() => setSelectedTime(time)}
+              className={cn(
+                'py-2.5 px-2 rounded-lg text-sm font-medium transition-all border',
+                selectedTime === time
+                  ? 'bg-gradient-to-r from-primary to-purple-500 text-primary-foreground border-primary shadow-lg shadow-primary/40'
+                  : 'bg-secondary/40 text-foreground border-border hover:border-primary/50'
+              )}
+            >
+              {time}
+            </button>
+          ))}
+        </div>
+
+        {selectedServiceData?.home_service && (
+          <div className="mt-4 p-3 rounded-xl bg-secondary/40 border border-border flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Home className="w-4 h-4 text-gold" />
+              <span className="text-sm font-medium text-foreground">Home Service</span>
+            </div>
+            <Button
+              size="sm"
+              variant={homeService ? 'default' : 'outline'}
+              onClick={() => setHomeService(!homeService)}
+            >
+              {homeService ? <><Check className="w-3 h-3 mr-1" /> Selected</> : 'Select'}
+            </Button>
+          </div>
+        )}
+      </motion.div>
+
+      {/* Price Summary */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+        className="glass-card rounded-2xl p-5 mb-6"
+      >
+        <h2 className="text-lg font-display font-bold text-foreground mb-4">Summary</h2>
+        <div className="space-y-3 text-sm">
+          <div className="flex justify-between text-foreground/80">
+            <span>Service</span>
+            <span className="text-foreground font-medium">{selectedServiceData?.name || '—'}</span>
+          </div>
+          <div className="flex justify-between text-foreground/80">
+            <span>Date</span>
+            <span className="text-foreground font-medium">
+              {selectedDate ? format(selectedDate, 'PPP') : '—'}
+            </span>
+          </div>
+          <div className="flex justify-between text-foreground/80">
+            <span>Time</span>
+            <span className="text-foreground font-medium">{selectedTime || '—'}</span>
+          </div>
+          <div className="flex justify-between text-foreground/80">
+            <span>Duration</span>
+            <span className="text-foreground font-medium">
+              {selectedServiceData ? `${selectedServiceData.duration} min` : '—'}
+            </span>
+          </div>
+          {homeService && (
+            <div className="flex justify-between text-foreground/80">
+              <span>Type</span>
+              <span className="text-gold font-medium flex items-center gap-1">
+                <Home className="w-3 h-3" /> Home Service
+              </span>
+            </div>
+          )}
+          <div className="border-t border-border pt-3 flex justify-between items-center">
+            <span className="text-base font-semibold text-foreground">Total</span>
+            <span className="text-2xl font-bold gradient-gold-text">
+              ₹{selectedServiceData?.price || 0}
+            </span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Confirm Button */}
+      <Button
+        onClick={handleBook}
+        disabled={loading || !selectedService || !selectedDate || !selectedTime}
+        className="w-full h-14 bg-gradient-to-r from-primary via-purple-500 to-primary hover:opacity-90 text-primary-foreground font-bold text-base rounded-xl shadow-lg shadow-primary/40"
+      >
+        {loading ? (
+          <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Booking...</>
+        ) : (
+          <><CalendarIcon className="w-5 h-5 mr-2" /> Confirm Booking</>
+        )}
+      </Button>
     </div>
   );
 }
