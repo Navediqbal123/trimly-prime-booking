@@ -158,7 +158,7 @@ export default function Dashboard() {
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-gradient-to-br from-primary/30 to-gold/20 border border-gold/20">
                   <Scissors className="w-6 h-6 text-gold" />
                 </div>
-                <h3 className="font-display font-semibold text-base mb-1 line-clamp-1 group-hover:text-gold transition-colors">
+                <h3 className="font-display font-semibold text-base mb-1 line-clamp-1 text-white group-hover:text-gold transition-colors">
                   {service.name}
                 </h3>
                 {service.barbers && (
