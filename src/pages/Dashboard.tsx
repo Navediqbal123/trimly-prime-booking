@@ -106,12 +106,12 @@ export default function Dashboard() {
             <Sparkles className="w-3.5 h-3.5 text-gold" />
             <span className="text-xs font-medium tracking-wide text-gold">Premium Grooming</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold leading-tight mb-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold leading-tight mb-3 text-white">
             Your Perfect <span className="gradient-gold-text">Trim</span>,
             <br />
             Anytime.
           </h1>
-          <p className="text-sm sm:text-base text-foreground/80 mb-6 max-w-md">
+          <p className="text-sm sm:text-base text-white mb-6 max-w-md">
             {user?.full_name?.split(' ')[0] ? `Welcome back, ${user.full_name.split(' ')[0]}. ` : ''}
             Book elite barbers near you in seconds.
           </p>
@@ -158,7 +158,7 @@ export default function Dashboard() {
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-gradient-to-br from-primary/30 to-gold/20 border border-gold/20">
                   <Scissors className="w-6 h-6 text-gold" />
                 </div>
-                <h3 className="font-display font-semibold text-base mb-1 line-clamp-1 group-hover:text-gold transition-colors">
+                <h3 className="font-display font-semibold text-base mb-1 line-clamp-1 text-white group-hover:text-gold transition-colors">
                   {service.name}
                 </h3>
                 {service.barbers && (
@@ -214,24 +214,24 @@ export default function Dashboard() {
                 onClick={() => navigate(`/book/${b.id}`)}
                 className="glass-card rounded-2xl overflow-hidden text-left hover:border-gold/50 transition-all group"
               >
-                <div className="relative h-28 bg-gradient-to-br from-primary/40 via-primary/20 to-gold/20 flex items-center justify-center">
-                  <div className="w-14 h-14 rounded-full glass-panel flex items-center justify-center">
-                    <span className="font-display font-bold text-lg gradient-gold-text">
+                <div className="relative h-28 bg-gradient-to-br from-primary/50 via-primary/30 to-gold/30 flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-background/40 border-2 border-gold flex items-center justify-center">
+                    <span className="font-display font-bold text-lg text-white">
                       {b.shop_name?.[0]?.toUpperCase() || 'B'}
                     </span>
                   </div>
-                  <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full glass-panel">
+                  <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/60 border border-gold/40">
                     <Star className="w-3 h-3 text-gold fill-gold" />
-                    <span className="text-[10px] font-semibold">4.9</span>
+                    <span className="text-[10px] font-semibold text-white">4.9</span>
                   </div>
                 </div>
                 <div className="p-3">
-                  <h3 className="font-display font-semibold text-sm line-clamp-1 group-hover:text-gold transition-colors">
+                  <h3 className="font-display font-semibold text-sm line-clamp-1 text-white group-hover:text-gold transition-colors">
                     {b.shop_name}
                   </h3>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Master Stylist</p>
+                  <p className="text-[11px] text-white/70 mt-0.5">Master Stylist</p>
                   {b.location && (
-                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1">
+                    <div className="flex items-center gap-1 text-[11px] text-white/70 mt-1">
                       <MapPin className="w-3 h-3" />
                       <span className="line-clamp-1">{b.location}</span>
                     </div>
