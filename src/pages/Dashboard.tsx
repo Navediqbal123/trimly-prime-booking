@@ -106,12 +106,12 @@ export default function Dashboard() {
             <Sparkles className="w-3.5 h-3.5 text-gold" />
             <span className="text-xs font-medium tracking-wide text-gold">Premium Grooming</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold leading-tight mb-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold leading-tight mb-3 text-white">
             Your Perfect <span className="gradient-gold-text">Trim</span>,
             <br />
             Anytime.
           </h1>
-          <p className="text-sm sm:text-base text-foreground/80 mb-6 max-w-md">
+          <p className="text-sm sm:text-base text-white mb-6 max-w-md">
             {user?.full_name?.split(' ')[0] ? `Welcome back, ${user.full_name.split(' ')[0]}. ` : ''}
             Book elite barbers near you in seconds.
           </p>
