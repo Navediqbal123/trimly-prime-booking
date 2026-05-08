@@ -119,18 +119,14 @@
   }
 
   .glass-card {
-    background: linear-gradient(135deg, hsl(270 40% 14% / 0.6), hsl(270 30% 8% / 0.5));
-    backdrop-filter: blur(18px) saturate(140%);
-    -webkit-backdrop-filter: blur(18px) saturate(140%);
-    border: 1px solid hsl(270 50% 40% / 0.25);
-    box-shadow: 0 8px 32px hsl(270 60% 5% / 0.45), inset 0 1px 0 hsl(270 60% 70% / 0.08);
+    background: #1A0A2E;
+    border: 1px solid hsl(270 50% 30% / 0.6);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   }
 
   .glass-panel {
-    background: hsl(270 40% 9% / 0.95);
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid hsl(270 50% 40% / 0.35);
+    background: #0A0A0A;
+    border: 1px solid hsl(270 50% 30% / 0.6);
   }
 
   .gradient-border {
