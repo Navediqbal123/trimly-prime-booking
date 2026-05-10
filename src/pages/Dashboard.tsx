@@ -130,7 +130,7 @@ export default function Dashboard() {
         <div className="flex items-end justify-between mb-4">
           <div>
             <h2 className="text-2xl font-display font-bold">Featured Services</h2>
-            <p className="text-sm text-muted-foreground">Swipe to explore</p>
+            <p className="text-sm text-white/90">Swipe to explore</p>
           </div>
         </div>
 
@@ -140,8 +140,8 @@ export default function Dashboard() {
           </div>
         ) : services.length === 0 ? (
           <div className="glass-card rounded-2xl p-8 text-center">
-            <Scissors className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground text-sm">No services available yet.</p>
+            <Scissors className="w-10 h-10 text-white/90 mx-auto mb-3" />
+            <p className="text-white/90 text-sm">No services available yet.</p>
           </div>
         ) : (
           <div className="flex gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 pl-1 pr-4 snap-x scrollbar-thin">
@@ -162,13 +162,13 @@ export default function Dashboard() {
                   {service.name}
                 </h3>
                 {service.barbers && (
-                  <p className="text-xs text-muted-foreground line-clamp-1 mb-2">
+                  <p className="text-xs text-white/90 line-clamp-1 mb-2">
                     {service.barbers.shop_name}
                   </p>
                 )}
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-lg font-display font-bold gradient-gold-text">₹{service.price}</span>
-                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <div className="flex items-center gap-1 text-[11px] text-white/90">
                     <Clock className="w-3 h-3" />
                     {service.duration}m
                   </div>
@@ -184,7 +184,7 @@ export default function Dashboard() {
         <div className="flex items-end justify-between mb-4">
           <div>
             <h2 className="text-2xl font-display font-bold">Discover Barbers</h2>
-            <p className="text-sm text-muted-foreground">Top professionals near you</p>
+            <p className="text-sm text-white/90">Top professionals near you</p>
           </div>
           <button
             onClick={() => navigate('/discover')}
@@ -200,7 +200,7 @@ export default function Dashboard() {
           </div>
         ) : barbers.length === 0 ? (
           <div className="glass-card rounded-2xl p-8 text-center">
-            <p className="text-muted-foreground text-sm">No barbers available yet.</p>
+            <p className="text-white/90 text-sm">No barbers available yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -270,7 +270,7 @@ export default function Dashboard() {
                   </DialogHeader>
 
                   {selectedService.barbers?.location && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+                    <div className="flex items-center gap-2 text-sm text-white/90 mb-4">
                       <MapPin className="w-4 h-4" />
                       <span>{selectedService.barbers.location}</span>
                     </div>
@@ -278,18 +278,18 @@ export default function Dashboard() {
 
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     <div className="glass-panel rounded-xl p-4">
-                      <p className="text-xs text-muted-foreground mb-1">Price</p>
+                      <p className="text-xs text-white/90 mb-1">Price</p>
                       <p className="text-2xl font-display font-bold gradient-gold-text">
                         ₹{selectedService.price}
                       </p>
                     </div>
                     <div className="glass-panel rounded-xl p-4">
-                      <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
+                      <p className="text-xs text-white/90 mb-1 flex items-center gap-1">
                         <Clock className="w-3 h-3" /> Duration
                       </p>
                       <p className="text-2xl font-display font-bold">
                         {selectedService.duration}
-                        <span className="text-sm font-normal text-muted-foreground ml-1">min</span>
+                        <span className="text-sm font-normal text-white/90 ml-1">min</span>
                       </p>
                     </div>
                   </div>
