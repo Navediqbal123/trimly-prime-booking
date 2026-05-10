@@ -263,7 +263,7 @@ export default function Dashboard() {
                       {selectedService.name}
                     </DialogTitle>
                     {selectedService.barbers && (
-                      <DialogDescription className="text-base text-foreground/80 font-medium">
+                      <DialogDescription className="text-base text-white/90 font-medium">
                         {selectedService.barbers.shop_name}
                       </DialogDescription>
                     )}
