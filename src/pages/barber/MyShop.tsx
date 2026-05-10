@@ -172,6 +172,6 @@ export default function MyShop() {
           </Button>
         </form>
       </motion.div>
-    </div>
+    </div></div>
   );
 }
