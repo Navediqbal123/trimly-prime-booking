@@ -219,7 +219,7 @@ export default function AdminDashboard() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-8"
+      className="page-black space-y-8"
     >
       <div className="flex items-center justify-between">
         <div>
