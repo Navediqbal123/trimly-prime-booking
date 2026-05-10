@@ -245,7 +245,7 @@ export default function Dashboard() {
 
       {/* Service Details Modal */}
       <Dialog open={!!selectedService} onOpenChange={(open) => !open && setSelectedService(null)}>
-        <DialogContent className="sm:max-w-md border-border bg-card p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-md border border-gold/30 bg-black p-0 overflow-hidden">
           <AnimatePresence>
             {selectedService && (
               <motion.div
@@ -253,51 +253,53 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.25 }}
+                className="bg-black"
               >
-                <div className="relative h-40 bg-gradient-to-br from-primary via-primary/70 to-[#1A0A2E] flex items-center justify-center border-b border-gold/30">
-                  <div className="absolute inset-0 bg-black/30" />
+                <div className="relative h-40 bg-black flex items-center justify-center border-b border-gold/30">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent" />
                   <Scissors className="relative w-16 h-16 text-gold drop-shadow-[0_0_20px_rgba(212,175,55,0.6)]" />
                 </div>
-                <div className="p-6">
+                <div className="p-6 bg-black">
                   <DialogHeader className="text-left mb-4">
-                    <DialogTitle className="text-2xl font-display gradient-gold-text">
+                    <DialogTitle className="text-2xl font-display text-white">
                       {selectedService.name}
                     </DialogTitle>
                     {selectedService.barbers && (
-                      <DialogDescription className="text-base text-white/90 font-medium">
+                      <DialogDescription className="text-base text-white font-medium">
                         {selectedService.barbers.shop_name}
                       </DialogDescription>
                     )}
                   </DialogHeader>
 
                   {selectedService.barbers?.location && (
-                    <div className="flex items-center gap-2 text-sm text-white/90 mb-4">
-                      <MapPin className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-sm text-white mb-4">
+                      <MapPin className="w-4 h-4 text-white" />
                       <span>{selectedService.barbers.location}</span>
                     </div>
                   )}
 
                   <div className="grid grid-cols-2 gap-3 mb-6">
-                    <div className="glass-panel rounded-xl p-4">
-                      <p className="text-xs text-white/90 mb-1">Price</p>
-                      <p className="text-2xl font-display font-bold gradient-gold-text">
-                        ₹{selectedService.price}
+                    <div className="rounded-xl p-4 bg-black border border-gold/40">
+                      <p className="text-xs text-white mb-1">Price</p>
+                      <p className="text-2xl font-display font-bold text-white flex items-center gap-0.5">
+                        <IndianRupee className="w-5 h-5 text-white" strokeWidth={2.5} />
+                        {selectedService.price}
                       </p>
                     </div>
-                    <div className="glass-panel rounded-xl p-4">
-                      <p className="text-xs text-white/90 mb-1 flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> Duration
+                    <div className="rounded-xl p-4 bg-black border border-gold/40">
+                      <p className="text-xs text-white mb-1 flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-white" /> Duration
                       </p>
-                      <p className="text-2xl font-display font-bold">
+                      <p className="text-2xl font-display font-bold text-white">
                         {selectedService.duration}
-                        <span className="text-sm font-normal text-white/90 ml-1">min</span>
+                        <span className="text-sm font-normal text-white ml-1">min</span>
                       </p>
                     </div>
                   </div>
 
                   {selectedService.home_service && (
-                    <div className="flex items-center gap-2 text-sm text-primary mb-4 bg-primary/10 px-3 py-2 rounded-lg">
-                      <Home className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-sm text-white mb-4 bg-primary/20 border border-primary/40 px-3 py-2 rounded-lg">
+                      <Home className="w-4 h-4 text-white" />
                       <span>Home service available</span>
                     </div>
                   )}
