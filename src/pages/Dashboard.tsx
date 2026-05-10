@@ -254,8 +254,9 @@ export default function Dashboard() {
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.25 }}
               >
-                <div className="relative h-40 bg-gradient-to-br from-primary/40 via-primary/10 to-gold/30 flex items-center justify-center">
-                  <Scissors className="w-16 h-16 text-gold/70" />
+                <div className="relative h-40 bg-gradient-to-br from-primary via-primary/70 to-[#1A0A2E] flex items-center justify-center border-b border-gold/30">
+                  <div className="absolute inset-0 bg-black/30" />
+                  <Scissors className="relative w-16 h-16 text-gold drop-shadow-[0_0_20px_rgba(212,175,55,0.6)]" />
                 </div>
                 <div className="p-6">
                   <DialogHeader className="text-left mb-4">
