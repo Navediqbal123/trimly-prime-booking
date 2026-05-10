@@ -47,7 +47,7 @@ export default function AdminBarbers() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="animate-fade-in"
+      className="page-black animate-fade-in"
     >
       <div className="mb-8 flex items-center justify-between">
         <div>

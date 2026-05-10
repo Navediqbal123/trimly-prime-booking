@@ -125,7 +125,7 @@ export default function BarberDashboard() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8"
+      className="page-black space-y-8"
     >
       <motion.div variants={itemVariants} className="flex items-center justify-between">
         <div>
