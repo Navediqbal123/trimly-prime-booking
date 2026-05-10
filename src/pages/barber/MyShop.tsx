@@ -64,7 +64,7 @@ export default function MyShop() {
   }
 
   return (
-    <div className="animate-fade-in max-w-2xl mx-auto">
+    <div className="page-black animate-fade-in"><div className="max-w-2xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
           My <span className="gradient-text">Shop</span>
