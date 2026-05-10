@@ -129,6 +129,41 @@
     border: 1px solid hsl(270 50% 30% / 0.6);
   }
 
+  .page-black {
+    background: #000000;
+    color: #ffffff;
+    margin: -1rem;
+    padding: 1rem;
+    min-height: 100vh;
+  }
+  @media (min-width: 1024px) {
+    .page-black {
+      margin: -2rem;
+      padding: 2rem;
+    }
+  }
+  .page-black .glass-card,
+  .page-black .bg-card {
+    background: #000000 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+  .page-black .text-muted-foreground,
+  .page-black .text-foreground\/70,
+  .page-black .text-foreground\/80,
+  .page-black .text-foreground\/60 {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  .page-black input,
+  .page-black textarea {
+    background: #0a0a0a !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+  .page-black input::placeholder,
+  .page-black textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+  }
+
   .gradient-border {
     @apply relative;
     background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
