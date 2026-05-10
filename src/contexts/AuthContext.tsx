@@ -77,11 +77,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {}
   }, [user?.id]);
 
-  // Initialize auth state — force sign-out once to clear stale tokens
+  // Initialize auth state — persist session until manual logout
   useEffect(() => {
-    const FORCE_RELOGIN_KEY = 'trimly_force_relogin_v6';
-    const didForce = sessionStorage.getItem(FORCE_RELOGIN_KEY);
-
     // Always subscribe to auth changes FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
@@ -93,23 +90,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-    if (!didForce) {
-      // Force one sign-out to clear stale tokens, but listener is already active
-      sessionStorage.setItem(FORCE_RELOGIN_KEY, '1');
-      supabase.auth.signOut().then(() => {
-        setUser(null);
-        setLoading(false);
-      });
-    } else {
-      // Normal init — check existing session
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) {
-          setUser(buildProfile(session.user));
-          fetchProfileFullName(session.user.id);
-        }
-        setLoading(false);
-      });
-    }
+    // Restore existing session on load — keeps user logged in across reloads
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser(buildProfile(session.user));
+        fetchProfileFullName(session.user.id);
+      }
+      setLoading(false);
+    });
 
     return () => subscription.unsubscribe();
   }, []);
