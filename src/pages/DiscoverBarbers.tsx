@@ -34,7 +34,7 @@ export default function DiscoverBarbers() {
           <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
             Discover <span className="gradient-text">Barbers</span>
           </h1>
-          <p className="text-muted-foreground">Find the perfect barber for your style</p>
+          <p className="text-white/90">Find the perfect barber for your style</p>
         </div>
         <Button variant="outline" onClick={() => refetch()} disabled={loading}>
           <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
@@ -44,7 +44,7 @@ export default function DiscoverBarbers() {
 
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/90" />
           <Input
             placeholder="Search by name or location..."
             value={searchQuery}
@@ -60,7 +60,7 @@ export default function DiscoverBarbers() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-          <p className="text-muted-foreground">Loading barbers...</p>
+          <p className="text-white/90">Loading barbers...</p>
         </div>
       ) : barbers.length > 0 ? (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -84,12 +84,12 @@ export default function DiscoverBarbers() {
                     {barber.shop_name}
                   </h3>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-foreground/80 mb-3">
+                <div className="flex items-center gap-2 text-sm text-white/90 mb-3">
                   <MapPin className="w-4 h-4 text-gold" />
                   <span className="font-medium">{barber.location}</span>
                 </div>
                 {barber.user?.name && (
-                  <p className="text-sm text-foreground/70 mb-4 font-medium">
+                  <p className="text-sm text-white/80 mb-4 font-medium">
                     Owner: <span className="text-foreground">{barber.user.name}</span>
                   </p>
                 )}
@@ -102,8 +102,8 @@ export default function DiscoverBarbers() {
         </motion.div>
       ) : (
         <div className="text-center py-12">
-          <Scissors className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">
+          <Scissors className="w-12 h-12 text-white/90 mx-auto mb-4" />
+          <p className="text-white/90">
             {searchQuery ? 'No barbers found matching your search.' : 'No approved barbers available yet.'}
           </p>
         </div>
