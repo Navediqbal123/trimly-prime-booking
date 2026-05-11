@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { BarberHubSidebar } from './BarberHubSidebar';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
+import { PageTransition } from '@/components/PageTransition';
 
 export function BarberHubLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
