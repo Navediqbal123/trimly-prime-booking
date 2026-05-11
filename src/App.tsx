@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { BarberHubLayout } from "@/components/layout/BarberHubLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AdminOnlyRoute, BarberOnlyRoute } from "@/components/RoleRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 import Auth from "./pages/Auth";
@@ -62,19 +63,21 @@ function AppRoutes() {
         <Route path="/become-barber" element={<BecomeBarber />} />
         <Route path="/book/:shopId" element={<BookingPage />} />
         
-        {/* Admin Routes */}
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/requests" element={<BarberRequests />} />
-        <Route path="/admin/barbers" element={<AdminBarbers />} />
-        <Route path="/admin/bookings" element={<AdminBookings />} />
+        {/* Admin Routes - super admin email only */}
+        <Route path="/admin/dashboard" element={<AdminOnlyRoute><AdminDashboard /></AdminOnlyRoute>} />
+        <Route path="/admin/users" element={<AdminOnlyRoute><AdminUsers /></AdminOnlyRoute>} />
+        <Route path="/admin/requests" element={<AdminOnlyRoute><BarberRequests /></AdminOnlyRoute>} />
+        <Route path="/admin/barbers" element={<AdminOnlyRoute><AdminBarbers /></AdminOnlyRoute>} />
+        <Route path="/admin/bookings" element={<AdminOnlyRoute><AdminBookings /></AdminOnlyRoute>} />
       </Route>
 
       {/* Barber Hub - separate layout */}
       <Route
         element={
           <ProtectedRoute>
-            <BarberHubLayout />
+            <BarberOnlyRoute>
+              <BarberHubLayout />
+            </BarberOnlyRoute>
           </ProtectedRoute>
         }
       >
