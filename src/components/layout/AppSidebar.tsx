@@ -152,10 +152,10 @@ export function AppSidebar() {
           className="p-6 border-b border-border"
         >
           <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center btn-gold">
-              <Scissors className="w-5 h-5" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center btn-gold shrink-0">
+              <Scissors className="w-6 h-6" />
             </div>
-            <span className="text-2xl font-display font-bold tracking-wide" style={{ color: '#000000' }}>
+            <span className="text-3xl font-display font-extrabold tracking-wide leading-none" style={{ color: '#000000' }}>
               Barber Lane
             </span>
           </Link>
