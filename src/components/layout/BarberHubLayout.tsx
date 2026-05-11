@@ -8,7 +8,7 @@ export function BarberHubLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex w-full bg-background">
+    <div className="page-black min-h-screen flex w-full bg-background">
       <BarberHubSidebar isOpen={sidebarOpen} onOpenChange={setSidebarOpen} />
       <main className="flex-1 overflow-x-hidden">
         <div className="p-4 lg:p-8">

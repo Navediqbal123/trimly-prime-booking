@@ -208,7 +208,7 @@ export function AppSidebar() {
             </>
           )}
 
-          {(isAdmin || isSuperAdmin) && (
+          {isSuperAdmin && (
             <>
               <div className="my-4 border-t border-border" />
               <div className="px-4 py-2">
