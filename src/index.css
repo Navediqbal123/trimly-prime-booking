@@ -130,8 +130,8 @@
   }
 
   .page-black {
-    background: #000000;
-    color: #ffffff;
+    background: #ffffff;
+    color: #000000;
     margin: -1rem;
     padding: 1rem;
     min-height: 100vh;
@@ -142,26 +142,48 @@
       padding: 2rem;
     }
   }
+  .page-black,
+  .page-black h1,
+  .page-black h2,
+  .page-black h3,
+  .page-black h4,
+  .page-black h5,
+  .page-black h6,
+  .page-black p,
+  .page-black span,
+  .page-black td,
+  .page-black th,
+  .page-black label,
+  .page-black div {
+    color: #000000;
+  }
+  .page-black .gradient-text {
+    -webkit-text-fill-color: initial;
+    color: inherit;
+  }
   .page-black .glass-card,
-  .page-black .bg-card {
-    background: #000000 !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
+  .page-black .bg-card,
+  .page-black [class*="bg-card"] {
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
+    color: #000000 !important;
   }
   .page-black .text-muted-foreground,
   .page-black .text-foreground\/70,
   .page-black .text-foreground\/80,
   .page-black .text-foreground\/60 {
-    color: rgba(255, 255, 255, 0.9) !important;
+    color: rgba(0, 0, 0, 0.75) !important;
   }
   .page-black input,
-  .page-black textarea {
-    background: #0a0a0a !important;
-    color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.15) !important;
+  .page-black textarea,
+  .page-black select {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
   }
   .page-black input::placeholder,
   .page-black textarea::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
+    color: rgba(0, 0, 0, 0.5) !important;
   }
 
   .gradient-border {
