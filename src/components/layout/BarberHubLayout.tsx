@@ -25,7 +25,9 @@ export function BarberHubLayout() {
             </Button>
             <span className="text-2xl font-display font-bold gradient-text tracking-tight">Barber&nbsp;&nbsp;Hub</span>
           </div>
-          <Outlet />
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
         </div>
       </main>
     </div>
