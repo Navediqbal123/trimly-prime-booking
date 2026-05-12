@@ -84,7 +84,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="animate-fade-in space-y-10 pt-20 lg:pt-0">
+    <div className="animate-fade-in space-y-10 pt-6 lg:pt-0">
       {/* Hero Banner */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
