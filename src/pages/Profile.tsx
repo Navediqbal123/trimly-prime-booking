@@ -64,9 +64,9 @@ export default function Profile() {
               <Camera className="w-4 h-4 text-primary-foreground" />
             </button>
           </div>
-          <div>
-            <h2 className="text-xl font-semibold">{user?.full_name || 'User'}</h2>
-            <p className="text-muted-foreground">{user?.email}</p>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-xl font-semibold truncate">{user?.full_name || 'User'}</h2>
+            <p className="text-muted-foreground text-sm break-all">{user?.email}</p>
             <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full capitalize">
               {user?.role?.replace('_', ' ') || 'User'}
             </span>
