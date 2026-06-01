@@ -7,6 +7,7 @@ import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase';
+import { getApprovedBarbers, getBarberServices } from '@/lib/api';
 
 interface ServiceWithBarber {
   id: string;
@@ -40,42 +41,39 @@ export default function Dashboard() {
     }
   };
 
-  const { data: services = [], isLoading: loadingServices } = useQuery({
-    queryKey: ['allServicesHome'],
-    queryFn: async (): Promise<ServiceWithBarber[]> => {
-      const { data, error } = await supabase
-        .from('services')
-        .select('id, barber_id, name, price, duration, home_service, barbers(id, shop_name, location, status)')
-        .eq('barbers.status', 'approved');
-      if (error) throw error;
-      return (data || [])
-        .filter((s: any) => s.barbers)
-        .map((s: any) => ({
-          id: s.id,
-          barber_id: s.barber_id,
-          name: s.name,
-          price: s.price,
-          duration: s.duration,
-          home_service: s.home_service,
-          barbers: {
-            id: s.barbers.id,
-            shop_name: s.barbers.shop_name,
-            location: s.barbers.location,
-          },
-        }));
-    },
-  });
-
   const { data: barbers = [], isLoading: loadingBarbers } = useQuery({
     queryKey: ['approvedBarbersHome'],
     queryFn: async (): Promise<Barber[]> => {
-      const { data, error } = await supabase
-        .from('barbers')
-        .select('id, shop_name, location')
-        .eq('status', 'approved')
-        .limit(10);
-      if (error) throw error;
-      return data || [];
+      const res = await getApprovedBarbers();
+      if (!res.success || !res.data) return [];
+      return res.data.map((b) => ({
+        id: b.id,
+        shop_name: b.shop_name,
+        location: b.location,
+      }));
+    },
+  });
+
+  const { data: services = [], isLoading: loadingServices } = useQuery({
+    queryKey: ['allServicesHome', barbers.map((b) => b.id).join(',')],
+    enabled: barbers.length > 0,
+    queryFn: async (): Promise<ServiceWithBarber[]> => {
+      const results = await Promise.all(
+        barbers.map(async (b) => {
+          const res = await getBarberServices(b.id);
+          if (!res.success || !res.data) return [];
+          return res.data.map((s) => ({
+            id: s.id,
+            barber_id: s.barber_id,
+            name: s.name,
+            price: s.price,
+            duration: s.duration,
+            home_service: s.home_service,
+            barbers: { id: b.id, shop_name: b.shop_name, location: b.location },
+          }));
+        }),
+      );
+      return results.flat();
     },
   });
 

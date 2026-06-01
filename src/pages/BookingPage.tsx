@@ -118,21 +118,6 @@ export default function BookingPage() {
     );
   }
 
-  if (services.length === 0) {
-    return (
-      <div className="animate-fade-in">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 text-foreground">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back
-        </Button>
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Scissors className="w-16 h-16 text-foreground/60 mb-4" />
-          <h3 className="text-xl font-semibold mb-2 text-foreground">No Services Available</h3>
-          <p className="text-foreground/70 mb-6">{shop.shop_name} hasn't added services yet.</p>
-          <Button onClick={() => navigate('/discover')}>Browse Other Barbers</Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="animate-fade-in max-w-3xl mx-auto pb-8">
@@ -174,34 +159,41 @@ export default function BookingPage() {
         className="glass-card rounded-2xl p-5 mb-6"
       >
         <h2 className="text-lg font-display font-bold text-foreground mb-4">Select Service</h2>
-        <div className="space-y-2">
-          {services.map((service) => (
-            <button
-              key={service.id}
-              onClick={() => {
-                setSelectedService(service.id);
-                if (!service.home_service) setHomeService(false);
-              }}
-              className={cn(
-                'w-full flex items-center justify-between p-3 rounded-xl border transition-all',
-                selectedService === service.id
-                  ? 'bg-primary/20 border-primary'
-                  : 'bg-secondary/40 border-border hover:border-primary/50'
-              )}
-            >
-              <div className="text-left">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm text-foreground">{service.name}</span>
-                  {service.home_service && <Home className="w-3 h-3 text-gold" />}
+        {services.length === 0 ? (
+          <div className="text-center py-6">
+            <Scissors className="w-10 h-10 text-foreground/40 mx-auto mb-2" />
+            <p className="text-sm text-foreground/70">No services added yet by this barber.</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {services.map((service) => (
+              <button
+                key={service.id}
+                onClick={() => {
+                  setSelectedService(service.id);
+                  if (!service.home_service) setHomeService(false);
+                }}
+                className={cn(
+                  'w-full flex items-center justify-between p-3 rounded-xl border transition-all',
+                  selectedService === service.id
+                    ? 'bg-primary/20 border-primary'
+                    : 'bg-secondary/40 border-border hover:border-primary/50'
+                )}
+              >
+                <div className="text-left">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-sm text-foreground">{service.name}</span>
+                    {service.home_service && <Home className="w-3 h-3 text-gold" />}
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-foreground/70 mt-0.5">
+                    <Clock className="w-3 h-3" /> {service.duration} min
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 text-xs text-foreground/70 mt-0.5">
-                  <Clock className="w-3 h-3" /> {service.duration} min
-                </div>
-              </div>
-              <span className="text-base font-bold gradient-gold-text">₹{service.price}</span>
-            </button>
-          ))}
-        </div>
+                <span className="text-base font-bold gradient-gold-text">₹{service.price}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </motion.div>
 
       {/* Date Picker */}
