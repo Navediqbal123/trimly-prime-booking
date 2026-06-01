@@ -118,21 +118,6 @@ export default function BookingPage() {
     );
   }
 
-  if (services.length === 0) {
-    return (
-      <div className="animate-fade-in">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 text-foreground">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back
-        </Button>
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Scissors className="w-16 h-16 text-foreground/60 mb-4" />
-          <h3 className="text-xl font-semibold mb-2 text-foreground">No Services Available</h3>
-          <p className="text-foreground/70 mb-6">{shop.shop_name} hasn't added services yet.</p>
-          <Button onClick={() => navigate('/discover')}>Browse Other Barbers</Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="animate-fade-in max-w-3xl mx-auto pb-8">
