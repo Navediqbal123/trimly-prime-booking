@@ -201,69 +201,7 @@ export default function Dashboard() {
         )}
       </section>
 
-      {/* Discover Barbers */}
-      <section>
-        <div className="flex items-end justify-between mb-4">
-          <div>
-            <h2 className="text-2xl font-display font-bold">Discover Barbers</h2>
-            <p className="text-sm text-white/90">Top professionals near you</p>
-          </div>
-          <button
-            onClick={() => navigate('/discover')}
-            className="text-xs font-medium text-gold hover:underline"
-          >
-            See all
-          </button>
-        </div>
-
-        {loadingBarbers ? (
-          <div className="flex items-center justify-center py-10">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
-          </div>
-        ) : barbers.length === 0 ? (
-          <div className="glass-card rounded-2xl p-8 text-center">
-            <p className="text-white/90 text-sm">No barbers available yet.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-            {barbers.map((b, i) => (
-              <motion.button
-                key={b.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.05, duration: 0.3 }}
-                whileHover={{ y: -4 }}
-                onClick={() => navigate(`/book/${b.id}`)}
-                className="glass-card rounded-2xl overflow-hidden text-left hover:border-gold/50 transition-all group"
-              >
-                <div className="relative h-28 bg-gradient-to-br from-primary/50 via-primary/30 to-gold/30 flex items-center justify-center">
-                  <div className="w-14 h-14 rounded-full bg-background/40 border-2 border-gold flex items-center justify-center">
-                    <span className="font-display font-bold text-lg text-white">
-                      {b.shop_name?.[0]?.toUpperCase() || 'B'}
-                    </span>
-                  </div>
-                  <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/60 border border-gold/40">
-                    <Star className="w-3 h-3 text-gold fill-gold" />
-                    <span className="text-[10px] font-semibold text-white">4.9</span>
-                  </div>
-                </div>
-                <div className="p-3">
-                  <h3 className="font-display font-semibold text-sm line-clamp-1 text-white group-hover:text-gold transition-colors">
-                    {b.shop_name}
-                  </h3>
-                  <p className="text-[11px] text-white/70 mt-0.5">Master Stylist</p>
-                  {b.location && (
-                    <div className="flex items-center gap-1 text-[11px] text-white/70 mt-1">
-                      <MapPin className="w-3 h-3" />
-                      <span className="line-clamp-1">{b.location}</span>
-                    </div>
-                  )}
-                </div>
-              </motion.button>
-            ))}
-          </div>
-        )}
-      </section>
+      {/* Discover Barbers section intentionally hidden — approved barbers are only visible in admin panel */}
 
       {/* Service Details Modal */}
       <Dialog open={!!selectedService} onOpenChange={(open) => !open && setSelectedService(null)}>
