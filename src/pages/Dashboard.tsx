@@ -7,7 +7,7 @@ import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase';
-import { getApprovedBarbers, getBarberServices } from '@/lib/api';
+import { getApprovedBarbers, getBarberServices, getMyServices } from '@/lib/api';
 
 interface ServiceWithBarber {
   id: string;
@@ -56,13 +56,39 @@ export default function Dashboard() {
 
   const { data: services = [], isLoading: loadingServices } = useQuery({
     queryKey: ['allServicesHome', barbers.map((b) => b.id).join(',')],
-    enabled: barbers.length > 0,
     queryFn: async (): Promise<ServiceWithBarber[]> => {
-      const results = await Promise.all(
-        barbers.map(async (b) => {
-          const res = await getBarberServices(b.id);
-          if (!res.success || !res.data) return [];
-          return res.data.map((s) => ({
+      const barberMap = new Map(barbers.map((b) => [b.id, b]));
+
+      // 1) Try the global /api/services endpoint first
+      const allRes = await getMyServices();
+      let collected: Array<{
+        id: string;
+        barber_id: string;
+        name: string;
+        price: number;
+        duration: number;
+        home_service: boolean;
+      }> = [];
+
+      if (allRes.success && Array.isArray(allRes.data) && allRes.data.length > 0) {
+        collected = allRes.data;
+      } else if (barbers.length > 0) {
+        // 2) Fallback: fan out per approved barber
+        const results = await Promise.all(
+          barbers.map(async (b) => {
+            const res = await getBarberServices(b.id);
+            return res.success && res.data ? res.data : [];
+          }),
+        );
+        collected = results.flat();
+      }
+
+      // Only keep services that belong to an APPROVED barber
+      return collected
+        .filter((s) => barberMap.has(s.barber_id))
+        .map((s) => {
+          const b = barberMap.get(s.barber_id)!;
+          return {
             id: s.id,
             barber_id: s.barber_id,
             name: s.name,
@@ -70,10 +96,8 @@ export default function Dashboard() {
             duration: s.duration,
             home_service: s.home_service,
             barbers: { id: b.id, shop_name: b.shop_name, location: b.location },
-          }));
-        }),
-      );
-      return results.flat();
+          };
+        });
     },
   });
 
