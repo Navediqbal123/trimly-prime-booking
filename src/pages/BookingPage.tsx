@@ -20,7 +20,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { createBooking, getApprovedBarbers, getPendingBarbers, getBarberServices } from '@/lib/api';
+import { createBooking, getApprovedBarbers, getPendingBarbers, getBarberServices, checkSlotAvailability } from '@/lib/api';
 
 const timeSlots = [
   '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
@@ -77,10 +77,24 @@ export default function BookingPage() {
     }
 
     setLoading(true);
+    const dateStr = selectedDate.toISOString().split('T')[0];
+
+    const slotCheck = await checkSlotAvailability(shopId, dateStr, selectedTime);
+    if (!slotCheck.success) {
+      toast.error(slotCheck.error || 'Failed to verify slot availability');
+      setLoading(false);
+      return;
+    }
+    if (slotCheck.data?.available === false) {
+      toast.error('This slot is already booked, please choose another time');
+      setLoading(false);
+      return;
+    }
+
     const response = await createBooking({
       barber_id: shopId,
       service_id: selectedService,
-      date: selectedDate.toISOString().split('T')[0],
+      date: dateStr,
       time_slot: selectedTime,
       home_service: homeService,
     });

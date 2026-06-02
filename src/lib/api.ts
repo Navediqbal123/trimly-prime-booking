@@ -129,6 +129,15 @@ export interface CreateBookingData {
   home_service: boolean;
 }
 
+export async function checkSlotAvailability(
+  barber_id: string,
+  date: string,
+  time_slot: string,
+): Promise<ApiResponse<{ available: boolean }>> {
+  const qs = new URLSearchParams({ barber_id, date, time_slot }).toString();
+  return apiCall<{ available: boolean }>(`/api/booking/check-slot?${qs}`, { method: 'GET' });
+}
+
 export async function createBooking(data: CreateBookingData): Promise<ApiResponse> {
   return apiCall('/api/booking/create', {
     method: 'POST',
