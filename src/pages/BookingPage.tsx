@@ -135,101 +135,103 @@ export default function BookingPage() {
 
 
   return (
-    <div className="animate-fade-in max-w-3xl mx-auto pb-8">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4 text-foreground">
+    <div className="animate-fade-in max-w-2xl mx-auto pb-10 px-1">
+      <Button variant="ghost" onClick={() => navigate(-1)} className="mb-5 text-foreground -ml-2">
         <ArrowLeft className="w-4 h-4 mr-2" /> Back
       </Button>
 
       {/* Barber Header */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-card rounded-2xl p-5 mb-6 flex items-center gap-4"
+        className="glass-card rounded-2xl p-5 mb-8 flex items-center gap-4"
       >
-        <div className="w-16 h-16 rounded-full btn-gold p-1 shrink-0">
+        <div className="w-14 h-14 rounded-full btn-gold p-[2px] shrink-0">
           <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-            <Scissors className="w-7 h-7 text-gold" />
+            <Scissors className="w-6 h-6 text-gold" />
           </div>
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-display font-bold gradient-gold-text truncate">{shop.shop_name}</h1>
-          <div className="flex items-center gap-1 text-xs text-foreground/80 mt-1">
-            <MapPin className="w-3 h-3 text-gold" />
+          <h1 className="text-lg font-display font-bold gradient-gold-text truncate">{shop.shop_name}</h1>
+          <div className="flex items-center gap-1.5 text-xs text-foreground/70 mt-1">
+            <MapPin className="w-3 h-3 text-gold shrink-0" />
             <span className="truncate">{shop.location}</span>
           </div>
-          <div className="flex items-center gap-1 mt-1">
+          <div className="flex items-center gap-0.5 mt-1.5">
             {[1, 2, 3, 4, 5].map((i) => (
-              <Star key={i} className={cn('w-3 h-3', i <= 4 ? 'fill-gold text-gold' : 'text-foreground/30')} />
+              <Star key={i} className={cn('w-3 h-3', i <= 4 ? 'fill-gold text-gold' : 'text-foreground/25')} />
             ))}
-            <span className="ml-1 text-xs text-foreground">4.8</span>
+            <span className="ml-1.5 text-[11px] text-foreground/80">4.8</span>
           </div>
         </div>
       </motion.div>
 
       {/* Service Selection */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="glass-card rounded-2xl p-5 mb-6"
+        transition={{ delay: 0.05 }}
+        className="mb-8"
       >
-        <h2 className="text-lg font-display font-bold text-foreground mb-4">Select Service</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/60 mb-3 px-1">Service</h2>
         {services.length === 0 ? (
-          <div className="text-center py-6">
-            <Scissors className="w-10 h-10 text-foreground/40 mx-auto mb-2" />
-            <p className="text-sm text-foreground/70">No services added yet by this barber.</p>
+          <div className="glass-card rounded-2xl p-8 text-center">
+            <Scissors className="w-9 h-9 text-foreground/30 mx-auto mb-2" />
+            <p className="text-sm text-foreground/60">No services added yet by this barber.</p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {services.map((service) => (
-              <button
-                key={service.id}
-                onClick={() => {
-                  setSelectedService(service.id);
-                  if (!service.home_service) setHomeService(false);
-                }}
-                className={cn(
-                  'w-full flex items-center justify-between p-3 rounded-xl border transition-all',
-                  selectedService === service.id
-                    ? 'bg-primary/20 border-primary'
-                    : 'bg-secondary/40 border-border hover:border-primary/50'
-                )}
-              >
-                <div className="text-left">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-foreground">{service.name}</span>
-                    {service.home_service && <Home className="w-3 h-3 text-gold" />}
+          <Select
+            value={selectedService ?? undefined}
+            onValueChange={(val) => {
+              setSelectedService(val);
+              const svc = services.find((s) => s.id === val);
+              if (svc && !svc.home_service) setHomeService(false);
+            }}
+          >
+            <SelectTrigger className="w-full h-14 bg-card/60 border-border rounded-xl px-4 text-foreground hover:border-gold/50 transition-colors">
+              <SelectValue placeholder="Choose a service" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border-border">
+              {services.map((service) => (
+                <SelectItem key={service.id} value={service.id} className="py-3">
+                  <div className="flex items-center justify-between gap-6 w-full">
+                    <div className="flex flex-col text-left">
+                      <span className="font-medium text-sm text-foreground flex items-center gap-1.5">
+                        {service.name}
+                        {service.home_service && <Home className="w-3 h-3 text-gold" />}
+                      </span>
+                      <span className="text-[11px] text-foreground/60 flex items-center gap-1 mt-0.5">
+                        <Clock className="w-3 h-3" /> {service.duration} min
+                      </span>
+                    </div>
+                    <span className="text-sm font-semibold gradient-gold-text">₹{service.price}</span>
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-foreground/70 mt-0.5">
-                    <Clock className="w-3 h-3" /> {service.duration} min
-                  </div>
-                </div>
-                <span className="text-base font-bold gradient-gold-text">₹{service.price}</span>
-              </button>
-            ))}
-          </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
-      </motion.div>
+      </motion.section>
 
       {/* Date Picker */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        className="glass-card rounded-2xl p-5 mb-6"
+        transition={{ delay: 0.1 }}
+        className="mb-8"
       >
-        <h2 className="text-lg font-display font-bold text-foreground mb-4">Select Date</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/60 mb-3 px-1">Date</h2>
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               className={cn(
-                'w-full justify-start text-left font-normal h-12 bg-secondary/40 border-border text-foreground hover:bg-secondary/60',
-                !selectedDate && 'text-foreground/60'
+                'w-full justify-start text-left font-normal h-14 bg-card/60 border-border rounded-xl px-4 hover:border-gold/50 hover:bg-card/60',
+                !selectedDate && 'text-foreground/50'
               )}
             >
-              <CalendarIcon className="mr-2 h-4 w-4 text-gold" />
-              {selectedDate ? format(selectedDate, 'PPP') : 'Pick a date'}
+              <CalendarIcon className="mr-3 h-4 w-4 text-gold" />
+              {selectedDate ? format(selectedDate, 'EEE, MMM d, yyyy') : 'Pick a date'}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
@@ -243,36 +245,39 @@ export default function BookingPage() {
             />
           </PopoverContent>
         </Popover>
-      </motion.div>
+      </motion.section>
 
       {/* Time Slots */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="glass-card rounded-2xl p-5 mb-6"
+        transition={{ delay: 0.15 }}
+        className="mb-8"
       >
-        <h2 className="text-lg font-display font-bold text-foreground mb-4">Select Time</h2>
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-          {timeSlots.map((time) => (
-            <button
-              key={time}
-              onClick={() => setSelectedTime(time)}
-              className={cn(
-                'py-2.5 px-2 rounded-lg text-sm font-medium transition-all border',
-                selectedTime === time
-                  ? 'bg-gradient-to-r from-primary to-purple-500 text-primary-foreground border-primary shadow-lg shadow-primary/40'
-                  : 'bg-secondary/40 text-foreground border-border hover:border-primary/50'
-              )}
-            >
-              {time}
-            </button>
-          ))}
+        <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/60 mb-3 px-1">Time</h2>
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+          {timeSlots.map((time) => {
+            const active = selectedTime === time;
+            return (
+              <button
+                key={time}
+                onClick={() => setSelectedTime(time)}
+                className={cn(
+                  'py-3 px-2 rounded-xl text-[13px] font-medium transition-all border',
+                  active
+                    ? 'bg-gold text-gold-foreground border-gold shadow-[0_0_18px_hsl(43_90%_60%_/_0.45)]'
+                    : 'bg-card/60 text-foreground/85 border-border hover:border-gold/50 hover:text-foreground'
+                )}
+              >
+                {time}
+              </button>
+            );
+          })}
         </div>
 
         {selectedServiceData?.home_service && (
-          <div className="mt-4 p-3 rounded-xl bg-secondary/40 border border-border flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="mt-5 p-4 rounded-xl bg-card/60 border border-border flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
               <Home className="w-4 h-4 text-gold" />
               <span className="text-sm font-medium text-foreground">Home Service</span>
             </div>
@@ -280,69 +285,63 @@ export default function BookingPage() {
               size="sm"
               variant={homeService ? 'default' : 'outline'}
               onClick={() => setHomeService(!homeService)}
+              className={homeService ? 'bg-gold text-gold-foreground hover:bg-gold/90' : ''}
             >
               {homeService ? <><Check className="w-3 h-3 mr-1" /> Selected</> : 'Select'}
             </Button>
           </div>
         )}
-      </motion.div>
+      </motion.section>
 
-      {/* Price Summary */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
+      {/* Summary */}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-        className="glass-card rounded-2xl p-5 mb-6"
+        transition={{ delay: 0.2 }}
+        className="mb-8"
       >
-        <h2 className="text-lg font-display font-bold text-foreground mb-4">Summary</h2>
-        <div className="space-y-3 text-sm">
-          <div className="flex justify-between text-foreground/80">
-            <span>Service</span>
-            <span className="text-foreground font-medium">{selectedServiceData?.name || '—'}</span>
-          </div>
-          <div className="flex justify-between text-foreground/80">
-            <span>Date</span>
-            <span className="text-foreground font-medium">
-              {selectedDate ? format(selectedDate, 'PPP') : '—'}
-            </span>
-          </div>
-          <div className="flex justify-between text-foreground/80">
-            <span>Time</span>
-            <span className="text-foreground font-medium">{selectedTime || '—'}</span>
-          </div>
-          <div className="flex justify-between text-foreground/80">
-            <span>Duration</span>
-            <span className="text-foreground font-medium">
-              {selectedServiceData ? `${selectedServiceData.duration} min` : '—'}
-            </span>
-          </div>
-          {homeService && (
-            <div className="flex justify-between text-foreground/80">
-              <span>Type</span>
-              <span className="text-gold font-medium flex items-center gap-1">
-                <Home className="w-3 h-3" /> Home Service
+        <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/60 mb-3 px-1">Summary</h2>
+        <div className="glass-card rounded-2xl p-5">
+          <div className="space-y-3 text-sm">
+            {[
+              ['Service', selectedServiceData?.name || '—'],
+              ['Date', selectedDate ? format(selectedDate, 'EEE, MMM d') : '—'],
+              ['Time', selectedTime || '—'],
+              ['Duration', selectedServiceData ? `${selectedServiceData.duration} min` : '—'],
+            ].map(([label, value]) => (
+              <div key={label} className="flex justify-between items-center">
+                <span className="text-foreground/60">{label}</span>
+                <span className="text-foreground font-medium">{value}</span>
+              </div>
+            ))}
+            {homeService && (
+              <div className="flex justify-between items-center">
+                <span className="text-foreground/60">Type</span>
+                <span className="text-gold font-medium flex items-center gap-1">
+                  <Home className="w-3 h-3" /> Home Service
+                </span>
+              </div>
+            )}
+            <div className="border-t border-border/60 pt-4 mt-4 flex justify-between items-center">
+              <span className="text-sm font-medium text-foreground/70">Total</span>
+              <span className="text-3xl font-bold gradient-gold-text leading-none">
+                ₹{selectedServiceData?.price || 0}
               </span>
             </div>
-          )}
-          <div className="border-t border-border pt-3 flex justify-between items-center">
-            <span className="text-base font-semibold text-foreground">Total</span>
-            <span className="text-2xl font-bold gradient-gold-text">
-              ₹{selectedServiceData?.price || 0}
-            </span>
           </div>
         </div>
-      </motion.div>
+      </motion.section>
 
       {/* Confirm Button */}
       <Button
         onClick={handleBook}
         disabled={loading || !selectedService || !selectedDate || !selectedTime}
-        className="w-full h-14 bg-gradient-to-r from-primary via-purple-500 to-primary hover:opacity-90 text-primary-foreground font-bold text-base rounded-xl shadow-lg shadow-primary/40"
+        className="w-full h-14 btn-gold text-gold-foreground font-semibold text-base rounded-xl shadow-[0_8px_30px_hsl(43_90%_60%_/_0.35)] hover:opacity-95 disabled:opacity-40 disabled:shadow-none transition-all"
       >
         {loading ? (
           <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Booking...</>
         ) : (
-          <><CalendarIcon className="w-5 h-5 mr-2" /> Confirm Booking</>
+          <><Check className="w-5 h-5 mr-2" /> Confirm Booking</>
         )}
       </Button>
     </div>
