@@ -234,14 +234,29 @@ export default function BookingPage() {
               {selectedDate ? format(selectedDate, 'EEE, MMM d, yyyy') : 'Pick a date'}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
+          <PopoverContent
+            className="w-auto p-0 border-border bg-[hsl(270_50%_8%)] backdrop-blur-xl rounded-2xl shadow-2xl"
+            align="start"
+          >
             <Calendar
               mode="single"
               selected={selectedDate}
-              onSelect={setSelectedDate}
+              onSelect={(date) => setSelectedDate(date ?? undefined)}
               disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
               initialFocus
-              className={cn('p-3 pointer-events-auto')}
+              className="p-3 pointer-events-auto"
+              classNames={{
+                day: 'h-9 w-9 p-0 font-normal rounded-lg text-foreground/85 hover:bg-gold/15 hover:text-foreground transition-colors aria-selected:opacity-100',
+                day_selected:
+                  'bg-gold text-gold-foreground hover:bg-gold hover:text-gold-foreground focus:bg-gold focus:text-gold-foreground shadow-[0_0_18px_hsl(43_90%_60%_/_0.45)]',
+                day_today: 'border border-gold/40 text-gold',
+                day_outside: 'text-foreground/30',
+                day_disabled: 'text-foreground/20 opacity-50',
+                head_cell: 'text-foreground/50 rounded-md w-9 font-medium text-[0.7rem] uppercase tracking-wider',
+                caption_label: 'text-sm font-semibold text-foreground',
+                nav_button: 'h-7 w-7 bg-card/40 hover:bg-gold/15 hover:text-gold border border-border rounded-lg p-0 transition-colors',
+                cell: 'h-9 w-9 text-center text-sm p-0 relative',
+              }}
             />
           </PopoverContent>
         </Popover>
