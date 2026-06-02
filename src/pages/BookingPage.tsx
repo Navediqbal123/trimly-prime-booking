@@ -77,10 +77,24 @@ export default function BookingPage() {
     }
 
     setLoading(true);
+    const dateStr = selectedDate.toISOString().split('T')[0];
+
+    const slotCheck = await checkSlotAvailability(shopId, dateStr, selectedTime);
+    if (!slotCheck.success) {
+      toast.error(slotCheck.error || 'Failed to verify slot availability');
+      setLoading(false);
+      return;
+    }
+    if (slotCheck.data?.available === false) {
+      toast.error('This slot is already booked, please choose another time');
+      setLoading(false);
+      return;
+    }
+
     const response = await createBooking({
       barber_id: shopId,
       service_id: selectedService,
-      date: selectedDate.toISOString().split('T')[0],
+      date: dateStr,
       time_slot: selectedTime,
       home_service: homeService,
     });
