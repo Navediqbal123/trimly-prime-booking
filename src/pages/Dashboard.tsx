@@ -162,15 +162,19 @@ export default function Dashboard() {
             <p className="text-white/90 text-sm">No services available yet.</p>
           </div>
         ) : (
-          <div className="flex gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 pl-1 pr-4 snap-x scrollbar-thin">
+          <div
+            className="flex gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 pl-1 pr-4 snap-x snap-mandatory scrollbar-thin scroll-smooth -mx-1"
+            style={{ WebkitOverflowScrolling: 'touch', scrollBehavior: 'smooth' }}
+          >
             {services.map((service, i) => (
               <motion.button
                 key={service.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06, duration: 0.3 }}
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05, duration: 0.35, ease: 'easeOut' }}
                 whileHover={{ y: -4 }}
-                onClick={() => setSelectedService(service)}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => goToBooking(service)}
                 className="snap-start shrink-0 w-44 sm:w-52 glass-card rounded-2xl p-4 text-left group hover:border-gold/50 transition-all"
               >
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-gradient-to-br from-primary/30 to-gold/20 border border-gold/20">
@@ -198,81 +202,7 @@ export default function Dashboard() {
       </section>
 
       {/* Discover Barbers section intentionally hidden — approved barbers are only visible in admin panel */}
-
-      {/* Service Details Modal */}
-      <Dialog open={!!selectedService} onOpenChange={(open) => !open && setSelectedService(null)}>
-        <DialogContent className="sm:max-w-md border border-gold/30 bg-black p-0 overflow-hidden">
-          <AnimatePresence>
-            {selectedService && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.25 }}
-                className="bg-black"
-              >
-                <div className="relative h-40 bg-black flex items-center justify-center border-b border-gold/30">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent" />
-                  <Scissors className="relative w-16 h-16 text-gold drop-shadow-[0_0_20px_rgba(212,175,55,0.6)]" />
-                </div>
-                <div className="p-6 bg-black">
-                  <DialogHeader className="text-left mb-4">
-                    <DialogTitle className="text-2xl font-display text-white">
-                      {selectedService.name}
-                    </DialogTitle>
-                    {selectedService.barbers && (
-                      <DialogDescription className="text-base text-white font-medium">
-                        {selectedService.barbers.shop_name}
-                      </DialogDescription>
-                    )}
-                  </DialogHeader>
-
-                  {selectedService.barbers?.location && (
-                    <div className="flex items-center gap-2 text-sm text-white mb-4">
-                      <MapPin className="w-4 h-4 text-white" />
-                      <span>{selectedService.barbers.location}</span>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    <div className="rounded-xl p-4 bg-black border border-gold/40">
-                      <p className="text-xs text-white mb-1">Price</p>
-                      <p className="text-2xl font-display font-bold text-white flex items-center gap-0.5">
-                        <IndianRupee className="w-5 h-5 text-white" strokeWidth={2.5} />
-                        {selectedService.price}
-                      </p>
-                    </div>
-                    <div className="rounded-xl p-4 bg-black border border-gold/40">
-                      <p className="text-xs text-white mb-1 flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-white" /> Duration
-                      </p>
-                      <p className="text-2xl font-display font-bold text-white">
-                        {selectedService.duration}
-                        <span className="text-sm font-normal text-white ml-1">min</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {selectedService.home_service && (
-                    <div className="flex items-center gap-2 text-sm text-white mb-4 bg-primary/20 border border-primary/40 px-3 py-2 rounded-lg">
-                      <Home className="w-4 h-4 text-white" />
-                      <span>Home service available</span>
-                    </div>
-                  )}
-
-                  <Button
-                    className="w-full h-12 btn-gold font-semibold"
-                    disabled={!selectedService.barbers?.id}
-                    onClick={handleBookNow}
-                  >
-                    Book Now
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
+
