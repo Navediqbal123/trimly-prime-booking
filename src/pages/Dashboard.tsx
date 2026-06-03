@@ -1,12 +1,9 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Scissors, Loader2, Clock, Home, ArrowRight, Sparkles, IndianRupee } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Scissors, Loader2, Clock, ArrowRight, Sparkles } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { supabase } from '@/lib/supabase';
 import { getApprovedBarbers, getBarberServices, getMyServices } from '@/lib/api';
 
 interface ServiceWithBarber {
