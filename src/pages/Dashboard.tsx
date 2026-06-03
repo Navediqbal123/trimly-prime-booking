@@ -29,14 +29,13 @@ interface Barber {
 export default function Dashboard() {
   const { user } = useProtectedUser();
   const navigate = useNavigate();
-  const [selectedService, setSelectedService] = useState<ServiceWithBarber | null>(null);
 
-  const handleBookNow = () => {
-    if (selectedService?.barbers?.id) {
-      navigate(`/book/${selectedService.barbers.id}`);
-      setSelectedService(null);
+  const goToBooking = (service: ServiceWithBarber) => {
+    if (service.barbers?.id) {
+      navigate(`/book/${service.barbers.id}?service=${service.id}`);
     }
   };
+
 
   const { data: barbers = [], isLoading: loadingBarbers } = useQuery({
     queryKey: ['approvedBarbersHome'],
