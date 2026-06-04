@@ -26,12 +26,12 @@ export default function Profile() {
     (async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, phone, avatar_url')
+        .select('name, phone, avatar_url')
         .eq('id', user.id)
         .maybeSingle();
       if (!error && data) {
         setFormData({
-          full_name: data.full_name || user.full_name || '',
+          full_name: data.name || user.full_name || '',
           phone: data.phone || '',
           avatar_url: data.avatar_url || '',
         });
@@ -86,7 +86,7 @@ export default function Profile() {
     const { error } = await supabase
       .from('profiles')
       .update({
-        full_name: formData.full_name,
+        name: formData.full_name,
         phone: formData.phone,
         avatar_url: formData.avatar_url,
       })

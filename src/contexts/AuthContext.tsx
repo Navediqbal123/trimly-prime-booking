@@ -106,14 +106,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data } = await supabase
         .from('profiles')
-        .select('full_name')
+        .select('name')
         .eq('id', userId)
         .maybeSingle();
-      if (data?.full_name) {
-        setUser(prev => (prev && prev.id === userId ? { ...prev, full_name: data.full_name } : prev));
+      if (data?.name) {
+        setUser(prev => (prev && prev.id === userId ? { ...prev, full_name: data.name } : prev));
       }
     } catch (err) {
-      console.error('Failed to fetch profile full_name:', err);
+      console.error('Failed to fetch profile name:', err);
     }
   };
 
@@ -184,14 +184,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signUp = async (name: string, email: string, password: string, phone?: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: name, phone: phone || '' },
+        data: { full_name: name, name, phone: phone || '' },
       },
     });
     if (error) return { error: new Error(error.message) };
+
+    const newUserId = data.user?.id;
+    if (newUserId) {
+      try {
+        await supabase.from('profiles').upsert(
+          {
+            id: newUserId,
+            name,
+            email,
+            phone: phone || null,
+            role: 'user',
+          },
+          { onConflict: 'id' }
+        );
+      } catch (err) {
+        console.error('Failed to upsert profile:', err);
+      }
+    }
     return { error: null };
   };
 
