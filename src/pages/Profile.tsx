@@ -86,7 +86,7 @@ export default function Profile() {
     const { error } = await supabase
       .from('profiles')
       .update({
-        full_name: formData.full_name,
+        name: formData.full_name,
         phone: formData.phone,
         avatar_url: formData.avatar_url,
       })
