@@ -106,14 +106,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data } = await supabase
         .from('profiles')
-        .select('full_name')
+        .select('name')
         .eq('id', userId)
         .maybeSingle();
-      if (data?.full_name) {
-        setUser(prev => (prev && prev.id === userId ? { ...prev, full_name: data.full_name } : prev));
+      if (data?.name) {
+        setUser(prev => (prev && prev.id === userId ? { ...prev, full_name: data.name } : prev));
       }
     } catch (err) {
-      console.error('Failed to fetch profile full_name:', err);
+      console.error('Failed to fetch profile name:', err);
     }
   };
 
