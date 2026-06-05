@@ -1,44 +1,30 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Loader2, RefreshCw, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { getBarberBookings, BookingData } from '@/lib/api';
+import { getBarberBookings, updateBookingStatus, BookingData } from '@/lib/api';
 
-const statusConfig = {
-  pending: {
-    icon: AlertCircle,
-    label: 'Pending',
-    className: 'text-yellow-500 bg-yellow-500/10',
-  },
-  confirmed: {
-    icon: CheckCircle,
-    label: 'Confirmed',
-    className: 'text-green-500 bg-green-500/10',
-  },
-  completed: {
-    icon: CheckCircle,
-    label: 'Completed',
-    className: 'text-blue-500 bg-blue-500/10',
-  },
-  cancelled: {
-    icon: XCircle,
-    label: 'Cancelled',
-    className: 'text-red-500 bg-red-500/10',
-  },
+const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; className: string }> = {
+  pending: { icon: AlertCircle, label: 'Pending', className: 'text-yellow-500 bg-yellow-500/10' },
+  approved: { icon: CheckCircle, label: 'Approved', className: 'text-green-500 bg-green-500/10' },
+  confirmed: { icon: CheckCircle, label: 'Confirmed', className: 'text-green-500 bg-green-500/10' },
+  completed: { icon: CheckCircle, label: 'Completed', className: 'text-blue-500 bg-blue-500/10' },
+  rejected: { icon: XCircle, label: 'Rejected', className: 'text-red-500 bg-red-500/10' },
+  cancelled: { icon: XCircle, label: 'Cancelled', className: 'text-red-500 bg-red-500/10' },
 };
 
 export default function BarberBookings() {
   const [bookings, setBookings] = useState<BookingData[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('upcoming');
+  const [actioningId, setActioningId] = useState<string | null>(null);
 
   const fetchBookings = async () => {
     setLoading(true);
     const response = await getBarberBookings();
-    
     if (response.success && response.data) {
       setBookings(response.data);
     } else {
@@ -51,17 +37,32 @@ export default function BarberBookings() {
     fetchBookings();
   }, []);
 
+  const handleStatus = async (id: string, status: 'approved' | 'rejected') => {
+    setActioningId(id);
+    const res = await updateBookingStatus(id, status);
+    if (res.success) {
+      toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
+      await fetchBookings();
+    } else {
+      toast.error(res.error || 'Action failed');
+    }
+    setActioningId(null);
+  };
+
+  const pendingBookings = bookings.filter((b) => b.status === 'pending');
   const upcomingBookings = bookings.filter(
-    (b) => b.status === 'pending' || b.status === 'confirmed'
+    (b) => b.status === 'pending' || b.status === 'confirmed' || b.status === 'approved'
   );
   const pastBookings = bookings.filter(
-    (b) => b.status === 'completed' || b.status === 'cancelled'
+    (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected'
   );
 
   const BookingCard = ({ booking }: { booking: BookingData }) => {
     const status = booking.status as keyof typeof statusConfig;
     const config = statusConfig[status] || statusConfig.pending;
     const StatusIcon = config.icon;
+    const isPending = booking.status === 'pending';
+    const isActing = actioningId === booking.id;
 
     return (
       <motion.div
@@ -79,12 +80,7 @@ export default function BarberBookings() {
               <p className="text-sm text-muted-foreground">Booking #{booking.id.slice(0, 8)}</p>
             </div>
           </div>
-          <span
-            className={cn(
-              'flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
-              config.className
-            )}
-          >
+          <span className={cn('flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium', config.className)}>
             <StatusIcon className="w-3 h-3" />
             {config.label}
           </span>
@@ -102,13 +98,31 @@ export default function BarberBookings() {
               <span>{booking.time_slot}</span>
             </div>
           </div>
-          {booking.home_service && (
-            <div className="text-sm text-green-500">🏠 Home Service</div>
-          )}
+          {booking.home_service && <div className="text-sm text-green-500">🏠 Home Service</div>}
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-border">
+        <div className="flex items-center justify-between pt-4 border-t border-border gap-2">
           <span className="text-lg font-bold">₹{booking.service?.price || 0}</span>
+          {isPending && (
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                disabled={isActing}
+                onClick={() => handleStatus(booking.id, 'rejected')}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {isActing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" /> Reject</>}
+              </Button>
+              <Button
+                size="sm"
+                disabled={isActing}
+                onClick={() => handleStatus(booking.id, 'approved')}
+                className="bg-green-500 hover:bg-green-600 text-white"
+              >
+                {isActing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" /> Accept</>}
+              </Button>
+            </div>
+          )}
         </div>
       </motion.div>
     );
@@ -129,6 +143,11 @@ export default function BarberBookings() {
         <div>
           <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
             Customer <span className="gradient-text">Bookings</span>
+            {pendingBookings.length > 0 && (
+              <span className="ml-3 inline-flex items-center justify-center min-w-[28px] h-7 px-2 rounded-full bg-red-500 text-white text-sm font-bold align-middle">
+                {pendingBookings.length} new
+              </span>
+            )}
           </h1>
           <p className="text-muted-foreground">Manage your customer appointments</p>
         </div>
@@ -140,9 +159,7 @@ export default function BarberBookings() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
-          <TabsTrigger value="upcoming">
-            Upcoming ({upcomingBookings.length})
-          </TabsTrigger>
+          <TabsTrigger value="upcoming">Upcoming ({upcomingBookings.length})</TabsTrigger>
           <TabsTrigger value="past">Past ({pastBookings.length})</TabsTrigger>
         </TabsList>
 
