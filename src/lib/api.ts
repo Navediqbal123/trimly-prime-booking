@@ -260,6 +260,16 @@ export async function cancelBooking(bookingId: string): Promise<ApiResponse> {
   return apiCall(`/api/booking/cancel/${bookingId}`, { method: 'PATCH' });
 }
 
+export async function updateBookingStatus(
+  bookingId: string,
+  status: 'approved' | 'rejected' | 'completed',
+): Promise<ApiResponse> {
+  return apiCall(`/api/booking/status/${bookingId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  });
+}
+
 // ==========================================
 // ADMIN ENDPOINTS
 // ==========================================

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Clock, XCircle, Loader2, RefreshCw, User } from 'lucide-react';
+import { Calendar, Clock, XCircle, Loader2, RefreshCw, User, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { BookingData, cancelBooking } from '@/lib/api';
+import { BookingData, cancelBooking, updateBookingStatus } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 interface BookingsTableProps {
@@ -21,23 +21,13 @@ interface BookingsTableProps {
   loading: boolean;
 }
 
-const statusConfig = {
-  pending: {
-    label: 'Pending',
-    className: 'text-yellow-500 bg-yellow-500/10',
-  },
-  confirmed: {
-    label: 'Confirmed',
-    className: 'text-green-500 bg-green-500/10',
-  },
-  completed: {
-    label: 'Completed',
-    className: 'text-blue-500 bg-blue-500/10',
-  },
-  cancelled: {
-    label: 'Cancelled',
-    className: 'text-red-500 bg-red-500/10',
-  },
+const statusConfig: Record<string, { label: string; className: string }> = {
+  pending: { label: 'Pending', className: 'text-yellow-500 bg-yellow-500/10' },
+  approved: { label: 'Approved', className: 'text-green-500 bg-green-500/10' },
+  confirmed: { label: 'Confirmed', className: 'text-green-500 bg-green-500/10' },
+  completed: { label: 'Completed', className: 'text-blue-500 bg-blue-500/10' },
+  rejected: { label: 'Rejected', className: 'text-red-500 bg-red-500/10' },
+  cancelled: { label: 'Cancelled', className: 'text-red-500 bg-red-500/10' },
 };
 
 const rowVariants = {
@@ -59,11 +49,11 @@ const rowVariants = {
 
 export function BookingsTable({ bookings, onRefresh, loading }: BookingsTableProps) {
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [actioningId, setActioningId] = useState<string | null>(null);
 
   const handleCancel = async (bookingId: string) => {
     setCancellingId(bookingId);
     const response = await cancelBooking(bookingId);
-    
     if (response.success) {
       toast.success('Booking cancelled successfully');
       onRefresh();
@@ -73,26 +63,49 @@ export function BookingsTable({ bookings, onRefresh, loading }: BookingsTablePro
     setCancellingId(null);
   };
 
+  const handleStatus = async (id: string, status: 'approved' | 'rejected') => {
+    setActioningId(id);
+    const res = await updateBookingStatus(id, status);
+    if (res.success) {
+      toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
+      onRefresh();
+    } else {
+      toast.error(res.error || 'Action failed');
+    }
+    setActioningId(null);
+  };
+
+  const pendingCount = bookings.filter((b) => b.status === 'pending').length;
+
   return (
     <Card className="border-border overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <Calendar className="w-5 h-5 text-primary" />
           Customer Bookings
-          {bookings.length > 0 && (
-            <motion.span 
+          {pendingCount > 0 && (
+            <motion.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="ml-2 px-2 py-0.5 text-xs bg-primary/10 text-primary rounded-full"
+              className="ml-2 px-2 py-0.5 text-xs bg-red-500 text-white rounded-full font-semibold"
+            >
+              {pendingCount} new
+            </motion.span>
+          )}
+          {bookings.length > 0 && (
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="ml-1 px-2 py-0.5 text-xs bg-primary/10 text-primary rounded-full"
             >
               {bookings.length}
             </motion.span>
           )}
         </CardTitle>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={onRefresh} 
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onRefresh}
           disabled={loading}
           className="transition-all duration-200 hover:scale-105 active:scale-95"
         >
@@ -167,10 +180,37 @@ export function BookingsTable({ bookings, onRefresh, loading }: BookingsTablePro
                           </motion.span>
                         </TableCell>
                         <TableCell className="text-right">
-                          {!isCancelled && (
-                            <Button 
-                              size="sm" 
-                              variant="ghost" 
+                          {booking.status === 'pending' ? (
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                size="sm"
+                                disabled={actioningId === booking.id}
+                                onClick={() => handleStatus(booking.id, 'rejected')}
+                                className="bg-red-500 hover:bg-red-600 text-white h-8"
+                              >
+                                {actioningId === booking.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <><X className="w-4 h-4 mr-1" /> Reject</>
+                                )}
+                              </Button>
+                              <Button
+                                size="sm"
+                                disabled={actioningId === booking.id}
+                                onClick={() => handleStatus(booking.id, 'approved')}
+                                className="bg-green-500 hover:bg-green-600 text-white h-8"
+                              >
+                                {actioningId === booking.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <><Check className="w-4 h-4 mr-1" /> Accept</>
+                                )}
+                              </Button>
+                            </div>
+                          ) : !isCancelled ? (
+                            <Button
+                              size="sm"
+                              variant="ghost"
                               onClick={() => handleCancel(booking.id)}
                               disabled={cancellingId === booking.id}
                               className="text-destructive hover:text-destructive transition-all duration-200 hover:scale-105"
@@ -184,7 +224,7 @@ export function BookingsTable({ bookings, onRefresh, loading }: BookingsTablePro
                                 </>
                               )}
                             </Button>
-                          )}
+                          ) : null}
                         </TableCell>
                       </motion.tr>
                     );
