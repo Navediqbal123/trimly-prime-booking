@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
+import { NotificationBell } from '@/components/NotificationBell';
 import { cn } from '@/lib/utils';
 
 interface NavItemType {
@@ -117,6 +118,11 @@ export function AppSidebar() {
         </AnimatePresence>
       </div>
 
+      {/* Mobile top-right notification bell */}
+      <div className="fixed top-4 right-4 z-50 lg:hidden">
+        <NotificationBell />
+      </div>
+
       {/* Mobile Overlay */}
       <AnimatePresence>
         {isOpen && (
@@ -151,14 +157,17 @@ export function AppSidebar() {
           transition={{ delay: 0.1, duration: 0.3 }}
           className="p-6 border-b border-border"
         >
-          <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center btn-gold shrink-0">
-              <Scissors className="w-6 h-6" />
-            </div>
-            <span className="text-3xl font-display font-extrabold tracking-wide leading-none" style={{ color: '#000000' }}>
-              Barber Lane
-            </span>
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link to="/dashboard" className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center btn-gold shrink-0">
+                <Scissors className="w-6 h-6" />
+              </div>
+              <span className="text-3xl font-display font-extrabold tracking-wide leading-none" style={{ color: '#000000' }}>
+                Barber Lane
+              </span>
+            </Link>
+            <NotificationBell className="hidden lg:block" />
+          </div>
         </motion.div>
 
         {/* Navigation */}

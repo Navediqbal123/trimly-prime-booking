@@ -276,3 +276,22 @@ export async function getAdminUsers(): Promise<ApiResponse<UserData[]>> {
   return apiCall<UserData[]>('/api/admin/users', { method: 'GET' });
 }
 
+// ==========================================
+// NOTIFICATIONS
+// ==========================================
+
+export interface NotificationData {
+  id: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+}
+
+export async function getNotifications(): Promise<ApiResponse<NotificationData[]>> {
+  return apiCall<NotificationData[]>('/api/booking/notifications', { method: 'GET' });
+}
+
+export async function markNotificationsRead(): Promise<ApiResponse> {
+  return apiCall('/api/booking/notifications/read', { method: 'PATCH' });
+}
+
