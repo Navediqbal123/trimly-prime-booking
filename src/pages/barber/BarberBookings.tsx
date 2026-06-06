@@ -20,7 +20,7 @@ export default function BarberBookings() {
   const [bookings, setBookings] = useState<BookingData[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('upcoming');
-  const [actioningId, setActioningId] = useState<string | null>(null);
+  const [acting, setActing] = useState<{ id: string; action: 'approved' | 'rejected' } | null>(null);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -37,16 +37,26 @@ export default function BarberBookings() {
     fetchBookings();
   }, []);
 
-  const handleStatus = async (id: string, status: 'approved' | 'rejected') => {
-    setActioningId(id);
-    const res = await updateBookingStatus(id, status);
-    if (res.success) {
-      toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
-      await fetchBookings();
-    } else {
-      toast.error(res.error || 'Action failed');
+  const handleStatus = async (
+    e: React.MouseEvent,
+    id: string,
+    status: 'approved' | 'rejected',
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (acting) return;
+    setActing({ id, action: status });
+    try {
+      const res = await updateBookingStatus(id, status);
+      if (res.success) {
+        toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
+        await fetchBookings();
+      } else {
+        toast.error(res.error || 'Action failed');
+      }
+    } finally {
+      setActing(null);
     }
-    setActioningId(null);
   };
 
   const pendingBookings = bookings.filter((b) => b.status === 'pending');
