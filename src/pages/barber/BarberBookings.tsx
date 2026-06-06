@@ -20,7 +20,7 @@ export default function BarberBookings() {
   const [bookings, setBookings] = useState<BookingData[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('upcoming');
-  const [actioningId, setActioningId] = useState<string | null>(null);
+  const [acting, setActing] = useState<{ id: string; action: 'approved' | 'rejected' } | null>(null);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -37,16 +37,26 @@ export default function BarberBookings() {
     fetchBookings();
   }, []);
 
-  const handleStatus = async (id: string, status: 'approved' | 'rejected') => {
-    setActioningId(id);
-    const res = await updateBookingStatus(id, status);
-    if (res.success) {
-      toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
-      await fetchBookings();
-    } else {
-      toast.error(res.error || 'Action failed');
+  const handleStatus = async (
+    e: React.MouseEvent,
+    id: string,
+    status: 'approved' | 'rejected',
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (acting) return;
+    setActing({ id, action: status });
+    try {
+      const res = await updateBookingStatus(id, status);
+      if (res.success) {
+        toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
+        await fetchBookings();
+      } else {
+        toast.error(res.error || 'Action failed');
+      }
+    } finally {
+      setActing(null);
     }
-    setActioningId(null);
   };
 
   const pendingBookings = bookings.filter((b) => b.status === 'pending');
@@ -62,7 +72,10 @@ export default function BarberBookings() {
     const config = statusConfig[status] || statusConfig.pending;
     const StatusIcon = config.icon;
     const isPending = booking.status === 'pending';
-    const isActing = actioningId === booking.id;
+    const isThisActing = acting?.id === booking.id;
+    const isRejecting = isThisActing && acting?.action === 'rejected';
+    const isApproving = isThisActing && acting?.action === 'approved';
+    const disableBoth = isThisActing;
 
     return (
       <motion.div
@@ -106,20 +119,22 @@ export default function BarberBookings() {
           {isPending && (
             <div className="flex items-center gap-2">
               <Button
+                type="button"
                 size="sm"
-                disabled={isActing}
-                onClick={() => handleStatus(booking.id, 'rejected')}
-                className="bg-red-500 hover:bg-red-600 text-white"
+                disabled={disableBoth}
+                onClick={(e) => handleStatus(e, booking.id, 'rejected')}
+                className="bg-red-500 hover:bg-red-600 text-white disabled:opacity-60"
               >
-                {isActing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" /> Reject</>}
+                {isRejecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" /> Reject</>}
               </Button>
               <Button
+                type="button"
                 size="sm"
-                disabled={isActing}
-                onClick={() => handleStatus(booking.id, 'approved')}
-                className="bg-green-500 hover:bg-green-600 text-white"
+                disabled={disableBoth}
+                onClick={(e) => handleStatus(e, booking.id, 'approved')}
+                className="bg-green-500 hover:bg-green-600 text-white disabled:opacity-60"
               >
-                {isActing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" /> Accept</>}
+                {isApproving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" /> Accept</>}
               </Button>
             </div>
           )}

@@ -49,7 +49,7 @@ const rowVariants = {
 
 export function BookingsTable({ bookings, onRefresh, loading }: BookingsTableProps) {
   const [cancellingId, setCancellingId] = useState<string | null>(null);
-  const [actioningId, setActioningId] = useState<string | null>(null);
+  const [acting, setActing] = useState<{ id: string; action: 'approved' | 'rejected' } | null>(null);
 
   const handleCancel = async (bookingId: string) => {
     setCancellingId(bookingId);
@@ -63,16 +63,26 @@ export function BookingsTable({ bookings, onRefresh, loading }: BookingsTablePro
     setCancellingId(null);
   };
 
-  const handleStatus = async (id: string, status: 'approved' | 'rejected') => {
-    setActioningId(id);
-    const res = await updateBookingStatus(id, status);
-    if (res.success) {
-      toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
-      onRefresh();
-    } else {
-      toast.error(res.error || 'Action failed');
+  const handleStatus = async (
+    e: React.MouseEvent,
+    id: string,
+    status: 'approved' | 'rejected',
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (acting) return;
+    setActing({ id, action: status });
+    try {
+      const res = await updateBookingStatus(id, status);
+      if (res.success) {
+        toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
+        onRefresh();
+      } else {
+        toast.error(res.error || 'Action failed');
+      }
+    } finally {
+      setActing(null);
     }
-    setActioningId(null);
   };
 
   const pendingCount = bookings.filter((b) => b.status === 'pending').length;
@@ -182,30 +192,41 @@ export function BookingsTable({ bookings, onRefresh, loading }: BookingsTablePro
                         <TableCell className="text-right">
                           {booking.status === 'pending' ? (
                             <div className="flex items-center justify-end gap-2">
-                              <Button
-                                size="sm"
-                                disabled={actioningId === booking.id}
-                                onClick={() => handleStatus(booking.id, 'rejected')}
-                                className="bg-red-500 hover:bg-red-600 text-white h-8"
-                              >
-                                {actioningId === booking.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <><X className="w-4 h-4 mr-1" /> Reject</>
-                                )}
-                              </Button>
-                              <Button
-                                size="sm"
-                                disabled={actioningId === booking.id}
-                                onClick={() => handleStatus(booking.id, 'approved')}
-                                className="bg-green-500 hover:bg-green-600 text-white h-8"
-                              >
-                                {actioningId === booking.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <><Check className="w-4 h-4 mr-1" /> Accept</>
-                                )}
-                              </Button>
+                              {(() => {
+                                const isThis = acting?.id === booking.id;
+                                const isRej = isThis && acting?.action === 'rejected';
+                                const isApp = isThis && acting?.action === 'approved';
+                                return (
+                                  <>
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      disabled={isThis}
+                                      onClick={(e) => handleStatus(e, booking.id, 'rejected')}
+                                      className="bg-red-500 hover:bg-red-600 text-white h-8 disabled:opacity-60"
+                                    >
+                                      {isRej ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        <><X className="w-4 h-4 mr-1" /> Reject</>
+                                      )}
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      disabled={isThis}
+                                      onClick={(e) => handleStatus(e, booking.id, 'approved')}
+                                      className="bg-green-500 hover:bg-green-600 text-white h-8 disabled:opacity-60"
+                                    >
+                                      {isApp ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        <><Check className="w-4 h-4 mr-1" /> Accept</>
+                                      )}
+                                    </Button>
+                                  </>
+                                );
+                              })()}
                             </div>
                           ) : !isCancelled ? (
                             <Button
