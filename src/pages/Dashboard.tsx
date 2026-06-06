@@ -177,8 +177,8 @@ export default function Dashboard() {
                 onClick={() => goToBooking(service)}
                 className="snap-start shrink-0 w-44 sm:w-52 bg-white rounded-2xl p-4 text-left group border border-black/10 hover:border-black hover:shadow-lg transition-all"
               >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-black border border-black">
-                  <Scissors className="w-6 h-6 text-gold" />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-white border border-black/20">
+                  <Scissors className="w-6 h-6 text-black" />
                 </div>
                 <h3 className="font-display font-semibold text-base mb-1 line-clamp-1 text-black">
                   {service.name}
