@@ -233,7 +233,8 @@ export async function getMyBarberProfile(): Promise<ApiResponse<BarberProfileDat
 }
 
 export async function getBarberServices(barberId: string): Promise<ApiResponse<ServiceData[]>> {
-  return apiCall<ServiceData[]>(`/api/services/${barberId}`, { method: 'GET' });
+  const qs = new URLSearchParams({ barber_id: barberId }).toString();
+  return apiCall<ServiceData[]>(`/api/services?${qs}`, { method: 'GET' });
 }
 
 export async function getBarberBookings(): Promise<ApiResponse<BookingData[]>> {
