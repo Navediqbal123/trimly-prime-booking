@@ -72,7 +72,10 @@ export default function BarberBookings() {
     const config = statusConfig[status] || statusConfig.pending;
     const StatusIcon = config.icon;
     const isPending = booking.status === 'pending';
-    const isActing = actioningId === booking.id;
+    const isThisActing = acting?.id === booking.id;
+    const isRejecting = isThisActing && acting?.action === 'rejected';
+    const isApproving = isThisActing && acting?.action === 'approved';
+    const disableBoth = isThisActing;
 
     return (
       <motion.div
@@ -116,20 +119,22 @@ export default function BarberBookings() {
           {isPending && (
             <div className="flex items-center gap-2">
               <Button
+                type="button"
                 size="sm"
-                disabled={isActing}
-                onClick={() => handleStatus(booking.id, 'rejected')}
-                className="bg-red-500 hover:bg-red-600 text-white"
+                disabled={disableBoth}
+                onClick={(e) => handleStatus(e, booking.id, 'rejected')}
+                className="bg-red-500 hover:bg-red-600 text-white disabled:opacity-60"
               >
-                {isActing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" /> Reject</>}
+                {isRejecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" /> Reject</>}
               </Button>
               <Button
+                type="button"
                 size="sm"
-                disabled={isActing}
-                onClick={() => handleStatus(booking.id, 'approved')}
-                className="bg-green-500 hover:bg-green-600 text-white"
+                disabled={disableBoth}
+                onClick={(e) => handleStatus(e, booking.id, 'approved')}
+                className="bg-green-500 hover:bg-green-600 text-white disabled:opacity-60"
               >
-                {isActing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" /> Accept</>}
+                {isApproving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" /> Accept</>}
               </Button>
             </div>
           )}
