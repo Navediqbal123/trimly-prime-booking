@@ -49,7 +49,7 @@ const rowVariants = {
 
 export function BookingsTable({ bookings, onRefresh, loading }: BookingsTableProps) {
   const [cancellingId, setCancellingId] = useState<string | null>(null);
-  const [actioningId, setActioningId] = useState<string | null>(null);
+  const [acting, setActing] = useState<{ id: string; action: 'approved' | 'rejected' } | null>(null);
 
   const handleCancel = async (bookingId: string) => {
     setCancellingId(bookingId);
@@ -63,16 +63,26 @@ export function BookingsTable({ bookings, onRefresh, loading }: BookingsTablePro
     setCancellingId(null);
   };
 
-  const handleStatus = async (id: string, status: 'approved' | 'rejected') => {
-    setActioningId(id);
-    const res = await updateBookingStatus(id, status);
-    if (res.success) {
-      toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
-      onRefresh();
-    } else {
-      toast.error(res.error || 'Action failed');
+  const handleStatus = async (
+    e: React.MouseEvent,
+    id: string,
+    status: 'approved' | 'rejected',
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (acting) return;
+    setActing({ id, action: status });
+    try {
+      const res = await updateBookingStatus(id, status);
+      if (res.success) {
+        toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
+        onRefresh();
+      } else {
+        toast.error(res.error || 'Action failed');
+      }
+    } finally {
+      setActing(null);
     }
-    setActioningId(null);
   };
 
   const pendingCount = bookings.filter((b) => b.status === 'pending').length;
