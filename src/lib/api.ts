@@ -28,7 +28,6 @@ async function apiCall<T>(
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       ...options,
       headers,
-      credentials: 'include',
     });
 
     let data: any;
