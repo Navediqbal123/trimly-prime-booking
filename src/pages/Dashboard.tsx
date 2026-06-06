@@ -175,22 +175,22 @@ export default function Dashboard() {
                 whileHover={{ y: -4 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => goToBooking(service)}
-                className="snap-start shrink-0 w-44 sm:w-52 glass-card rounded-2xl p-4 text-left group hover:border-gold/50 transition-all"
+                className="snap-start shrink-0 w-44 sm:w-52 bg-white rounded-2xl p-4 text-left group border border-black/10 hover:border-black hover:shadow-lg transition-all"
               >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-gradient-to-br from-primary/30 to-gold/20 border border-gold/20">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-black border border-black">
                   <Scissors className="w-6 h-6 text-gold" />
                 </div>
-                <h3 className="font-display font-semibold text-base mb-1 line-clamp-1 text-white group-hover:text-gold transition-colors">
+                <h3 className="font-display font-semibold text-base mb-1 line-clamp-1 text-black">
                   {service.name}
                 </h3>
                 {service.barbers && (
-                  <p className="text-xs text-white/90 line-clamp-1 mb-2">
+                  <p className="text-xs text-black/70 line-clamp-1 mb-2">
                     {service.barbers.shop_name}
                   </p>
                 )}
                 <div className="flex items-center justify-between mt-2">
-                  <span className="text-lg font-display font-bold gradient-gold-text">₹{service.price}</span>
-                  <div className="flex items-center gap-1 text-[11px] text-white/90">
+                  <span className="text-lg font-display font-bold text-black">₹{service.price}</span>
+                  <div className="flex items-center gap-1 text-[11px] text-black/70">
                     <Clock className="w-3 h-3" />
                     {service.duration}m
                   </div>
