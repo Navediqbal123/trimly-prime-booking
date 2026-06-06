@@ -192,30 +192,41 @@ export function BookingsTable({ bookings, onRefresh, loading }: BookingsTablePro
                         <TableCell className="text-right">
                           {booking.status === 'pending' ? (
                             <div className="flex items-center justify-end gap-2">
-                              <Button
-                                size="sm"
-                                disabled={actioningId === booking.id}
-                                onClick={() => handleStatus(booking.id, 'rejected')}
-                                className="bg-red-500 hover:bg-red-600 text-white h-8"
-                              >
-                                {actioningId === booking.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <><X className="w-4 h-4 mr-1" /> Reject</>
-                                )}
-                              </Button>
-                              <Button
-                                size="sm"
-                                disabled={actioningId === booking.id}
-                                onClick={() => handleStatus(booking.id, 'approved')}
-                                className="bg-green-500 hover:bg-green-600 text-white h-8"
-                              >
-                                {actioningId === booking.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <><Check className="w-4 h-4 mr-1" /> Accept</>
-                                )}
-                              </Button>
+                              {(() => {
+                                const isThis = acting?.id === booking.id;
+                                const isRej = isThis && acting?.action === 'rejected';
+                                const isApp = isThis && acting?.action === 'approved';
+                                return (
+                                  <>
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      disabled={isThis}
+                                      onClick={(e) => handleStatus(e, booking.id, 'rejected')}
+                                      className="bg-red-500 hover:bg-red-600 text-white h-8 disabled:opacity-60"
+                                    >
+                                      {isRej ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        <><X className="w-4 h-4 mr-1" /> Reject</>
+                                      )}
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      disabled={isThis}
+                                      onClick={(e) => handleStatus(e, booking.id, 'approved')}
+                                      className="bg-green-500 hover:bg-green-600 text-white h-8 disabled:opacity-60"
+                                    >
+                                      {isApp ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        <><Check className="w-4 h-4 mr-1" /> Accept</>
+                                      )}
+                                    </Button>
+                                  </>
+                                );
+                              })()}
                             </div>
                           ) : !isCancelled ? (
                             <Button
