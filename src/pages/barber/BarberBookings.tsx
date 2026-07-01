@@ -22,6 +22,30 @@ export default function BarberBookings() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('upcoming');
   const [acting, setActing] = useState<{ id: string; action: 'approved' | 'rejected' } | null>(null);
+  const [otpInputs, setOtpInputs] = useState<Record<string, string>>({});
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+
+  const handleVerifyOtp = async (bookingId: string) => {
+    const otp = (otpInputs[bookingId] || '').trim();
+    if (!otp) {
+      toast.error('Please enter the OTP');
+      return;
+    }
+    setVerifyingId(bookingId);
+    try {
+      const res = await verifyBookingOtp(bookingId, otp);
+      if (res.success) {
+        toast.success('OTP verified — booking completed');
+        setOtpInputs((p) => ({ ...p, [bookingId]: '' }));
+        await fetchBookings();
+      } else {
+        toast.error(res.error || 'Invalid OTP');
+      }
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
 
   const fetchBookings = async () => {
     setLoading(true);
