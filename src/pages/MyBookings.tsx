@@ -14,6 +14,11 @@ const statusConfig = {
     label: 'Pending',
     className: 'text-yellow-500 bg-yellow-500/10',
   },
+  approved: {
+    icon: CheckCircle,
+    label: 'Approved',
+    className: 'text-green-500 bg-green-500/10',
+  },
   confirmed: {
     icon: CheckCircle,
     label: 'Confirmed',
@@ -27,6 +32,11 @@ const statusConfig = {
   cancelled: {
     icon: XCircle,
     label: 'Cancelled',
+    className: 'text-red-500 bg-red-500/10',
+  },
+  rejected: {
+    icon: XCircle,
+    label: 'Rejected',
     className: 'text-red-500 bg-red-500/10',
   },
 };
