@@ -164,9 +164,39 @@ export default function BarberBookings() {
             </div>
           )}
         </div>
+
+        {booking.status === 'approved' && (
+          <div className="mt-4 pt-4 border-t border-border">
+            <label className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2">
+              <KeyRound className="w-3.5 h-3.5" />
+              Verify customer OTP
+            </label>
+            <div className="flex items-center gap-2">
+              <Input
+                inputMode="numeric"
+                placeholder="Enter OTP"
+                value={otpInputs[booking.id] || ''}
+                onChange={(e) =>
+                  setOtpInputs((p) => ({ ...p, [booking.id]: e.target.value.replace(/\D/g, '').slice(0, 8) }))
+                }
+                className="tracking-[0.3em] font-mono text-center text-base"
+                disabled={verifyingId === booking.id}
+              />
+              <Button
+                type="button"
+                onClick={() => handleVerifyOtp(booking.id)}
+                disabled={verifyingId === booking.id}
+                className="bg-primary hover:bg-primary/90"
+              >
+                {verifyingId === booking.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify'}
+              </Button>
+            </div>
+          </div>
+        )}
       </motion.div>
     );
   };
+
 
   if (loading) {
     return (
