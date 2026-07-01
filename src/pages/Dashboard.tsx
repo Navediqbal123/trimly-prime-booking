@@ -162,20 +162,14 @@ export default function Dashboard() {
             <p className="text-white/90 text-sm">No services available yet.</p>
           </div>
         ) : (
-          <div
-            className="flex gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 pl-1 pr-4 snap-x snap-mandatory scrollbar-thin scroll-smooth -mx-1"
-            style={{ WebkitOverflowScrolling: 'touch', scrollBehavior: 'smooth' }}
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {services.map((service, i) => (
-              <motion.button
+              <motion.div
                 key={service.id}
-                initial={{ opacity: 0, x: 24 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05, duration: 0.35, ease: 'easeOut' }}
-                whileHover={{ y: -4 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => goToBooking(service)}
-                className="snap-start shrink-0 w-44 sm:w-52 bg-white rounded-2xl p-4 text-left group border border-black/10 hover:border-black hover:shadow-lg transition-all"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04, duration: 0.35, ease: 'easeOut' }}
+                className="bg-white rounded-2xl p-5 text-left border border-black/10 hover:border-black hover:shadow-lg transition-all flex flex-col"
               >
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-white border border-black/20">
                   <Scissors className="w-6 h-6 text-black" />
@@ -188,14 +182,20 @@ export default function Dashboard() {
                     {service.barbers.shop_name}
                   </p>
                 )}
-                <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center justify-between mt-2 mb-4">
                   <span className="text-lg font-display font-bold text-black">₹{service.price}</span>
                   <div className="flex items-center gap-1 text-[11px] text-black/70">
                     <Clock className="w-3 h-3" />
                     {service.duration}m
                   </div>
                 </div>
-              </motion.button>
+                <Button
+                  onClick={() => goToBooking(service)}
+                  className="mt-auto w-full h-11 bg-black text-white hover:bg-black/90 rounded-xl font-medium transition-colors"
+                >
+                  Book Now
+                </Button>
+              </motion.div>
             ))}
           </div>
         )}
