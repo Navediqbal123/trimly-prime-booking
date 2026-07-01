@@ -158,6 +158,7 @@ export interface BookingData {
   time_slot: string;
   status: string;
   home_service: boolean;
+  otp?: string;
   barber?: {
     shop_name: string;
     location: string;
