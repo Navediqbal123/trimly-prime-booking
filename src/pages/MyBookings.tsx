@@ -78,10 +78,10 @@ export default function MyBookings() {
   }, []);
 
   const upcomingBookings = bookings.filter(
-    (b) => b.status === 'pending' || b.status === 'confirmed'
+    (b) => b.status === 'pending' || b.status === 'confirmed' || b.status === 'approved'
   );
   const pastBookings = bookings.filter(
-    (b) => b.status === 'completed' || b.status === 'cancelled'
+    (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected'
   );
 
   const BookingCard = ({ booking }: { booking: BookingData }) => {
