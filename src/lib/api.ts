@@ -271,6 +271,13 @@ export async function updateBookingStatus(
   });
 }
 
+export async function verifyBookingOtp(booking_id: string, otp: string): Promise<ApiResponse> {
+  return apiCall('/api/booking/verify-otp', {
+    method: 'POST',
+    body: JSON.stringify({ booking_id, otp }),
+  });
+}
+
 // ==========================================
 // ADMIN ENDPOINTS
 // ==========================================
