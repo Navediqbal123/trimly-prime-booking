@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Loader2, RefreshCw, Check, X } from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Loader2, RefreshCw, Check, X, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { getBarberBookings, updateBookingStatus, BookingData } from '@/lib/api';
+import { getBarberBookings, updateBookingStatus, verifyBookingOtp, BookingData } from '@/lib/api';
 
 const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; className: string }> = {
   pending: { icon: AlertCircle, label: 'Pending', className: 'text-yellow-500 bg-yellow-500/10' },
@@ -21,6 +22,30 @@ export default function BarberBookings() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('upcoming');
   const [acting, setActing] = useState<{ id: string; action: 'approved' | 'rejected' } | null>(null);
+  const [otpInputs, setOtpInputs] = useState<Record<string, string>>({});
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+
+  const handleVerifyOtp = async (bookingId: string) => {
+    const otp = (otpInputs[bookingId] || '').trim();
+    if (!otp) {
+      toast.error('Please enter the OTP');
+      return;
+    }
+    setVerifyingId(bookingId);
+    try {
+      const res = await verifyBookingOtp(bookingId, otp);
+      if (res.success) {
+        toast.success('OTP verified — booking completed');
+        setOtpInputs((p) => ({ ...p, [bookingId]: '' }));
+        await fetchBookings();
+      } else {
+        toast.error(res.error || 'Invalid OTP');
+      }
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -139,9 +164,39 @@ export default function BarberBookings() {
             </div>
           )}
         </div>
+
+        {booking.status === 'approved' && (
+          <div className="mt-4 pt-4 border-t border-border">
+            <label className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2">
+              <KeyRound className="w-3.5 h-3.5" />
+              Verify customer OTP
+            </label>
+            <div className="flex items-center gap-2">
+              <Input
+                inputMode="numeric"
+                placeholder="Enter OTP"
+                value={otpInputs[booking.id] || ''}
+                onChange={(e) =>
+                  setOtpInputs((p) => ({ ...p, [booking.id]: e.target.value.replace(/\D/g, '').slice(0, 8) }))
+                }
+                className="tracking-[0.3em] font-mono text-center text-base"
+                disabled={verifyingId === booking.id}
+              />
+              <Button
+                type="button"
+                onClick={() => handleVerifyOtp(booking.id)}
+                disabled={verifyingId === booking.id}
+                className="bg-primary hover:bg-primary/90"
+              >
+                {verifyingId === booking.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify'}
+              </Button>
+            </div>
+          </div>
+        )}
       </motion.div>
     );
   };
+
 
   if (loading) {
     return (

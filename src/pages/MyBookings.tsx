@@ -14,6 +14,11 @@ const statusConfig = {
     label: 'Pending',
     className: 'text-yellow-500 bg-yellow-500/10',
   },
+  approved: {
+    icon: CheckCircle,
+    label: 'Approved',
+    className: 'text-green-500 bg-green-500/10',
+  },
   confirmed: {
     icon: CheckCircle,
     label: 'Confirmed',
@@ -27,6 +32,11 @@ const statusConfig = {
   cancelled: {
     icon: XCircle,
     label: 'Cancelled',
+    className: 'text-red-500 bg-red-500/10',
+  },
+  rejected: {
+    icon: XCircle,
+    label: 'Rejected',
     className: 'text-red-500 bg-red-500/10',
   },
 };
@@ -68,10 +78,10 @@ export default function MyBookings() {
   }, []);
 
   const upcomingBookings = bookings.filter(
-    (b) => b.status === 'pending' || b.status === 'confirmed'
+    (b) => b.status === 'pending' || b.status === 'confirmed' || b.status === 'approved'
   );
   const pastBookings = bookings.filter(
-    (b) => b.status === 'completed' || b.status === 'cancelled'
+    (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected'
   );
 
   const BookingCard = ({ booking }: { booking: BookingData }) => {
@@ -119,7 +129,25 @@ export default function MyBookings() {
             )}
           </div>
 
-          {(booking.status === 'pending' || booking.status === 'confirmed') && (
+          {booking.status === 'approved' && booking.otp && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mt-4 rounded-xl p-4 bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/40"
+            >
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2">
+                Your Verification OTP
+              </p>
+              <p className="text-4xl font-display font-bold gradient-text tracking-[0.3em] mb-2">
+                {booking.otp}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Show this OTP to your barber when you arrive
+              </p>
+            </motion.div>
+          )}
+
+          {(booking.status === 'pending' || booking.status === 'confirmed' || booking.status === 'approved') && (
             <div className="flex gap-2 mt-4">
               <Button 
                 variant="outline" 

@@ -158,6 +158,7 @@ export interface BookingData {
   time_slot: string;
   status: string;
   home_service: boolean;
+  otp?: string;
   barber?: {
     shop_name: string;
     location: string;
@@ -267,6 +268,13 @@ export async function updateBookingStatus(
   return apiCall(`/api/booking/status/${bookingId}`, {
     method: 'PATCH',
     body: JSON.stringify({ status }),
+  });
+}
+
+export async function verifyBookingOtp(booking_id: string, otp: string): Promise<ApiResponse> {
+  return apiCall('/api/booking/verify-otp', {
+    method: 'POST',
+    body: JSON.stringify({ booking_id, otp }),
   });
 }
 
