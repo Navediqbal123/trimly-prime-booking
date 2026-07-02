@@ -64,6 +64,24 @@ export default function BookingPage() {
     enabled: !!shopId,
   });
 
+  const dateKey = selectedDate ? selectedDate.toISOString().split('T')[0] : null;
+
+  const { data: bookedSlots = [], isLoading: loadingSlots } = useQuery({
+    queryKey: ['bookedSlots', shopId, dateKey],
+    queryFn: async () => {
+      if (!shopId || !dateKey) return [];
+      const results = await Promise.all(
+        timeSlots.map(async (slot) => {
+          const res = await checkSlotAvailability(shopId, dateKey, slot);
+          const available = res.success ? res.data?.available !== false : true;
+          return available ? null : slot;
+        })
+      );
+      return results.filter((s): s is string => !!s);
+    },
+    enabled: !!shopId && !!dateKey,
+  });
+
   const loadingData = loadingShop || loadingServices;
   const selectedServiceData = services.find((s) => s.id === selectedService);
 
@@ -73,6 +91,12 @@ export default function BookingPage() {
       if (match) setSelectedService(match.id);
     }
   }, [preselectedServiceId, services, selectedService]);
+
+  useEffect(() => {
+    if (selectedTime && bookedSlots.includes(selectedTime)) {
+      setSelectedTime(null);
+    }
+  }, [bookedSlots, selectedTime]);
 
   const handleBook = async () => {
     if (!selectedService || !selectedDate || !selectedTime) {
@@ -263,15 +287,20 @@ export default function BookingPage() {
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
             {timeSlots.map((time) => {
               const active = selectedTime === time;
+              const booked = bookedSlots.includes(time);
               return (
                 <button
                   key={time}
-                  onClick={() => setSelectedTime(time)}
+                  onClick={() => !booked && setSelectedTime(time)}
+                  disabled={booked}
+                  title={booked ? 'Already booked' : undefined}
                   className={cn(
                     'py-3 px-2 rounded-xl text-[13px] font-medium transition-all border',
-                    active
-                      ? 'bg-gold text-black border-gold shadow-[0_0_18px_-4px_hsl(var(--gold)/0.7)]'
-                      : 'bg-[#111] text-white border-[#111] hover:border-gold/60'
+                    booked
+                      ? 'bg-neutral-300 text-neutral-500 border-neutral-300 cursor-not-allowed line-through'
+                      : active
+                        ? 'bg-gold text-black border-gold shadow-[0_0_18px_-4px_hsl(var(--gold)/0.7)]'
+                        : 'bg-[#111] text-white border-[#111] hover:border-gold/60'
                   )}
                 >
                   {time}
@@ -279,6 +308,9 @@ export default function BookingPage() {
               );
             })}
           </div>
+          {dateKey && loadingSlots && (
+            <p className="text-xs text-black/50 mt-2">Checking availability…</p>
+          )}
 
           {selectedServiceData?.home_service && (
             <div className="mt-5 p-4 rounded-xl bg-white border border-black/10 flex items-center justify-between">

@@ -15,7 +15,7 @@ export function EarningsChart({ bookings }: EarningsChartProps) {
     const earningsByDate: Record<string, number> = {};
     
     bookings
-      .filter(b => b.status === 'completed' || b.status === 'confirmed' || b.status === 'pending')
+      .filter(b => b.status === 'completed')
       .forEach(booking => {
         const date = booking.date;
         const price = booking.service?.price || 0;

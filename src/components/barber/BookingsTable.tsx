@@ -131,6 +131,7 @@ export function BookingsTable({ bookings, onRefresh, loading }: BookingsTablePro
                 <TableRow>
                   <TableHead>Customer</TableHead>
                   <TableHead>Service</TableHead>
+                  <TableHead>Price</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Time Slot</TableHead>
                   <TableHead>Status</TableHead>
@@ -167,6 +168,7 @@ export function BookingsTable({ bookings, onRefresh, loading }: BookingsTablePro
                           </div>
                         </TableCell>
                         <TableCell>{booking.service?.name || 'N/A'}</TableCell>
+                        <TableCell className="font-semibold">₹{booking.service?.price ?? 0}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4 text-muted-foreground" />
