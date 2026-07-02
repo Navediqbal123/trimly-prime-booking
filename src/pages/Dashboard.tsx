@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Scissors, Loader2, Clock, ArrowRight, Sparkles } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
-import { getApprovedBarbers, getBarberServices, getMyServices } from '@/lib/api';
+import { getApprovedBarbers, getBarberServices } from '@/lib/api';
 
 interface ServiceWithBarber {
   id: string;
