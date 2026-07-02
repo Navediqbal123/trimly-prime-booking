@@ -119,7 +119,7 @@ export default function BookingPage() {
       return;
     }
     if (slotCheck.data?.available === false) {
-      toast.error('This slot is already booked, please choose another time');
+      toast.error('This slot is already booked, please select another time');
       setLoading(false);
       return;
     }
