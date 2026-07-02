@@ -80,6 +80,11 @@ export default function BookingPage() {
       return results.filter((s): s is string => !!s);
     },
     enabled: !!shopId && !!dateKey,
+    // Slots free up when bookings are completed/cancelled — keep this fresh.
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    refetchInterval: 20000,
   });
 
   const loadingData = loadingShop || loadingServices;
