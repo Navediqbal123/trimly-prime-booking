@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Scissors, Loader2, Clock, ArrowRight, Sparkles } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
-import { getApprovedBarbers, getBarberServices, getMyServices } from '@/lib/api';
+import { getApprovedBarbers, getBarberServices } from '@/lib/api';
 
 interface ServiceWithBarber {
   id: string;
@@ -52,34 +52,20 @@ export default function Dashboard() {
 
   const { data: services = [], isLoading: loadingServices } = useQuery({
     queryKey: ['allServicesHome', barbers.map((b) => b.id).join(',')],
+    enabled: barbers.length > 0,
     queryFn: async (): Promise<ServiceWithBarber[]> => {
       const barberMap = new Map(barbers.map((b) => [b.id, b]));
 
-      // 1) Try the global /api/services endpoint first
-      const allRes = await getMyServices();
-      let collected: Array<{
-        id: string;
-        barber_id: string;
-        name: string;
-        price: number;
-        duration: number;
-        home_service: boolean;
-      }> = [];
+      // Fan out per approved barber so EVERY user sees ALL services
+      // from ALL approved barbers (no user-specific filter).
+      const results = await Promise.all(
+        barbers.map(async (b) => {
+          const res = await getBarberServices(b.id);
+          return res.success && res.data ? res.data : [];
+        }),
+      );
+      const collected = results.flat();
 
-      if (allRes.success && Array.isArray(allRes.data) && allRes.data.length > 0) {
-        collected = allRes.data;
-      } else if (barbers.length > 0) {
-        // 2) Fallback: fan out per approved barber
-        const results = await Promise.all(
-          barbers.map(async (b) => {
-            const res = await getBarberServices(b.id);
-            return res.success && res.data ? res.data : [];
-          }),
-        );
-        collected = results.flat();
-      }
-
-      // Only keep services that belong to an APPROVED barber
       return collected
         .filter((s) => barberMap.has(s.barber_id))
         .map((s) => {
