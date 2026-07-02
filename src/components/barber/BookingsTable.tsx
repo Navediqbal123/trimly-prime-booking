@@ -131,6 +131,7 @@ export function BookingsTable({ bookings, onRefresh, loading }: BookingsTablePro
                 <TableRow>
                   <TableHead>Customer</TableHead>
                   <TableHead>Service</TableHead>
+                  <TableHead>Price</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Time Slot</TableHead>
                   <TableHead>Status</TableHead>
