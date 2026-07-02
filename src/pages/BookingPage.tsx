@@ -64,6 +64,24 @@ export default function BookingPage() {
     enabled: !!shopId,
   });
 
+  const dateKey = selectedDate ? selectedDate.toISOString().split('T')[0] : null;
+
+  const { data: bookedSlots = [], isLoading: loadingSlots } = useQuery({
+    queryKey: ['bookedSlots', shopId, dateKey],
+    queryFn: async () => {
+      if (!shopId || !dateKey) return [];
+      const results = await Promise.all(
+        timeSlots.map(async (slot) => {
+          const res = await checkSlotAvailability(shopId, dateKey, slot);
+          const available = res.success ? res.data?.available !== false : true;
+          return available ? null : slot;
+        })
+      );
+      return results.filter((s): s is string => !!s);
+    },
+    enabled: !!shopId && !!dateKey,
+  });
+
   const loadingData = loadingShop || loadingServices;
   const selectedServiceData = services.find((s) => s.id === selectedService);
 
@@ -73,6 +91,12 @@ export default function BookingPage() {
       if (match) setSelectedService(match.id);
     }
   }, [preselectedServiceId, services, selectedService]);
+
+  useEffect(() => {
+    if (selectedTime && bookedSlots.includes(selectedTime)) {
+      setSelectedTime(null);
+    }
+  }, [bookedSlots, selectedTime]);
 
   const handleBook = async () => {
     if (!selectedService || !selectedDate || !selectedTime) {
