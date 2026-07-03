@@ -146,7 +146,7 @@ export default function BarberBookings() {
           {upcomingBookings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {upcomingBookings.map((booking) => (
-                <BookingCard key={booking.id} booking={booking} />
+                renderBookingCard(booking)
               ))}
             </div>
           ) : (
