@@ -334,13 +334,14 @@ export default function BookingPage() {
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
             {timeSlots.map((time) => {
               const active = selectedTime === time;
-              const booked = bookedSlots.includes(time);
+              const past = isSlotPast(time);
+              const booked = bookedSlots.includes(time) || past;
               return (
                 <button
                   key={time}
                   onClick={() => !booked && setSelectedTime(time)}
                   disabled={booked}
-                  title={booked ? 'Already booked' : undefined}
+                  title={booked ? (past ? 'Time already passed' : 'Already booked') : undefined}
                   className={cn(
                     'py-3 px-2 rounded-xl text-[13px] font-medium transition-all border',
                     booked
