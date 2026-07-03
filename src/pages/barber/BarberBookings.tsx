@@ -17,6 +17,119 @@ const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; cl
   cancelled: { icon: XCircle, label: 'Cancelled', className: 'text-red-500 bg-red-500/10' },
 };
 
+type BookingCardProps = {
+  booking: BookingData;
+  acting: { id: string; action: 'approved' | 'rejected' } | null;
+  onStatus: (e: React.MouseEvent, id: string, status: 'approved' | 'rejected') => void;
+  otpValue: string;
+  onOtpChange: (v: string) => void;
+  onVerify: () => void;
+  verifying: boolean;
+};
+
+function BookingCard({ booking, acting, onStatus, otpValue, onOtpChange, onVerify, verifying }: BookingCardProps) {
+  const status = booking.status as keyof typeof statusConfig;
+  const config = statusConfig[status] || statusConfig.pending;
+  const StatusIcon = config.icon;
+  const isPending = booking.status === 'pending';
+  const isThisActing = acting?.id === booking.id;
+  const isRejecting = isThisActing && acting?.action === 'rejected';
+  const isApproving = isThisActing && acting?.action === 'approved';
+  const disableBoth = isThisActing;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-all"
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <User className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <p className="font-medium">Customer</p>
+            <p className="text-sm text-muted-foreground">Booking #{booking.id.slice(0, 8)}</p>
+          </div>
+        </div>
+        <span className={cn('flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium', config.className)}>
+          <StatusIcon className="w-3 h-3" />
+          {config.label}
+        </span>
+      </div>
+
+      <div className="space-y-2 mb-4">
+        <p className="text-primary font-medium">{booking.service?.name || 'Service'}</p>
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <Calendar className="w-4 h-4" />
+            <span>{new Date(booking.date).toLocaleDateString()}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Clock className="w-4 h-4" />
+            <span>{booking.time_slot}</span>
+          </div>
+        </div>
+        {booking.home_service && <div className="text-sm text-green-500">🏠 Home Service</div>}
+      </div>
+
+      <div className="flex items-center justify-between pt-4 border-t border-border gap-2">
+        <span className="text-lg font-bold">₹{booking.service?.price || 0}</span>
+        {isPending && (
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              disabled={disableBoth}
+              onClick={(e) => onStatus(e, booking.id, 'rejected')}
+              className="bg-red-500 hover:bg-red-600 text-white disabled:opacity-60"
+            >
+              {isRejecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" /> Reject</>}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              disabled={disableBoth}
+              onClick={(e) => onStatus(e, booking.id, 'approved')}
+              className="bg-green-500 hover:bg-green-600 text-white disabled:opacity-60"
+            >
+              {isApproving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" /> Accept</>}
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {booking.status === 'approved' && (
+        <div className="mt-4 pt-4 border-t border-border">
+          <label className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2">
+            <KeyRound className="w-3.5 h-3.5" />
+            Verify customer OTP
+          </label>
+          <div className="flex items-center gap-2">
+            <Input
+              inputMode="numeric"
+              placeholder="Enter OTP"
+              value={otpValue}
+              onChange={(e) => onOtpChange(e.target.value.replace(/\D/g, '').slice(0, 8))}
+              className="tracking-[0.3em] font-mono text-center text-base"
+              disabled={verifying}
+            />
+            <Button
+              type="button"
+              onClick={onVerify}
+              disabled={verifying}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {verifying ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify'}
+            </Button>
+          </div>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
 export default function BarberBookings() {
   const [bookings, setBookings] = useState<BookingData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,110 +205,19 @@ export default function BarberBookings() {
     (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected'
   );
 
-  const BookingCard = ({ booking }: { booking: BookingData }) => {
-    const status = booking.status as keyof typeof statusConfig;
-    const config = statusConfig[status] || statusConfig.pending;
-    const StatusIcon = config.icon;
-    const isPending = booking.status === 'pending';
-    const isThisActing = acting?.id === booking.id;
-    const isRejecting = isThisActing && acting?.action === 'rejected';
-    const isApproving = isThisActing && acting?.action === 'approved';
-    const disableBoth = isThisActing;
+  const renderBookingCard = (booking: BookingData) => (
+    <BookingCard
+      key={booking.id}
+      booking={booking}
+      acting={acting}
+      onStatus={handleStatus}
+      otpValue={otpInputs[booking.id] || ''}
+      onOtpChange={(v) => setOtpInputs((p) => ({ ...p, [booking.id]: v }))}
+      onVerify={() => handleVerifyOtp(booking.id)}
+      verifying={verifyingId === booking.id}
+    />
+  );
 
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-all"
-      >
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="font-medium">Customer</p>
-              <p className="text-sm text-muted-foreground">Booking #{booking.id.slice(0, 8)}</p>
-            </div>
-          </div>
-          <span className={cn('flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium', config.className)}>
-            <StatusIcon className="w-3 h-3" />
-            {config.label}
-          </span>
-        </div>
-
-        <div className="space-y-2 mb-4">
-          <p className="text-primary font-medium">{booking.service?.name || 'Service'}</p>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              <span>{new Date(booking.date).toLocaleDateString()}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              <span>{booking.time_slot}</span>
-            </div>
-          </div>
-          {booking.home_service && <div className="text-sm text-green-500">🏠 Home Service</div>}
-        </div>
-
-        <div className="flex items-center justify-between pt-4 border-t border-border gap-2">
-          <span className="text-lg font-bold">₹{booking.service?.price || 0}</span>
-          {isPending && (
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                disabled={disableBoth}
-                onClick={(e) => handleStatus(e, booking.id, 'rejected')}
-                className="bg-red-500 hover:bg-red-600 text-white disabled:opacity-60"
-              >
-                {isRejecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" /> Reject</>}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                disabled={disableBoth}
-                onClick={(e) => handleStatus(e, booking.id, 'approved')}
-                className="bg-green-500 hover:bg-green-600 text-white disabled:opacity-60"
-              >
-                {isApproving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" /> Accept</>}
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {booking.status === 'approved' && (
-          <div className="mt-4 pt-4 border-t border-border">
-            <label className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2">
-              <KeyRound className="w-3.5 h-3.5" />
-              Verify customer OTP
-            </label>
-            <div className="flex items-center gap-2">
-              <Input
-                inputMode="numeric"
-                placeholder="Enter OTP"
-                value={otpInputs[booking.id] || ''}
-                onChange={(e) =>
-                  setOtpInputs((p) => ({ ...p, [booking.id]: e.target.value.replace(/\D/g, '').slice(0, 8) }))
-                }
-                className="tracking-[0.3em] font-mono text-center text-base"
-                disabled={verifyingId === booking.id}
-              />
-              <Button
-                type="button"
-                onClick={() => handleVerifyOtp(booking.id)}
-                disabled={verifyingId === booking.id}
-                className="bg-primary hover:bg-primary/90"
-              >
-                {verifyingId === booking.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify'}
-              </Button>
-            </div>
-          </div>
-        )}
-      </motion.div>
-    );
-  };
 
 
   if (loading) {
@@ -237,7 +259,7 @@ export default function BarberBookings() {
           {upcomingBookings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {upcomingBookings.map((booking) => (
-                <BookingCard key={booking.id} booking={booking} />
+                renderBookingCard(booking)
               ))}
             </div>
           ) : (
@@ -252,7 +274,7 @@ export default function BarberBookings() {
           {pastBookings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {pastBookings.map((booking) => (
-                <BookingCard key={booking.id} booking={booking} />
+                renderBookingCard(booking)
               ))}
             </div>
           ) : (
