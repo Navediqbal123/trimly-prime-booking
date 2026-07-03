@@ -76,6 +76,34 @@ export default function BookingPage() {
   };
   const dateKey = selectedDate ? toLocalDateKey(selectedDate) : null;
 
+  // Parse a "9:00 AM" / "12:30 AM" slot into a Date on the given day (local time).
+  const slotToDate = (day: Date, slot: string) => {
+    const m = slot.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (!m) return null;
+    let hh = parseInt(m[1], 10);
+    const mm = parseInt(m[2], 10);
+    const ap = m[3].toUpperCase();
+    if (ap === 'AM') hh = hh === 12 ? 0 : hh;
+    else hh = hh === 12 ? 12 : hh + 12;
+    const d = new Date(day);
+    d.setHours(hh, mm, 0, 0);
+    return d;
+  };
+
+  // Tick every 30s so "past slot" disabling updates in real time.
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNowTick(Date.now()), 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  const isSlotPast = (slot: string) => {
+    if (!selectedDate) return false;
+    const d = slotToDate(selectedDate, slot);
+    if (!d) return false;
+    return d.getTime() <= nowTick;
+  };
+
   const { data: bookedSlots = [], isLoading: loadingSlots } = useQuery({
     queryKey: ['bookedSlots', shopId, dateKey],
     queryFn: async () => {
@@ -306,13 +334,14 @@ export default function BookingPage() {
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
             {timeSlots.map((time) => {
               const active = selectedTime === time;
-              const booked = bookedSlots.includes(time);
+              const past = isSlotPast(time);
+              const booked = bookedSlots.includes(time) || past;
               return (
                 <button
                   key={time}
                   onClick={() => !booked && setSelectedTime(time)}
                   disabled={booked}
-                  title={booked ? 'Already booked' : undefined}
+                  title={booked ? (past ? 'Time already passed' : 'Already booked') : undefined}
                   className={cn(
                     'py-3 px-2 rounded-xl text-[13px] font-medium transition-all border',
                     booked
