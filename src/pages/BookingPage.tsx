@@ -126,7 +126,7 @@ export default function BookingPage() {
     }
 
     setLoading(true);
-    const dateStr = selectedDate.toISOString().split('T')[0];
+    const dateStr = toLocalDateKey(selectedDate);
 
     const slotCheck = await checkSlotAvailability(shopId, dateStr, selectedTime);
     if (!slotCheck.success) {
