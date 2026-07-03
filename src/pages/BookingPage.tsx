@@ -64,12 +64,22 @@ export default function BookingPage() {
     enabled: !!shopId,
   });
 
-  const dateKey = selectedDate ? selectedDate.toISOString().split('T')[0] : null;
+  // Use LOCAL date (not UTC) so slot lookups match the date the user picked.
+  const toLocalDateKey = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+  const dateKey = selectedDate ? toLocalDateKey(selectedDate) : null;
 
   const { data: bookedSlots = [], isLoading: loadingSlots } = useQuery({
     queryKey: ['bookedSlots', shopId, dateKey],
     queryFn: async () => {
       if (!shopId || !dateKey) return [];
+      // Check each slot independently for this specific date. Backend returns
+      // available:false only when there's an active booking (pending / approved /
+      // in-progress). Completed / cancelled / rejected free the slot back up.
       const results = await Promise.all(
         timeSlots.map(async (slot) => {
           const res = await checkSlotAvailability(shopId, dateKey, slot);
@@ -80,11 +90,12 @@ export default function BookingPage() {
       return results.filter((s): s is string => !!s);
     },
     enabled: !!shopId && !!dateKey,
-    // Slots free up when bookings are completed/cancelled — keep this fresh.
+    // Real-time freshness: refetch every 15s so freed slots re-enable automatically.
     staleTime: 0,
     refetchOnMount: 'always',
     refetchOnWindowFocus: true,
-    refetchInterval: 20000,
+    refetchInterval: 15000,
+    refetchIntervalInBackground: false,
   });
 
   const loadingData = loadingShop || loadingServices;
