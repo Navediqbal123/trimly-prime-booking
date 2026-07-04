@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Loader2, RefreshCw, Check, X, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { getBarberBookings, updateBookingStatus, verifyBookingOtp, BookingData } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 
 const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; className: string }> = {
   pending: { icon: AlertCircle, label: 'Pending', className: 'text-yellow-500 bg-yellow-500/10' },
@@ -19,6 +21,7 @@ const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; cl
 
 type BookingCardProps = {
   booking: BookingData;
+  customerName: string;
   acting: { id: string; action: 'approved' | 'rejected' } | null;
   onStatus: (e: React.MouseEvent, id: string, status: 'approved' | 'rejected') => void;
   otpValue: string;
@@ -27,7 +30,7 @@ type BookingCardProps = {
   verifying: boolean;
 };
 
-function BookingCard({ booking, acting, onStatus, otpValue, onOtpChange, onVerify, verifying }: BookingCardProps) {
+function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpChange, onVerify, verifying }: BookingCardProps) {
   const status = booking.status as keyof typeof statusConfig;
   const config = statusConfig[status] || statusConfig.pending;
   const StatusIcon = config.icon;
@@ -49,7 +52,7 @@ function BookingCard({ booking, acting, onStatus, otpValue, onOtpChange, onVerif
             <User className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="font-medium">Customer</p>
+            <p className="font-medium">{customerName}</p>
             <p className="text-sm text-muted-foreground">Booking #{booking.id.slice(0, 8)}</p>
           </div>
         </div>
@@ -75,7 +78,7 @@ function BookingCard({ booking, acting, onStatus, otpValue, onOtpChange, onVerif
       </div>
 
       <div className="flex items-center justify-between pt-4 border-t border-border gap-2">
-        <span className="text-lg font-bold">₹{booking.service?.price || 0}</span>
+        <span className="text-lg font-bold">₹{booking.service?.price ?? 0}</span>
         {isPending && (
           <div className="flex items-center gap-2">
             <Button
@@ -131,12 +134,70 @@ function BookingCard({ booking, acting, onStatus, otpValue, onOtpChange, onVerif
 }
 
 export default function BarberBookings() {
-  const [bookings, setBookings] = useState<BookingData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState('upcoming');
   const [acting, setActing] = useState<{ id: string; action: 'approved' | 'rejected' } | null>(null);
   const [otpInputs, setOtpInputs] = useState<Record<string, string>>({});
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
+
+  const {
+    data: bookings = [],
+    isLoading: loading,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: ['barberBookings'],
+    queryFn: async () => {
+      const res = await getBarberBookings();
+      if (!res.success) throw new Error(res.error || 'Failed to fetch bookings');
+      return res.data || [];
+    },
+    // Poll every 10s so newly-confirmed customer bookings appear in real time.
+    refetchInterval: 10000,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+  });
+
+  // Resolve real customer names from profiles (public.profiles.name) for any
+  // user_id referenced by the bookings list.
+  const userIds = Array.from(
+    new Set(
+      bookings
+        .map((b) => b.user_id || b.customer_id)
+        .filter((v): v is string => !!v),
+    ),
+  );
+  const userIdsKey = userIds.slice().sort().join(',');
+
+  const { data: nameMap = {} } = useQuery({
+    queryKey: ['bookingCustomerNames', userIdsKey],
+    queryFn: async () => {
+      if (userIds.length === 0) return {};
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, name')
+        .in('id', userIds);
+      if (error) return {};
+      const map: Record<string, string> = {};
+      for (const row of data || []) {
+        if (row?.id) map[row.id as string] = (row as { name?: string }).name || '';
+      }
+      return map;
+    },
+    enabled: userIds.length > 0,
+    staleTime: 60_000,
+  });
+
+  const nameFor = (b: BookingData) => {
+    const uid = b.user_id || b.customer_id;
+    return (
+      b.user?.full_name ||
+      b.user?.name ||
+      (uid ? nameMap[uid] : '') ||
+      b.user?.email ||
+      'Customer'
+    );
+  };
 
   const handleVerifyOtp = async (bookingId: string) => {
     const otp = (otpInputs[bookingId] || '').trim();
@@ -150,7 +211,9 @@ export default function BarberBookings() {
       if (res.success) {
         toast.success('OTP verified — booking completed');
         setOtpInputs((p) => ({ ...p, [bookingId]: '' }));
-        await fetchBookings();
+        qc.invalidateQueries({ queryKey: ['barberBookings'] });
+        qc.invalidateQueries({ queryKey: ['myBookings'] });
+        qc.invalidateQueries({ queryKey: ['bookedSlots'] });
       } else {
         toast.error(res.error || 'Invalid OTP');
       }
@@ -158,22 +221,6 @@ export default function BarberBookings() {
       setVerifyingId(null);
     }
   };
-
-
-  const fetchBookings = async () => {
-    setLoading(true);
-    const response = await getBarberBookings();
-    if (response.success && response.data) {
-      setBookings(response.data);
-    } else {
-      toast.error(response.error || 'Failed to fetch bookings');
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchBookings();
-  }, []);
 
   const handleStatus = async (
     e: React.MouseEvent,
@@ -188,7 +235,9 @@ export default function BarberBookings() {
       const res = await updateBookingStatus(id, status);
       if (res.success) {
         toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
-        await fetchBookings();
+        qc.invalidateQueries({ queryKey: ['barberBookings'] });
+        qc.invalidateQueries({ queryKey: ['myBookings'] });
+        qc.invalidateQueries({ queryKey: ['bookedSlots'] });
       } else {
         toast.error(res.error || 'Action failed');
       }
@@ -209,6 +258,7 @@ export default function BarberBookings() {
     <BookingCard
       key={booking.id}
       booking={booking}
+      customerName={nameFor(booking)}
       acting={acting}
       onStatus={handleStatus}
       otpValue={otpInputs[booking.id] || ''}
@@ -217,8 +267,6 @@ export default function BarberBookings() {
       verifying={verifyingId === booking.id}
     />
   );
-
-
 
   if (loading) {
     return (
@@ -243,8 +291,8 @@ export default function BarberBookings() {
           </h1>
           <p className="text-muted-foreground">Manage your customer appointments</p>
         </div>
-        <Button variant="outline" onClick={fetchBookings} disabled={loading}>
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+        <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
+          <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
@@ -258,9 +306,7 @@ export default function BarberBookings() {
         <TabsContent value="upcoming">
           {upcomingBookings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {upcomingBookings.map((booking) => (
-                renderBookingCard(booking)
-              ))}
+              {upcomingBookings.map((booking) => renderBookingCard(booking))}
             </div>
           ) : (
             <div className="text-center py-12 bg-card rounded-xl border border-border">
@@ -273,9 +319,7 @@ export default function BarberBookings() {
         <TabsContent value="past">
           {pastBookings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {pastBookings.map((booking) => (
-                renderBookingCard(booking)
-              ))}
+              {pastBookings.map((booking) => renderBookingCard(booking))}
             </div>
           ) : (
             <div className="text-center py-12 bg-card rounded-xl border border-border">

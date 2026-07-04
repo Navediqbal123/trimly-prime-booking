@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import {
@@ -34,7 +34,9 @@ export default function BookingPage() {
   const { shopId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const queryClient = useQueryClient();
   const preselectedServiceId = searchParams.get('service');
+
 
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -181,7 +183,12 @@ export default function BookingPage() {
 
     if (response.success) {
       toast.success('Booking confirmed!');
+      // Real-time refresh across the app: customer's Bookings + barber's Hub
+      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['barberBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['bookedSlots'] });
       navigate('/bookings');
+
     } else {
       toast.error(response.error || 'Failed to create booking');
     }
