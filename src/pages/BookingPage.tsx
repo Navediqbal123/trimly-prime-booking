@@ -183,7 +183,12 @@ export default function BookingPage() {
 
     if (response.success) {
       toast.success('Booking confirmed!');
+      // Real-time refresh across the app: customer's Bookings + barber's Hub
+      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['barberBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['bookedSlots'] });
       navigate('/bookings');
+
     } else {
       toast.error(response.error || 'Failed to create booking');
     }
