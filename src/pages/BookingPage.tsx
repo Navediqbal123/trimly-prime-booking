@@ -34,7 +34,9 @@ export default function BookingPage() {
   const { shopId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const queryClient = useQueryClient();
   const preselectedServiceId = searchParams.get('service');
+
 
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
