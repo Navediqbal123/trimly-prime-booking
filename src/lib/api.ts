@@ -154,11 +154,14 @@ export interface BookingData {
   id: string;
   barber_id: string;
   service_id: string;
+  user_id?: string;
+  customer_id?: string;
   date: string;
   time_slot: string;
   status: string;
   home_service: boolean;
   otp?: string;
+  created_at?: string;
   barber?: {
     shop_name: string;
     location: string;
@@ -167,7 +170,13 @@ export interface BookingData {
     name: string;
     price: number;
   };
+  user?: {
+    name?: string;
+    full_name?: string;
+    email?: string;
+  };
 }
+
 
 export async function getMyBookings(): Promise<ApiResponse<BookingData[]>> {
   return apiCall<BookingData[]>('/api/booking/my', { method: 'GET' });
