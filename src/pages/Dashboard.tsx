@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Scissors, Loader2, Clock, ArrowRight, Sparkles } from 'lucide-react';
+import { Scissors, Loader2, Clock, ArrowRight, Sparkles, MapPin, Star } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { getApprovedBarbers, getBarberServices } from '@/lib/api';
+import { shopImage, shopRating } from '@/lib/shopMedia';
 
 interface ServiceWithBarber {
   id: string;
@@ -32,7 +33,8 @@ export default function Dashboard() {
 
   const goToBooking = (service: ServiceWithBarber) => {
     if (service.barbers?.id) {
-      navigate(`/book/${service.barbers.id}?service=${service.id}`);
+      // Route through the Barber Profile step so users can review the shop first.
+      navigate(`/barber/${service.barbers.id}?service=${service.id}`);
     }
   };
 
@@ -149,40 +151,61 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {services.map((service, i) => (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04, duration: 0.35, ease: 'easeOut' }}
-                className="bg-white rounded-2xl p-5 text-left border border-black/10 hover:border-black hover:shadow-lg transition-all flex flex-col"
-              >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-white border border-black/20">
-                  <Scissors className="w-6 h-6 text-black" />
-                </div>
-                <h3 className="font-display font-semibold text-base mb-1 line-clamp-1 text-black">
-                  {service.name}
-                </h3>
-                {service.barbers && (
-                  <p className="text-xs text-black/70 line-clamp-1 mb-2">
-                    {service.barbers.shop_name}
-                  </p>
-                )}
-                <div className="flex items-center justify-between mt-2 mb-4">
-                  <span className="text-lg font-display font-bold text-black">₹{service.price}</span>
-                  <div className="flex items-center gap-1 text-[11px] text-black/70">
-                    <Clock className="w-3 h-3" />
-                    {service.duration}m
-                  </div>
-                </div>
-                <Button
-                  onClick={() => goToBooking(service)}
-                  className="mt-auto w-full h-11 bg-black text-white hover:bg-black/90 rounded-xl font-medium transition-colors"
+            {services.map((service, i) => {
+              const shopId = service.barbers?.id || service.barber_id;
+              const { rating, reviews } = shopRating(shopId);
+              return (
+                <motion.div
+                  key={service.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.04, duration: 0.35, ease: 'easeOut' }}
+                  className="bg-white rounded-2xl overflow-hidden text-left border border-black/10 hover:border-black hover:shadow-lg transition-all flex flex-col"
                 >
-                  Book Now
-                </Button>
-              </motion.div>
-            ))}
+                  <div className="relative h-32 overflow-hidden">
+                    <img
+                      src={shopImage(shopId)}
+                      alt={service.barbers?.shop_name || 'Barber shop'}
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-2 right-2 inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full">
+                      <Star className="w-3 h-3 fill-gold text-gold" />
+                      <span className="text-[11px] font-semibold text-white">{rating.toFixed(1)}</span>
+                      <span className="text-[10px] text-white/70">({reviews})</span>
+                    </div>
+                  </div>
+                  <div className="p-5 flex flex-col flex-1">
+                    <h3 className="font-display font-semibold text-base mb-1 line-clamp-1 text-black">
+                      {service.name}
+                    </h3>
+                    {service.barbers && (
+                      <>
+                        <p className="text-xs font-medium text-black/80 line-clamp-1">
+                          {service.barbers.shop_name}
+                        </p>
+                        <p className="flex items-center gap-1 text-[11px] text-black/60 line-clamp-1 mt-0.5">
+                          <MapPin className="w-3 h-3" /> {service.barbers.location}
+                        </p>
+                      </>
+                    )}
+                    <div className="flex items-center justify-between mt-3 mb-4">
+                      <span className="text-lg font-display font-bold text-black">₹{service.price}</span>
+                      <div className="flex items-center gap-1 text-[11px] text-black/70">
+                        <Clock className="w-3 h-3" />
+                        {service.duration}m
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => goToBooking(service)}
+                      className="mt-auto w-full h-11 bg-black text-white hover:bg-black/90 rounded-xl font-medium transition-colors"
+                    >
+                      Book Now
+                    </Button>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </section>

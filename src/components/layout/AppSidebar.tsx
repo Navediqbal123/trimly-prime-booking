@@ -21,6 +21,7 @@ import {
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/NotificationBell';
+import { HideOnScroll } from '@/components/layout/HideOnScroll';
 import { cn } from '@/lib/utils';
 
 interface NavItemType {
@@ -91,37 +92,37 @@ export function AppSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Button + Brand */}
-      <div className="fixed top-4 left-4 z-50 lg:hidden flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsOpen(!isOpen)}
-          className="h-12 w-12 [&_svg]:size-7"
-        >
-          {isOpen ? <X /> : <Menu />}
-        </Button>
-        <AnimatePresence>
-          {!isOpen && (
-            <motion.div
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="flex items-center"
+      {/* Mobile Menu Button + Brand (hides on scroll down, shows on scroll up) */}
+      <HideOnScroll className="fixed top-0 left-0 right-0 z-50 lg:hidden">
+        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(!isOpen)}
+              className="h-12 w-12 [&_svg]:size-7"
             >
-              <span className="text-3xl sm:text-4xl font-display font-extrabold tracking-wide" style={{ color: '#000000' }}>
-                Barber Lane
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Mobile top-right notification bell */}
-      <div className="fixed top-4 right-4 z-50 lg:hidden">
-        <NotificationBell />
-      </div>
+              {isOpen ? <X /> : <Menu />}
+            </Button>
+            <AnimatePresence>
+              {!isOpen && (
+                <motion.div
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -8 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  className="flex items-center"
+                >
+                  <span className="text-3xl sm:text-4xl font-display font-extrabold tracking-wide" style={{ color: '#000000' }}>
+                    Barber Lane
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <NotificationBell />
+        </div>
+      </HideOnScroll>
 
       {/* Mobile Overlay */}
       <AnimatePresence>
