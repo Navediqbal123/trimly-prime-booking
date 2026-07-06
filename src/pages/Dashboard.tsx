@@ -6,6 +6,8 @@ import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { getApprovedBarbers } from '@/lib/api';
 import { shopImage, shopRating } from '@/lib/shopMedia';
+import { listAllShopMedia } from '@/lib/shopMediaStore';
+import { ShopImageCarousel } from '@/components/ShopImageCarousel';
 
 interface Barber {
   id: string;
@@ -28,6 +30,12 @@ export default function Dashboard() {
         location: b.location,
       }));
     },
+  });
+
+  const { data: mediaMap = {} } = useQuery({
+    queryKey: ['shopMediaMap'],
+    queryFn: listAllShopMedia,
+    staleTime: 30_000,
   });
 
   const scrollToShops = () => {
