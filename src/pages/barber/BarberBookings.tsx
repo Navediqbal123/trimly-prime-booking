@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { getBarberBookings, updateBookingStatus, verifyBookingOtp, BookingData } from '@/lib/api';
+import { getBarberBookings, getMyServices, updateBookingStatus, verifyBookingOtp, BookingData } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 
 const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; className: string }> = {
@@ -141,7 +141,7 @@ export default function BarberBookings() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
 
   const {
-    data: bookings = [],
+    data: rawBookings = [],
     isLoading: loading,
     isFetching,
     refetch,
@@ -152,10 +152,25 @@ export default function BarberBookings() {
       if (!res.success) throw new Error(res.error || 'Failed to fetch bookings');
       return res.data || [];
     },
-    // Poll every 10s so newly-confirmed customer bookings appear in real time.
     refetchInterval: 10000,
     refetchOnWindowFocus: true,
     staleTime: 0,
+  });
+
+  const { data: myServices = [] } = useQuery({
+    queryKey: ['myServicesForBookings'],
+    queryFn: async () => {
+      const res = await getMyServices();
+      return res.success && res.data ? res.data : [];
+    },
+    staleTime: 60_000,
+  });
+
+  const bookings = rawBookings.map((b) => {
+    const s = myServices.find((x) => x.id === b.service_id);
+    return s
+      ? { ...b, service: { name: s.name, price: s.price, ...(b.service || {}) } }
+      : b;
   });
 
   // Resolve real customer names from profiles (public.profiles.name) for any

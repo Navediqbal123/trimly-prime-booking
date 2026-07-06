@@ -6,6 +6,8 @@ import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { getApprovedBarbers } from '@/lib/api';
 import { shopImage, shopRating } from '@/lib/shopMedia';
+import { listAllShopMedia } from '@/lib/shopMediaStore';
+import { ShopImageCarousel } from '@/components/ShopImageCarousel';
 
 interface Barber {
   id: string;
@@ -28,6 +30,12 @@ export default function Dashboard() {
         location: b.location,
       }));
     },
+  });
+
+  const { data: mediaMap = {} } = useQuery({
+    queryKey: ['shopMediaMap'],
+    queryFn: listAllShopMedia,
+    staleTime: 30_000,
   });
 
   const scrollToShops = () => {
@@ -98,6 +106,8 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {barbers.map((b, i) => {
               const { rating, reviews } = shopRating(b.id);
+              const uploaded = mediaMap[b.id] || [];
+              const gallery = uploaded.length > 0 ? uploaded : [shopImage(b.id)];
               return (
                 <motion.div
                   key={b.id}
@@ -107,13 +117,12 @@ export default function Dashboard() {
                   className="bg-white rounded-2xl overflow-hidden text-left border border-black/10 hover:shadow-lg transition-all flex flex-col"
                 >
                   <div className="relative h-40 overflow-hidden">
-                    <img
-                      src={shopImage(b.id)}
+                    <ShopImageCarousel
+                      images={gallery}
                       alt={b.shop_name}
-                      loading="lazy"
-                      className="w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full"
                     />
-                    <div className="absolute top-2 right-2 inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full">
+                    <div className="absolute top-2 right-2 inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full z-10">
                       <Star className="w-3 h-3 fill-gold text-gold" />
                       <span className="text-[11px] font-semibold text-white">{rating.toFixed(1)}</span>
                       <span className="text-[10px] text-white/70">({reviews})</span>

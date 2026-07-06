@@ -83,15 +83,15 @@ export function NotificationBell({ className }: { className?: string }) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[99]"
             />
             <motion.aside
               key="panel"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'tween', ease: [0.22, 1, 0.36, 1], duration: 0.4 }}
-              className="fixed inset-0 h-full w-full bg-background z-[61] flex flex-col shadow-2xl"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'tween', ease: [0.22, 1, 0.36, 1], duration: 0.45 }}
+              className="fixed inset-0 h-full w-full bg-background z-[100] flex flex-col shadow-2xl"
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                 <div>

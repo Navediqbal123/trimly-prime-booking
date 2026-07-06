@@ -4,26 +4,41 @@ import { IndianRupee, TrendingUp, Calendar, Loader2, RefreshCw } from 'lucide-re
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { getBarberBookings, BookingData } from '@/lib/api';
+import { getBarberBookings, getMyServices, BookingData, ServiceData } from '@/lib/api';
 import { format, subDays, isAfter, parseISO } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 export default function BarberEarnings() {
-  const [bookings, setBookings] = useState<BookingData[]>([]);
+  const [rawBookings, setRawBookings] = useState<BookingData[]>([]);
+  const [services, setServices] = useState<ServiceData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     setLoading(true);
-    const res = await getBarberBookings();
-    if (res.success && res.data) {
-      setBookings(res.data);
-    } else {
-      toast.error(res.error || 'Failed to load earnings data');
-    }
+    const [bRes, sRes] = await Promise.all([getBarberBookings(), getMyServices()]);
+    if (bRes.success && bRes.data) setRawBookings(bRes.data);
+    else toast.error(bRes.error || 'Failed to load earnings data');
+    if (sRes.success && sRes.data) setServices(sRes.data);
     setLoading(false);
   };
 
   useEffect(() => { fetchData(); }, []);
+
+  const serviceMap = useMemo(() => {
+    const m = new Map<string, ServiceData>();
+    services.forEach(s => m.set(s.id, s));
+    return m;
+  }, [services]);
+
+  const bookings = useMemo(
+    () => rawBookings.map(b => {
+      const s = serviceMap.get(b.service_id);
+      return s
+        ? { ...b, service: { name: s.name, price: s.price, ...(b.service || {}) } }
+        : b;
+    }),
+    [rawBookings, serviceMap]
+  );
 
   const completedBookings = useMemo(
     () => bookings.filter(b => b.status === 'completed'),
