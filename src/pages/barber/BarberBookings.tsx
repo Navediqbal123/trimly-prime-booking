@@ -166,7 +166,12 @@ export default function BarberBookings() {
     staleTime: 60_000,
   });
 
-  const bookings = bookings_enrich(rawBookings, myServices);
+  const bookings = rawBookings.map((b) => {
+    const s = myServices.find((x) => x.id === b.service_id);
+    return s
+      ? { ...b, service: { name: s.name, price: s.price, ...(b.service || {}) } }
+      : b;
+  });
 
   // Resolve real customer names from profiles (public.profiles.name) for any
   // user_id referenced by the bookings list.
