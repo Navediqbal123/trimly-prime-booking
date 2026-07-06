@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { getBarberBookings, updateBookingStatus, verifyBookingOtp, BookingData } from '@/lib/api';
+import { getBarberBookings, getMyServices, updateBookingStatus, verifyBookingOtp, BookingData } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 
 const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; className: string }> = {
