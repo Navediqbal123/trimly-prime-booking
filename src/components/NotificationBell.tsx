@@ -83,7 +83,7 @@ export function NotificationBell({ className }: { className?: string }) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[99]"
             />
             <motion.aside
               key="panel"
