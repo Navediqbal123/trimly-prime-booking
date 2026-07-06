@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Store, Save, Loader2, MapPin, Phone, FileText } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Store, Save, Loader2, MapPin, Phone, ImagePlus, Trash2, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { getMyBarberProfile, BarberProfileData } from '@/lib/api';
+import { listShopMedia, uploadShopImage, deleteShopImage } from '@/lib/shopMediaStore';
+import { shopImage } from '@/lib/shopMedia';
 
 export default function MyShop() {
   const [loading, setLoading] = useState(true);
