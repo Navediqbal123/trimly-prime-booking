@@ -24,6 +24,22 @@ export default function BarberEarnings() {
 
   useEffect(() => { fetchData(); }, []);
 
+  const serviceMap = useMemo(() => {
+    const m = new Map<string, ServiceData>();
+    services.forEach(s => m.set(s.id, s));
+    return m;
+  }, [services]);
+
+  const bookings = useMemo(
+    () => rawBookings.map(b => {
+      const s = serviceMap.get(b.service_id);
+      return s
+        ? { ...b, service: { name: s.name, price: s.price, ...(b.service || {}) } }
+        : b;
+    }),
+    [rawBookings, serviceMap]
+  );
+
   const completedBookings = useMemo(
     () => bookings.filter(b => b.status === 'completed'),
     [bookings]
