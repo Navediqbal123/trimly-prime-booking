@@ -4,22 +4,21 @@ import { IndianRupee, TrendingUp, Calendar, Loader2, RefreshCw } from 'lucide-re
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { getBarberBookings, BookingData } from '@/lib/api';
+import { getBarberBookings, getMyServices, BookingData, ServiceData } from '@/lib/api';
 import { format, subDays, isAfter, parseISO } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 export default function BarberEarnings() {
-  const [bookings, setBookings] = useState<BookingData[]>([]);
+  const [rawBookings, setRawBookings] = useState<BookingData[]>([]);
+  const [services, setServices] = useState<ServiceData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     setLoading(true);
-    const res = await getBarberBookings();
-    if (res.success && res.data) {
-      setBookings(res.data);
-    } else {
-      toast.error(res.error || 'Failed to load earnings data');
-    }
+    const [bRes, sRes] = await Promise.all([getBarberBookings(), getMyServices()]);
+    if (bRes.success && bRes.data) setRawBookings(bRes.data);
+    else toast.error(bRes.error || 'Failed to load earnings data');
+    if (sRes.success && sRes.data) setServices(sRes.data);
     setLoading(false);
   };
 
