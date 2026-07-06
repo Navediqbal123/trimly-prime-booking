@@ -87,11 +87,11 @@ export function NotificationBell({ className }: { className?: string }) {
             />
             <motion.aside
               key="panel"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'tween', ease: [0.22, 1, 0.36, 1], duration: 0.4 }}
-              className="fixed inset-0 h-full w-full bg-background z-[61] flex flex-col shadow-2xl"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'tween', ease: [0.22, 1, 0.36, 1], duration: 0.45 }}
+              className="fixed inset-0 h-full w-full bg-background z-[100] flex flex-col shadow-2xl"
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                 <div>
