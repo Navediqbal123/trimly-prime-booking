@@ -134,23 +134,23 @@ export default function BarberProfile() {
                   transition={{ delay: i * 0.03 }}
                   onClick={() => setSelected(s.id)}
                   className={cn(
-                    'w-full text-left rounded-2xl p-4 border transition-all flex items-center justify-between gap-4',
+                    'w-full text-left rounded-2xl p-4 border-2 transition-all flex items-center justify-between gap-4 bg-white text-black',
                     active
-                      ? 'bg-gold/10 border-gold shadow-[0_0_20px_-6px_hsl(var(--gold)/0.6)]'
-                      : 'bg-[#0d0d0d] border-gold/20 hover:border-gold/60',
+                      ? 'border-gold shadow-[0_0_20px_-6px_hsl(var(--gold)/0.6)]'
+                      : 'border-black/10 hover:border-gold/60',
                   )}
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-display font-semibold text-white truncate">{s.name}</span>
+                      <span className="font-display font-semibold text-black truncate">{s.name}</span>
                       {s.home_service && <HomeIcon className="w-3.5 h-3.5 text-gold shrink-0" />}
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-white/60 mt-1">
+                    <div className="flex items-center gap-1 text-xs text-black/60 mt-1">
                       <Clock className="w-3 h-3" /> {s.duration} min
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-lg font-bold text-white">₹{s.price}</span>
+                    <span className="text-lg font-bold text-black">₹{s.price}</span>
                     {active && (
                       <span className="w-6 h-6 rounded-full bg-gold flex items-center justify-center">
                         <Check className="w-3.5 h-3.5 text-black" />

@@ -91,7 +91,7 @@ export function NotificationBell({ className }: { className?: string }) {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', ease: [0.22, 1, 0.36, 1], duration: 0.4 }}
-              className="fixed top-0 right-0 h-full w-full sm:max-w-md bg-background border-l border-border z-[61] flex flex-col shadow-2xl"
+              className="fixed inset-0 h-full w-full bg-background z-[61] flex flex-col shadow-2xl"
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                 <div>

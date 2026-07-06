@@ -1,25 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Scissors, Loader2, Clock, ArrowRight, Sparkles, MapPin, Star } from 'lucide-react';
+import { Scissors, Loader2, ArrowRight, Sparkles, MapPin, Star } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
-import { getApprovedBarbers, getBarberServices } from '@/lib/api';
+import { getApprovedBarbers } from '@/lib/api';
 import { shopImage, shopRating } from '@/lib/shopMedia';
-
-interface ServiceWithBarber {
-  id: string;
-  barber_id: string;
-  name: string;
-  price: number;
-  duration: number;
-  home_service: boolean;
-  barbers: {
-    id: string;
-    shop_name: string;
-    location: string;
-  } | null;
-}
 
 interface Barber {
   id: string;
@@ -31,15 +17,7 @@ export default function Dashboard() {
   const { user } = useProtectedUser();
   const navigate = useNavigate();
 
-  const goToBooking = (service: ServiceWithBarber) => {
-    if (service.barbers?.id) {
-      // Route through the Barber Profile step so users can review the shop first.
-      navigate(`/barber/${service.barbers.id}?service=${service.id}`);
-    }
-  };
-
-
-  const { data: barbers = [], isLoading: loadingBarbers } = useQuery({
+  const { data: barbers = [], isLoading } = useQuery({
     queryKey: ['approvedBarbersHome'],
     queryFn: async (): Promise<Barber[]> => {
       const res = await getApprovedBarbers();
@@ -52,41 +30,8 @@ export default function Dashboard() {
     },
   });
 
-  const { data: services = [], isLoading: loadingServices } = useQuery({
-    queryKey: ['allServicesHome', barbers.map((b) => b.id).join(',')],
-    enabled: barbers.length > 0,
-    queryFn: async (): Promise<ServiceWithBarber[]> => {
-      const barberMap = new Map(barbers.map((b) => [b.id, b]));
-
-      // Fan out per approved barber so EVERY user sees ALL services
-      // from ALL approved barbers (no user-specific filter).
-      const results = await Promise.all(
-        barbers.map(async (b) => {
-          const res = await getBarberServices(b.id);
-          return res.success && res.data ? res.data : [];
-        }),
-      );
-      const collected = results.flat();
-
-      return collected
-        .filter((s) => barberMap.has(s.barber_id))
-        .map((s) => {
-          const b = barberMap.get(s.barber_id)!;
-          return {
-            id: s.id,
-            barber_id: s.barber_id,
-            name: s.name,
-            price: s.price,
-            duration: s.duration,
-            home_service: s.home_service,
-            barbers: { id: b.id, shop_name: b.shop_name, location: b.location },
-          };
-        });
-    },
-  });
-
-  const scrollToServices = () => {
-    document.getElementById('featured-services')?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToShops = () => {
+    document.getElementById('featured-shops')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -122,7 +67,7 @@ export default function Dashboard() {
             Book elite barbers near you in seconds.
           </p>
           <Button
-            onClick={scrollToServices}
+            onClick={scrollToShops}
             className="btn-gold h-12 px-6 rounded-full font-semibold hover:scale-105 transition-transform"
           >
             Discover Now
@@ -131,41 +76,40 @@ export default function Dashboard() {
         </div>
       </motion.section>
 
-      {/* Featured Services */}
-      <section id="featured-services">
+      {/* Featured Barber Shops */}
+      <section id="featured-shops">
         <div className="flex items-end justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-display font-bold">Featured Services</h2>
-            <p className="text-sm text-white/90">Swipe to explore</p>
+            <h2 className="text-2xl font-display font-bold">Barber Shops</h2>
+            <p className="text-sm text-white/90">Choose a shop to view services</p>
           </div>
         </div>
 
-        {loadingServices ? (
+        {isLoading ? (
           <div className="flex items-center justify-center py-10">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
-        ) : services.length === 0 ? (
+        ) : barbers.length === 0 ? (
           <div className="glass-card rounded-2xl p-8 text-center">
             <Scissors className="w-10 h-10 text-white/90 mx-auto mb-3" />
-            <p className="text-white/90 text-sm">No services available yet.</p>
+            <p className="text-white/90 text-sm">No barber shops available yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {services.map((service, i) => {
-              const shopId = service.barbers?.id || service.barber_id;
-              const { rating, reviews } = shopRating(shopId);
+            {barbers.map((b, i) => {
+              const { rating, reviews } = shopRating(b.id);
               return (
                 <motion.div
-                  key={service.id}
+                  key={b.id}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.04, duration: 0.35, ease: 'easeOut' }}
-                  className="bg-white rounded-2xl overflow-hidden text-left border border-black/10 hover:border-black hover:shadow-lg transition-all flex flex-col"
+                  className="bg-white rounded-2xl overflow-hidden text-left border border-black/10 hover:shadow-lg transition-all flex flex-col"
                 >
-                  <div className="relative h-32 overflow-hidden">
+                  <div className="relative h-40 overflow-hidden">
                     <img
-                      src={shopImage(shopId)}
-                      alt={service.barbers?.shop_name || 'Barber shop'}
+                      src={shopImage(b.id)}
+                      alt={b.shop_name}
                       loading="lazy"
                       className="w-full h-full object-cover"
                     />
@@ -176,31 +120,18 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="p-5 flex flex-col flex-1">
-                    <h3 className="font-display font-semibold text-base mb-1 line-clamp-1 text-black">
-                      {service.name}
+                    <h3 className="font-display font-semibold text-lg mb-1 line-clamp-1 text-black">
+                      {b.shop_name}
                     </h3>
-                    {service.barbers && (
-                      <>
-                        <p className="text-xs font-medium text-black/80 line-clamp-1">
-                          {service.barbers.shop_name}
-                        </p>
-                        <p className="flex items-center gap-1 text-[11px] text-black/60 line-clamp-1 mt-0.5">
-                          <MapPin className="w-3 h-3" /> {service.barbers.location}
-                        </p>
-                      </>
-                    )}
-                    <div className="flex items-center justify-between mt-3 mb-4">
-                      <span className="text-lg font-display font-bold text-black">₹{service.price}</span>
-                      <div className="flex items-center gap-1 text-[11px] text-black/70">
-                        <Clock className="w-3 h-3" />
-                        {service.duration}m
-                      </div>
-                    </div>
+                    <p className="flex items-center gap-1 text-xs text-black/60 line-clamp-1">
+                      <MapPin className="w-3 h-3" /> {b.location}
+                    </p>
                     <Button
-                      onClick={() => goToBooking(service)}
-                      className="mt-auto w-full h-11 bg-black text-white hover:bg-black/90 rounded-xl font-medium transition-colors"
+                      onClick={() => navigate(`/barber/${b.id}`)}
+                      className="mt-4 w-full h-11 bg-black text-white hover:bg-black/90 rounded-xl font-medium transition-colors"
                     >
-                      Book Now
+                      Visit
+                      <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                   </div>
                 </motion.div>
@@ -209,9 +140,8 @@ export default function Dashboard() {
           </div>
         )}
       </section>
-
-      {/* Discover Barbers section intentionally hidden — approved barbers are only visible in admin panel */}
     </div>
   );
 }
+
 
