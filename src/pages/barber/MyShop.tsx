@@ -21,6 +21,10 @@ export default function MyShop() {
     description: '',
     phone: '',
   });
+  const [images, setImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const MAX_IMAGES = 5;
 
   useEffect(() => {
     fetchProfile();
@@ -37,10 +41,47 @@ export default function MyShop() {
         description: '',
         phone: '',
       });
+      const media = await listShopMedia(res.data.id);
+      setImages(media);
     } else {
       toast.error(res.error || 'Failed to load shop profile');
     }
     setLoading(false);
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!profile) return;
+    const slots = MAX_IMAGES - images.length;
+    if (slots <= 0) {
+      toast.error(`Maximum ${MAX_IMAGES} photos allowed`);
+      return;
+    }
+    const toUpload = files.slice(0, slots);
+    setUploading(true);
+    try {
+      for (let i = 0; i < toUpload.length; i++) {
+        const url = await uploadShopImage(profile.id, toUpload[i], images.length + i);
+        setImages((prev) => [...prev, url]);
+      }
+      toast.success(`${toUpload.length} photo(s) uploaded`);
+    } catch (err: any) {
+      toast.error(err?.message || 'Upload failed. Ensure shop-images bucket exists.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async (url: string) => {
+    if (!profile) return;
+    try {
+      await deleteShopImage(profile.id, url);
+      setImages((prev) => prev.filter((u) => u !== url));
+      toast.success('Photo removed');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to remove');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
