@@ -141,7 +141,7 @@ export default function BarberBookings() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
 
   const {
-    data: bookings = [],
+    data: rawBookings = [],
     isLoading: loading,
     isFetching,
     refetch,
@@ -152,11 +152,21 @@ export default function BarberBookings() {
       if (!res.success) throw new Error(res.error || 'Failed to fetch bookings');
       return res.data || [];
     },
-    // Poll every 10s so newly-confirmed customer bookings appear in real time.
     refetchInterval: 10000,
     refetchOnWindowFocus: true,
     staleTime: 0,
   });
+
+  const { data: myServices = [] } = useQuery({
+    queryKey: ['myServicesForBookings'],
+    queryFn: async () => {
+      const res = await getMyServices();
+      return res.success && res.data ? res.data : [];
+    },
+    staleTime: 60_000,
+  });
+
+  const bookings = bookings_enrich(rawBookings, myServices);
 
   // Resolve real customer names from profiles (public.profiles.name) for any
   // user_id referenced by the bookings list.
