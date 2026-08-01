@@ -51,6 +51,41 @@ async function apiCall<T>(
 }
 
 // ==========================================
+// RESPONSE NORMALIZERS
+// Backends may return a bare array, or wrap it as
+// { data: [] } / { services: [] } / { barbers: [] } / { results: [] }.
+// ==========================================
+
+function asList<T>(payload: unknown): T[] {
+  if (Array.isArray(payload)) return payload as T[];
+  if (payload && typeof payload === 'object') {
+    const obj = payload as Record<string, unknown>;
+    for (const key of ['data', 'services', 'barbers', 'results', 'items', 'rows']) {
+      if (Array.isArray(obj[key])) return obj[key] as T[];
+    }
+  }
+  return [];
+}
+
+function normalizeService(raw: any): ServiceData {
+  return {
+    id: String(raw?.id ?? raw?.service_id ?? raw?._id ?? ''),
+    barber_id: String(raw?.barber_id ?? raw?.barberId ?? raw?.barber?.id ?? ''),
+    name: raw?.name ?? raw?.service_name ?? raw?.title ?? 'Service',
+    price: Number(raw?.price ?? raw?.cost ?? raw?.amount ?? 0),
+    duration: Number(raw?.duration ?? raw?.duration_minutes ?? raw?.minutes ?? 0),
+    home_service: Boolean(raw?.home_service ?? raw?.is_home_service ?? false),
+  };
+}
+
+async function fetchServiceList(endpoint: string): Promise<ApiResponse<ServiceData[]>> {
+  const res = await apiCall<unknown>(endpoint, { method: 'GET' });
+  if (!res.success) return { success: false, error: res.error };
+  return { success: true, data: asList<any>(res.data).map(normalizeService) };
+}
+
+
+// ==========================================
 // BARBER ENDPOINTS
 // ==========================================
 
