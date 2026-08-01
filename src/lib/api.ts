@@ -280,20 +280,23 @@ export async function getMyBarberProfile(): Promise<ApiResponse<BarberProfileDat
 
 export async function getBarberServices(barberId: string): Promise<ApiResponse<ServiceData[]>> {
   const qs = new URLSearchParams({ barber_id: barberId }).toString();
-  const primary = await apiCall<ServiceData[]>(`/api/services?${qs}`, { method: 'GET' });
-  if (primary.success && Array.isArray(primary.data) && primary.data.length > 0) return primary;
+  const primary = await fetchServiceList(`/api/services?${qs}`);
+  if (primary.success && primary.data && primary.data.length > 0) {
+    return { success: true, data: primary.data.filter((s) => !s.barber_id || s.barber_id === barberId) };
+  }
 
   // Fallback 1: alt route some backends expose
-  const alt = await apiCall<ServiceData[]>(`/api/barber/${barberId}/services`, { method: 'GET' });
-  if (alt.success && Array.isArray(alt.data) && alt.data.length > 0) return alt;
+  const alt = await fetchServiceList(`/api/barber/${barberId}/services`);
+  if (alt.success && alt.data && alt.data.length > 0) return alt;
 
   // Fallback 2: fetch all services and filter client-side
-  const all = await apiCall<ServiceData[]>(`/api/services`, { method: 'GET' });
-  if (all.success && Array.isArray(all.data)) {
+  const all = await fetchServiceList('/api/services');
+  if (all.success && all.data) {
     return { success: true, data: all.data.filter((s) => s.barber_id === barberId) };
   }
   return primary;
 }
+
 
 export async function getBarberBookings(): Promise<ApiResponse<BookingData[]>> {
   return apiCall<BookingData[]>('/api/booking/barber', { method: 'GET' });
