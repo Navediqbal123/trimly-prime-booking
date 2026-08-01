@@ -109,7 +109,11 @@ export default function Dashboard() {
           <div className="glass-card rounded-2xl p-8 text-center">
             <Scissors className="w-10 h-10 text-white/90 mx-auto mb-3" />
             <p className="text-white/90 text-sm">No barber shops available yet.</p>
+            {loadError && (
+              <p className="text-xs text-destructive mt-2 break-words">{loadError}</p>
+            )}
           </div>
+
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {barbers.map((b, i) => {
