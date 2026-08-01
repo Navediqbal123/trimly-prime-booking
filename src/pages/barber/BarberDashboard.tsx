@@ -68,7 +68,11 @@ export default function BarberDashboard() {
     }
     if (servicesRes.success && servicesRes.data) {
       setServices(servicesRes.data);
+    } else if (!servicesRes.success) {
+      console.error('Services fetch failed:', servicesRes.error);
+      toast.error(servicesRes.error || 'Failed to load services');
     }
+
 
     setLoading(false);
     setIsRefreshing(false);

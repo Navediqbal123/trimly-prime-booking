@@ -19,18 +19,26 @@ export default function Dashboard() {
   const { user } = useProtectedUser();
   const navigate = useNavigate();
 
-  const { data: barbers = [], isLoading } = useQuery({
+  const { data: shops, isLoading } = useQuery({
     queryKey: ['approvedBarbersHome'],
-    queryFn: async (): Promise<Barber[]> => {
+    queryFn: async (): Promise<{ list: Barber[]; error: string | null }> => {
       const res = await getApprovedBarbers();
-      if (!res.success || !res.data) return [];
-      return res.data.map((b) => ({
-        id: b.id,
-        shop_name: b.shop_name,
-        location: b.location,
-      }));
+      if (!res.success || !res.data) return { list: [], error: res.error || 'Failed to load shops' };
+      return {
+        list: res.data.map((b) => ({
+          id: b.id,
+          shop_name: b.shop_name,
+          location: b.location,
+        })),
+        error: null,
+      };
     },
+    refetchOnWindowFocus: true,
   });
+
+  const barbers = shops?.list ?? [];
+  const loadError = shops?.error ?? null;
+
 
   const { data: mediaMap = {} } = useQuery({
     queryKey: ['shopMediaMap'],
@@ -101,7 +109,11 @@ export default function Dashboard() {
           <div className="glass-card rounded-2xl p-8 text-center">
             <Scissors className="w-10 h-10 text-white/90 mx-auto mb-3" />
             <p className="text-white/90 text-sm">No barber shops available yet.</p>
+            {loadError && (
+              <p className="text-xs text-destructive mt-2 break-words">{loadError}</p>
+            )}
           </div>
+
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {barbers.map((b, i) => {

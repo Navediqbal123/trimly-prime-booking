@@ -51,6 +51,41 @@ async function apiCall<T>(
 }
 
 // ==========================================
+// RESPONSE NORMALIZERS
+// Backends may return a bare array, or wrap it as
+// { data: [] } / { services: [] } / { barbers: [] } / { results: [] }.
+// ==========================================
+
+function asList<T>(payload: unknown): T[] {
+  if (Array.isArray(payload)) return payload as T[];
+  if (payload && typeof payload === 'object') {
+    const obj = payload as Record<string, unknown>;
+    for (const key of ['data', 'services', 'barbers', 'results', 'items', 'rows']) {
+      if (Array.isArray(obj[key])) return obj[key] as T[];
+    }
+  }
+  return [];
+}
+
+function normalizeService(raw: any): ServiceData {
+  return {
+    id: String(raw?.id ?? raw?.service_id ?? raw?._id ?? ''),
+    barber_id: String(raw?.barber_id ?? raw?.barberId ?? raw?.barber?.id ?? ''),
+    name: raw?.name ?? raw?.service_name ?? raw?.title ?? 'Service',
+    price: Number(raw?.price ?? raw?.cost ?? raw?.amount ?? 0),
+    duration: Number(raw?.duration ?? raw?.duration_minutes ?? raw?.minutes ?? 0),
+    home_service: Boolean(raw?.home_service ?? raw?.is_home_service ?? false),
+  };
+}
+
+async function fetchServiceList(endpoint: string): Promise<ApiResponse<ServiceData[]>> {
+  const res = await apiCall<unknown>(endpoint, { method: 'GET' });
+  if (!res.success) return { success: false, error: res.error };
+  return { success: true, data: asList<any>(res.data).map(normalizeService) };
+}
+
+
+// ==========================================
 // BARBER ENDPOINTS
 // ==========================================
 
@@ -113,8 +148,10 @@ export async function addService(data: AddServiceData): Promise<ApiResponse> {
 }
 
 export async function getMyServices(): Promise<ApiResponse<ServiceData[]>> {
-  return apiCall<ServiceData[]>('/api/services', { method: 'GET' });
+  // Auth token is attached automatically by apiCall (barber-scoped list)
+  return fetchServiceList('/api/services');
 }
+
 
 // ==========================================
 // BOOKING ENDPOINTS
@@ -201,8 +238,11 @@ export interface PendingBarberData {
 }
 
 export async function getPendingBarbers(): Promise<ApiResponse<PendingBarberData[]>> {
-  return apiCall<PendingBarberData[]>('/api/barber/pending', { method: 'GET' });
+  const res = await apiCall<unknown>('/api/barber/pending', { method: 'GET' });
+  if (!res.success) return { success: false, error: res.error };
+  return { success: true, data: asList<PendingBarberData>(res.data) };
 }
+
 
 export interface ApprovedBarberData {
   id: string;
@@ -214,8 +254,11 @@ export interface ApprovedBarberData {
 }
 
 export async function getApprovedBarbers(): Promise<ApiResponse<ApprovedBarberData[]>> {
-  return apiCall<ApprovedBarberData[]>('/api/barber/approved', { method: 'GET' });
+  const res = await apiCall<unknown>('/api/barber/approved', { method: 'GET' });
+  if (!res.success) return { success: false, error: res.error };
+  return { success: true, data: asList<ApprovedBarberData>(res.data) };
 }
+
 
 // ==========================================
 // SERVICES ENDPOINTS
@@ -243,20 +286,23 @@ export async function getMyBarberProfile(): Promise<ApiResponse<BarberProfileDat
 
 export async function getBarberServices(barberId: string): Promise<ApiResponse<ServiceData[]>> {
   const qs = new URLSearchParams({ barber_id: barberId }).toString();
-  const primary = await apiCall<ServiceData[]>(`/api/services?${qs}`, { method: 'GET' });
-  if (primary.success && Array.isArray(primary.data) && primary.data.length > 0) return primary;
+  const primary = await fetchServiceList(`/api/services?${qs}`);
+  if (primary.success && primary.data && primary.data.length > 0) {
+    return { success: true, data: primary.data.filter((s) => !s.barber_id || s.barber_id === barberId) };
+  }
 
   // Fallback 1: alt route some backends expose
-  const alt = await apiCall<ServiceData[]>(`/api/barber/${barberId}/services`, { method: 'GET' });
-  if (alt.success && Array.isArray(alt.data) && alt.data.length > 0) return alt;
+  const alt = await fetchServiceList(`/api/barber/${barberId}/services`);
+  if (alt.success && alt.data && alt.data.length > 0) return alt;
 
   // Fallback 2: fetch all services and filter client-side
-  const all = await apiCall<ServiceData[]>(`/api/services`, { method: 'GET' });
-  if (all.success && Array.isArray(all.data)) {
+  const all = await fetchServiceList('/api/services');
+  if (all.success && all.data) {
     return { success: true, data: all.data.filter((s) => s.barber_id === barberId) };
   }
   return primary;
 }
+
 
 export async function getBarberBookings(): Promise<ApiResponse<BookingData[]>> {
   return apiCall<BookingData[]>('/api/booking/barber', { method: 'GET' });
