@@ -254,8 +254,11 @@ export interface ApprovedBarberData {
 }
 
 export async function getApprovedBarbers(): Promise<ApiResponse<ApprovedBarberData[]>> {
-  return apiCall<ApprovedBarberData[]>('/api/barber/approved', { method: 'GET' });
+  const res = await apiCall<unknown>('/api/barber/approved', { method: 'GET' });
+  if (!res.success) return { success: false, error: res.error };
+  return { success: true, data: asList<ApprovedBarberData>(res.data) };
 }
+
 
 // ==========================================
 // SERVICES ENDPOINTS
