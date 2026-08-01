@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Loader2, X, Inbox } from 'lucide-react';
+import { Bell, Loader2, X, Inbox, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getNotifications, markNotificationsRead, NotificationData } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
+
+type ProfileInfo = { name?: string | null; avatar_url?: string | null };
+
 
 function timeAgo(iso: string) {
   const d = new Date(iso).getTime();
@@ -20,16 +24,43 @@ function timeAgo(iso: string) {
 export function NotificationBell({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationData[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, ProfileInfo>>({});
   const [loading, setLoading] = useState(false);
 
   const unread = items.filter((n) => !n.read).length;
 
+  const loadProfiles = async (list: NotificationData[]) => {
+    const ids = Array.from(
+      new Set(
+        list
+          .map((n) => n.actor_id || n.customer_id || n.user_id)
+          .filter((id): id is string => !!id),
+      ),
+    );
+    if (ids.length === 0) return;
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, name, avatar_url')
+      .in('id', ids);
+    if (data) {
+      setProfiles((prev) => {
+        const next = { ...prev };
+        for (const p of data as any[]) next[p.id] = { name: p.name, avatar_url: p.avatar_url };
+        return next;
+      });
+    }
+  };
+
   const load = async () => {
     setLoading(true);
     const res = await getNotifications();
-    if (res.success && Array.isArray(res.data)) setItems(res.data);
+    if (res.success && Array.isArray(res.data)) {
+      setItems(res.data);
+      loadProfiles(res.data);
+    }
     setLoading(false);
   };
+
 
   useEffect(() => {
     load();
@@ -83,7 +114,8 @@ export function NotificationBell({ className }: { className?: string }) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[99]"
+              style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9998 }}
+              className="bg-black/40"
             />
             <motion.aside
               key="panel"
@@ -91,70 +123,92 @@ export function NotificationBell({ className }: { className?: string }) {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'tween', ease: [0.22, 1, 0.36, 1], duration: 0.45 }}
-              className="fixed inset-0 h-full w-full bg-background z-[100] flex flex-col shadow-2xl"
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                zIndex: 9999,
+                backgroundColor: '#ffffff',
+              }}
+              className="flex flex-col shadow-2xl"
             >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-black/10">
                 <div>
-                  <h2 className="text-xl font-display font-bold">Notifications</h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <h2 className="text-xl font-display font-bold text-black">Notifications</h2>
+                  <p className="text-xs text-black/60 mt-0.5">
                     {items.length} total{unread > 0 ? ` · ${unread} new` : ''}
                   </p>
                 </div>
                 <button
                   onClick={() => setOpen(false)}
                   aria-label="Close notifications"
-                  className="h-10 w-10 rounded-full flex items-center justify-center hover:bg-secondary/60 transition-colors"
+                  className="h-10 w-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-5 h-5 text-black" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-3">
                 {loading ? (
                   <div className="flex items-center justify-center py-16">
-                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                    <Loader2 className="w-6 h-6 animate-spin text-black/40" />
                   </div>
                 ) : items.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center mb-4">
-                      <Inbox className="w-8 h-8 text-muted-foreground" />
+                    <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mb-4">
+                      <Inbox className="w-8 h-8 text-black/40" />
                     </div>
-                    <p className="font-medium text-foreground">You're all caught up</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      No notifications yet
-                    </p>
+                    <p className="font-medium text-black">You're all caught up</p>
+                    <p className="text-sm text-black/60 mt-1">No notifications yet</p>
                   </div>
                 ) : (
-                  items.map((n, i) => (
-                    <motion.div
-                      key={n.id}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.03, duration: 0.25 }}
-                      className={cn(
-                        'rounded-2xl p-4 border transition-colors',
-                        !n.read
-                          ? 'bg-primary/5 border-primary/30'
-                          : 'bg-card border-border',
-                      )}
-                    >
-                      <div className="flex items-start gap-3">
-                        {!n.read && (
-                          <span className="mt-1.5 w-2 h-2 rounded-full bg-primary shrink-0" />
+                  items.map((n, i) => {
+                    const pid = n.actor_id || n.customer_id || n.user_id;
+                    const prof = pid ? profiles[pid] : undefined;
+                    const name = n.name || prof?.name || 'Barber Lane';
+                    const avatar = n.avatar_url || prof?.avatar_url || '';
+                    return (
+                      <motion.div
+                        key={n.id}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.03, duration: 0.25 }}
+                        className={cn(
+                          'rounded-2xl p-4 border transition-colors bg-white',
+                          !n.read ? 'border-primary/40 shadow-sm' : 'border-black/10',
                         )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-foreground leading-relaxed">
-                            {n.message}
-                          </p>
-                          <p className="text-[11px] text-muted-foreground mt-2">
-                            {timeAgo(n.created_at)}
-                          </p>
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-11 h-11 rounded-full overflow-hidden bg-black/5 flex items-center justify-center shrink-0">
+                            {avatar ? (
+                              <img src={avatar} alt={name} className="w-full h-full object-cover" />
+                            ) : (
+                              <User className="w-5 h-5 text-black/50" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-bold text-black truncate">{name}</p>
+                              {!n.read && (
+                                <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                              )}
+                            </div>
+                            <p className="text-sm text-black/80 leading-relaxed mt-0.5 break-words">
+                              {n.message}
+                            </p>
+                            <p className="text-[11px] text-black/50 mt-2 text-right">
+                              {timeAgo(n.created_at)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))
+                      </motion.div>
+                    );
+                  })
                 )}
               </div>
+
             </motion.aside>
           </>
         )}

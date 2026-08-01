@@ -370,6 +370,12 @@ export interface NotificationData {
   message: string;
   read: boolean;
   created_at: string;
+  user_id?: string;
+  actor_id?: string;
+  customer_id?: string;
+  barber_id?: string;
+  name?: string;
+  avatar_url?: string;
 }
 
 export async function getNotifications(): Promise<ApiResponse<NotificationData[]>> {
