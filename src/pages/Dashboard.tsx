@@ -19,18 +19,26 @@ export default function Dashboard() {
   const { user } = useProtectedUser();
   const navigate = useNavigate();
 
-  const { data: barbers = [], isLoading } = useQuery({
+  const { data: shops, isLoading } = useQuery({
     queryKey: ['approvedBarbersHome'],
-    queryFn: async (): Promise<Barber[]> => {
+    queryFn: async (): Promise<{ list: Barber[]; error: string | null }> => {
       const res = await getApprovedBarbers();
-      if (!res.success || !res.data) return [];
-      return res.data.map((b) => ({
-        id: b.id,
-        shop_name: b.shop_name,
-        location: b.location,
-      }));
+      if (!res.success || !res.data) return { list: [], error: res.error || 'Failed to load shops' };
+      return {
+        list: res.data.map((b) => ({
+          id: b.id,
+          shop_name: b.shop_name,
+          location: b.location,
+        })),
+        error: null,
+      };
     },
+    refetchOnWindowFocus: true,
   });
+
+  const barbers = shops?.list ?? [];
+  const loadError = shops?.error ?? null;
+
 
   const { data: mediaMap = {} } = useQuery({
     queryKey: ['shopMediaMap'],
