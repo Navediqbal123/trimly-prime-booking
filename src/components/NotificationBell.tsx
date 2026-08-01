@@ -24,16 +24,43 @@ function timeAgo(iso: string) {
 export function NotificationBell({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationData[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, ProfileInfo>>({});
   const [loading, setLoading] = useState(false);
 
   const unread = items.filter((n) => !n.read).length;
 
+  const loadProfiles = async (list: NotificationData[]) => {
+    const ids = Array.from(
+      new Set(
+        list
+          .map((n) => n.actor_id || n.customer_id || n.user_id)
+          .filter((id): id is string => !!id),
+      ),
+    );
+    if (ids.length === 0) return;
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, name, avatar_url')
+      .in('id', ids);
+    if (data) {
+      setProfiles((prev) => {
+        const next = { ...prev };
+        for (const p of data as any[]) next[p.id] = { name: p.name, avatar_url: p.avatar_url };
+        return next;
+      });
+    }
+  };
+
   const load = async () => {
     setLoading(true);
     const res = await getNotifications();
-    if (res.success && Array.isArray(res.data)) setItems(res.data);
+    if (res.success && Array.isArray(res.data)) {
+      setItems(res.data);
+      loadProfiles(res.data);
+    }
     setLoading(false);
   };
+
 
   useEffect(() => {
     load();
