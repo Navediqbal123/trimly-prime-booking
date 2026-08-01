@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Loader2, X, Inbox } from 'lucide-react';
+import { Bell, Loader2, X, Inbox, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getNotifications, markNotificationsRead, NotificationData } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
+
+type ProfileInfo = { name?: string | null; avatar_url?: string | null };
+
 
 function timeAgo(iso: string) {
   const d = new Date(iso).getTime();
