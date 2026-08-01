@@ -238,8 +238,11 @@ export interface PendingBarberData {
 }
 
 export async function getPendingBarbers(): Promise<ApiResponse<PendingBarberData[]>> {
-  return apiCall<PendingBarberData[]>('/api/barber/pending', { method: 'GET' });
+  const res = await apiCall<unknown>('/api/barber/pending', { method: 'GET' });
+  if (!res.success) return { success: false, error: res.error };
+  return { success: true, data: asList<PendingBarberData>(res.data) };
 }
+
 
 export interface ApprovedBarberData {
   id: string;
