@@ -13,7 +13,10 @@ export default function BarberProfile() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselected = searchParams.get('service');
-  const [selected, setSelected] = useState<string | null>(preselected);
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    preselected ? preselected.split(',').filter(Boolean) : [],
+  );
+
 
   const { data: shop, isLoading: loadingShop } = useQuery({
     queryKey: ['approvedShopProfile', shopId],
