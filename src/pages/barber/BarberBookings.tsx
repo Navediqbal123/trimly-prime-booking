@@ -63,8 +63,16 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
       </div>
 
       <div className="space-y-2 mb-4">
-        <p className="text-primary font-medium">{booking.service?.name || 'Service'}</p>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        {(booking.services && booking.services.length > 0
+          ? booking.services
+          : [{ id: booking.service_id, name: booking.service?.name || 'Service', price: booking.service?.price ?? 0, duration: booking.service?.duration }]
+        ).map((s, i) => (
+          <div key={s.id || `${s.name}-${i}`} className="flex items-center justify-between gap-3">
+            <p className="text-primary font-medium truncate">{s.name}</p>
+            <span className="text-sm font-semibold shrink-0">₹{s.price ?? 0}</span>
+          </div>
+        ))}
+        <div className="flex items-center gap-4 text-sm text-muted-foreground pt-1">
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
             <span>{new Date(booking.date).toLocaleDateString()}</span>
@@ -78,7 +86,8 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
       </div>
 
       <div className="flex items-center justify-between pt-4 border-t border-border gap-2">
-        <span className="text-lg font-bold">₹{booking.service?.price ?? 0}</span>
+        <span className="text-lg font-bold">₹{totalPrice}</span>
+
         {isPending && (
           <div className="flex items-center gap-2">
             <Button
