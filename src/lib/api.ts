@@ -195,6 +195,7 @@ export interface BookingData {
   id: string;
   barber_id: string;
   service_id: string;
+  service_ids?: string[];
   user_id?: string;
   customer_id?: string;
   date: string;
@@ -210,7 +211,16 @@ export interface BookingData {
   service?: {
     name: string;
     price: number;
+    duration?: number;
   };
+  /** Multi-service bookings: every selected service with its own price */
+  services?: {
+    id?: string;
+    name: string;
+    price: number;
+    duration?: number;
+  }[];
+
   user?: {
     name?: string;
     full_name?: string;
