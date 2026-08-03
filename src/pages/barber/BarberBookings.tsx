@@ -39,6 +39,10 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
   const isRejecting = isThisActing && acting?.action === 'rejected';
   const isApproving = isThisActing && acting?.action === 'approved';
   const disableBoth = isThisActing;
+  const totalPrice = booking.services && booking.services.length > 0
+    ? booking.services.reduce((sum, s) => sum + (Number(s.price) || 0), 0)
+    : Number(booking.service?.price ?? 0);
+
 
   return (
     <motion.div
