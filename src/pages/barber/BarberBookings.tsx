@@ -181,10 +181,26 @@ export default function BarberBookings() {
 
   const bookings = rawBookings.map((b) => {
     const s = myServices.find((x) => x.id === b.service_id);
-    return s
-      ? { ...b, service: { name: s.name, price: s.price, ...(b.service || {}) } }
-      : b;
+    const enriched = s
+      ? { ...b, service: { name: s.name, price: s.price, duration: s.duration, ...(b.service || {}) } }
+      : { ...b };
+
+    // Multi-service bookings: resolve every service id to name + own price.
+    const ids = b.service_ids && b.service_ids.length > 0 ? b.service_ids : null;
+    if (!enriched.services && ids) {
+      enriched.services = ids.map((id) => {
+        const found = myServices.find((x) => x.id === id);
+        return {
+          id,
+          name: found?.name || 'Service',
+          price: Number(found?.price ?? 0),
+          duration: found?.duration,
+        };
+      });
+    }
+    return enriched;
   });
+
 
   // Resolve real customer names from profiles (public.profiles.name) for any
   // user_id referenced by the bookings list.
