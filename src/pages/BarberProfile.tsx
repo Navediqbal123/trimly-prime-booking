@@ -63,12 +63,17 @@ export default function BarberProfile() {
 
   const { rating, reviews } = shopRating(shop.id);
   const description = shopDescription(shop.id);
-  const svc = services.find((s) => s.id === selected);
+  const chosen = services.filter((s) => selectedIds.includes(s.id));
+  const total = chosen.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
+
+  const toggle = (id: string) =>
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const goBook = () => {
-    if (!selected) return;
-    navigate(`/book/${shop.id}?service=${selected}`);
+    if (chosen.length === 0) return;
+    navigate(`/book/${shop.id}?service=${selectedIds.join(',')}`);
   };
+
 
   return (
     <div className="animate-fade-in pt-2 lg:pt-0 pb-8">
