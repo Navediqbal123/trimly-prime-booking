@@ -133,20 +133,34 @@ export default function BookingPage() {
   });
 
   const loadingData = loadingShop || loadingServices;
-  const selectedServiceData = services.find((s) => s.id === selectedService);
+  const chosenServices = services.filter((s) => selectedServices.includes(s.id));
+  const totalPrice = chosenServices.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
+  const totalDuration = chosenServices.reduce((sum, s) => sum + (Number(s.duration) || 0), 0);
+  const anyHomeService = chosenServices.some((s) => s.home_service);
+
+  const toggleService = (id: string) => {
+    setSelectedServices((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
 
   useEffect(() => {
-    if (preselectedServiceId && !selectedService && services.length > 0) {
-      const match = services.find((s) => s.id === preselectedServiceId);
-      if (match) setSelectedService(match.id);
+    if (!anyHomeService && homeService) setHomeService(false);
+  }, [anyHomeService, homeService]);
+
+  useEffect(() => {
+    if (preselectedServiceId && selectedServices.length === 0 && services.length > 0) {
+      const ids = preselectedServiceId.split(',').filter((id) => services.some((s) => s.id === id));
+      if (ids.length > 0) setSelectedServices(ids);
     }
-  }, [preselectedServiceId, services, selectedService]);
+  }, [preselectedServiceId, services, selectedServices.length]);
 
   useEffect(() => {
     if (selectedTime && bookedSlots.includes(selectedTime)) {
       setSelectedTime(null);
     }
   }, [bookedSlots, selectedTime]);
+
 
   const handleBook = async () => {
     if (!selectedService || !selectedDate || !selectedTime) {
