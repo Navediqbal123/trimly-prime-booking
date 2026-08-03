@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Loader2, X, Inbox, User } from 'lucide-react';
+import { Bell, Loader2, ArrowLeft, Inbox, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getNotifications, markNotificationsRead, NotificationData } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
@@ -119,14 +119,14 @@ export function NotificationBell({ className }: { className?: string }) {
             />
             <motion.aside
               key="panel"
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'tween', ease: [0.22, 1, 0.36, 1], duration: 0.45 }}
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', ease: [0.22, 1, 0.36, 1], duration: 0.4 }}
               style={{
                 position: 'fixed',
                 top: 0,
-                left: 0,
+                right: 0,
                 width: '100vw',
                 height: '100vh',
                 zIndex: 9999,
@@ -134,21 +134,22 @@ export function NotificationBell({ className }: { className?: string }) {
               }}
               className="flex flex-col shadow-2xl"
             >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-black/10">
-                <div>
+              <div className="flex items-center gap-3 px-4 py-4 border-b border-black/10">
+                <button
+                  onClick={() => setOpen(false)}
+                  aria-label="Back"
+                  className="h-10 w-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors shrink-0"
+                >
+                  <ArrowLeft className="w-6 h-6 text-black" />
+                </button>
+                <div className="min-w-0">
                   <h2 className="text-xl font-display font-bold text-black">Notifications</h2>
                   <p className="text-xs text-black/60 mt-0.5">
                     {items.length} total{unread > 0 ? ` · ${unread} new` : ''}
                   </p>
                 </div>
-                <button
-                  onClick={() => setOpen(false)}
-                  aria-label="Close notifications"
-                  className="h-10 w-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors"
-                >
-                  <X className="w-5 h-5 text-black" />
-                </button>
               </div>
+
 
               <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-3">
                 {loading ? (

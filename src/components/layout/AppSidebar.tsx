@@ -92,8 +92,18 @@ export function AppSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Button + Brand (hides on scroll down, shows on scroll up) */}
-      <HideOnScroll className="fixed top-0 left-0 right-0 z-50 lg:hidden">
+      {/* Mobile Menu Button + Brand (fixed at top, always visible) */}
+      <div
+        className="lg:hidden"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          zIndex: 1000,
+          backgroundColor: '#ffffff',
+        }}
+      >
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">
             <Button
@@ -122,7 +132,8 @@ export function AppSidebar() {
           </div>
           <NotificationBell />
         </div>
-      </HideOnScroll>
+      </div>
+
 
       {/* Mobile Overlay */}
       <AnimatePresence>
