@@ -21,7 +21,7 @@ import {
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/NotificationBell';
-import { HideOnScroll } from '@/components/layout/HideOnScroll';
+
 import { cn } from '@/lib/utils';
 
 interface NavItemType {
