@@ -159,11 +159,15 @@ export async function getMyServices(): Promise<ApiResponse<ServiceData[]>> {
 
 export interface CreateBookingData {
   barber_id: string;
+  /** Primary service (first selected) — kept for backend compatibility */
   service_id: string;
+  /** All selected services for multi-service bookings */
+  service_ids?: string[];
   date: string;
   time_slot: string;
   home_service: boolean;
 }
+
 
 export async function checkSlotAvailability(
   barber_id: string,
@@ -191,6 +195,7 @@ export interface BookingData {
   id: string;
   barber_id: string;
   service_id: string;
+  service_ids?: string[];
   user_id?: string;
   customer_id?: string;
   date: string;
@@ -206,7 +211,16 @@ export interface BookingData {
   service?: {
     name: string;
     price: number;
+    duration?: number;
   };
+  /** Multi-service bookings: every selected service with its own price */
+  services?: {
+    id?: string;
+    name: string;
+    price: number;
+    duration?: number;
+  }[];
+
   user?: {
     name?: string;
     full_name?: string;

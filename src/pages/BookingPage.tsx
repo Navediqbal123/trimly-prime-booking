@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { createBooking, getApprovedBarbers, getPendingBarbers, getBarberServices, checkSlotAvailability } from '@/lib/api';
@@ -38,11 +38,12 @@ export default function BookingPage() {
   const preselectedServiceId = searchParams.get('service');
 
 
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [homeService, setHomeService] = useState(false);
   const [loading, setLoading] = useState(false);
+
 
   const { data: shop, isLoading: loadingShop } = useQuery({
     queryKey: ['barber', shopId],
@@ -132,14 +133,27 @@ export default function BookingPage() {
   });
 
   const loadingData = loadingShop || loadingServices;
-  const selectedServiceData = services.find((s) => s.id === selectedService);
+  const chosenServices = services.filter((s) => selectedServices.includes(s.id));
+  const totalPrice = chosenServices.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
+  const totalDuration = chosenServices.reduce((sum, s) => sum + (Number(s.duration) || 0), 0);
+  const anyHomeService = chosenServices.some((s) => s.home_service);
+
+  const toggleService = (id: string) => {
+    setSelectedServices((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
 
   useEffect(() => {
-    if (preselectedServiceId && !selectedService && services.length > 0) {
-      const match = services.find((s) => s.id === preselectedServiceId);
-      if (match) setSelectedService(match.id);
+    if (!anyHomeService && homeService) setHomeService(false);
+  }, [anyHomeService, homeService]);
+
+  useEffect(() => {
+    if (preselectedServiceId && selectedServices.length === 0 && services.length > 0) {
+      const ids = preselectedServiceId.split(',').filter((id) => services.some((s) => s.id === id));
+      if (ids.length > 0) setSelectedServices(ids);
     }
-  }, [preselectedServiceId, services, selectedService]);
+  }, [preselectedServiceId, services, selectedServices.length]);
 
   useEffect(() => {
     if (selectedTime && bookedSlots.includes(selectedTime)) {
@@ -147,13 +161,14 @@ export default function BookingPage() {
     }
   }, [bookedSlots, selectedTime]);
 
+
   const handleBook = async () => {
-    if (!selectedService || !selectedDate || !selectedTime) {
-      toast.error('Please select a service, date and time');
+    if (selectedServices.length === 0 || !selectedDate || !selectedTime) {
+      toast.error('Please select at least one service, a date and time');
       return;
     }
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!shopId || !uuidRegex.test(shopId) || !uuidRegex.test(selectedService)) {
+    if (!shopId || !uuidRegex.test(shopId) || !selectedServices.every((id) => uuidRegex.test(id))) {
       toast.error('Invalid IDs');
       return;
     }
@@ -175,11 +190,13 @@ export default function BookingPage() {
 
     const response = await createBooking({
       barber_id: shopId,
-      service_id: selectedService,
+      service_id: selectedServices[0],
+      service_ids: selectedServices,
       date: dateStr,
       time_slot: selectedTime,
       home_service: homeService,
     });
+
 
     if (response.success) {
       toast.success('Booking confirmed!');
@@ -259,47 +276,65 @@ export default function BookingPage() {
           </div>
         </motion.div>
 
-        {/* Service */}
+        {/* Services — multi-select */}
         <section className="mb-8">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-black/60 mb-3">Service</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-black/60">
+              Services
+            </h2>
+            <span className="text-[11px] text-black/50">
+              {selectedServices.length > 0
+                ? `${selectedServices.length} selected`
+                : 'Select one or more'}
+            </span>
+          </div>
           {services.length === 0 ? (
             <div className="rounded-2xl p-8 text-center bg-white border border-black/10">
               <Scissors className="w-9 h-9 text-black/30 mx-auto mb-2" />
               <p className="text-sm text-black/60">No services added yet by this barber.</p>
             </div>
           ) : (
-            <Select
-              value={selectedService ?? undefined}
-              onValueChange={(val) => {
-                setSelectedService(val);
-                const svc = services.find((s) => s.id === val);
-                if (svc && !svc.home_service) setHomeService(false);
-              }}
-            >
-              <SelectTrigger className="w-full h-14 bg-white border border-black/15 rounded-xl px-4 text-black hover:border-black/40 transition-colors">
-                <SelectValue placeholder="Choose a service" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-black/10 text-black">
-                {services.map((service) => (
-                  <SelectItem key={service.id} value={service.id} className="py-3 text-black focus:bg-black/5 focus:text-black">
-                    <div className="flex items-center justify-between gap-6 w-full">
-                      <div className="flex flex-col text-left">
-                        <span className="font-medium text-sm flex items-center gap-1.5">
-                          {service.name}
-                          {service.home_service && <Home className="w-3 h-3 text-black" />}
-                        </span>
-                        <span className="text-[11px] text-black/60 flex items-center gap-1 mt-0.5">
-                          <Clock className="w-3 h-3" /> {service.duration} min
-                        </span>
-                      </div>
-                      <span className="text-sm font-semibold text-black">₹{service.price}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2.5">
+              {services.map((service) => {
+                const active = selectedServices.includes(service.id);
+                return (
+                  <button
+                    key={service.id}
+                    type="button"
+                    onClick={() => toggleService(service.id)}
+                    className={cn(
+                      'w-full text-left rounded-2xl p-4 border-2 bg-white text-black transition-all flex items-center gap-4',
+                      active
+                        ? 'border-gold shadow-[0_0_20px_-6px_hsl(var(--gold)/0.6)]'
+                        : 'border-black/10 hover:border-gold/60',
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-all',
+                        active ? 'bg-gold border-gold' : 'border-black/25',
+                      )}
+                    >
+                      {active && <Check className="w-4 h-4 text-black" />}
+                    </span>
+                    <span className="flex-1 min-w-0">
+                      <span className="font-semibold text-black flex items-center gap-1.5 truncate">
+                        {service.name}
+                        {service.home_service && <Home className="w-3.5 h-3.5 text-gold shrink-0" />}
+                      </span>
+                      <span className="text-[11px] text-black/60 flex items-center gap-1 mt-0.5">
+                        <Clock className="w-3 h-3" /> {service.duration} min
+                      </span>
+                    </span>
+                    <span className="text-lg font-bold text-black shrink-0">₹{service.price}</span>
+                  </button>
+                );
+              })}
+            </div>
           )}
         </section>
+
+
 
         {/* Date — dark calendar */}
         <section className="mb-8">
@@ -367,7 +402,7 @@ export default function BookingPage() {
             <p className="text-xs text-black/50 mt-2">Checking availability…</p>
           )}
 
-          {selectedServiceData?.home_service && (
+          {anyHomeService && (
             <div className="mt-5 p-4 rounded-xl bg-white border border-black/10 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <Home className="w-4 h-4 text-black" />
@@ -394,35 +429,58 @@ export default function BookingPage() {
           <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-black/60 mb-3">Summary</h2>
           <div className="rounded-2xl bg-[#0d0d0d] border border-gold/30 p-5 text-white">
             <div className="space-y-3 text-sm">
-              {[
-                ['Service', selectedServiceData?.name || '—'],
-                ['Date', selectedDate ? format(selectedDate, 'EEE, MMM d') : '—'],
-                ['Time', selectedTime || '—'],
-                ['Duration', selectedServiceData ? `${selectedServiceData.duration} min` : '—'],
-              ].map(([label, value]) => (
-                <div key={label} className="flex justify-between items-center">
-                  <span className="text-white/55">{label}</span>
-                  <span className="text-white font-medium">{value}</span>
-                </div>
-              ))}
-              {selectedServiceData && (
-                <div className="flex justify-between items-center">
-                  <span className="text-white/55">Price</span>
-                  <span className="text-white font-medium">₹{selectedServiceData.price}</span>
-                </div>
-              )}
-              {homeService && (
-                <div className="flex justify-between items-center">
-                  <span className="text-white/55">Type</span>
-                  <span className="font-medium flex items-center gap-1 text-gold">
-                    <Home className="w-3 h-3" /> Home Service
-                  </span>
-                </div>
-              )}
+              {/* Selected services, each listed with its own price */}
+              <div className="space-y-2.5">
+                <span className="text-[11px] uppercase tracking-[0.16em] text-white/45">
+                  Selected Services
+                </span>
+                {chosenServices.length === 0 ? (
+                  <p className="text-white/55">No services selected yet</p>
+                ) : (
+                  chosenServices.map((s) => (
+                    <div key={s.id} className="flex justify-between items-start gap-3">
+                      <div className="min-w-0">
+                        <p className="text-white font-medium truncate">{s.name}</p>
+                        <p className="text-[11px] text-white/45 flex items-center gap-1 mt-0.5">
+                          <Clock className="w-3 h-3" /> {s.duration} min
+                        </p>
+                      </div>
+                      <span className="text-white font-semibold shrink-0">₹{s.price}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="border-t border-white/10 pt-3 space-y-3">
+                {[
+                  ['Date', selectedDate ? format(selectedDate, 'EEE, MMM d') : '—'],
+                  ['Time', selectedTime || '—'],
+                  ['Total Duration', totalDuration > 0 ? `${totalDuration} min` : '—'],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex justify-between items-center">
+                    <span className="text-white/55">{label}</span>
+                    <span className="text-white font-medium">{value}</span>
+                  </div>
+                ))}
+                {homeService && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-white/55">Type</span>
+                    <span className="font-medium flex items-center gap-1 text-gold">
+                      <Home className="w-3 h-3" /> Home Service
+                    </span>
+                  </div>
+                )}
+              </div>
+
               <div className="border-t border-white/10 pt-4 mt-4 flex justify-between items-center">
-                <span className="text-sm font-medium text-white/70">Total</span>
+                <span className="text-sm font-medium text-white/70">
+                  Grand Total
+                  {chosenServices.length > 1 && (
+                    <span className="text-white/40"> ({chosenServices.length} services)</span>
+                  )}
+                </span>
                 <span className="text-3xl font-bold leading-none gradient-gold-text">
-                  ₹{selectedServiceData?.price ?? 0}
+                  ₹{totalPrice}
                 </span>
               </div>
             </div>
@@ -431,7 +489,8 @@ export default function BookingPage() {
 
         <Button
           onClick={handleBook}
-          disabled={loading || !selectedService || !selectedDate || !selectedTime}
+          disabled={loading || selectedServices.length === 0 || !selectedDate || !selectedTime}
+
           className="w-full h-14 btn-gold font-semibold text-base rounded-xl disabled:opacity-40 transition-all shadow-[0_8px_30px_-8px_hsl(var(--gold)/0.6)]"
         >
           {loading ? (

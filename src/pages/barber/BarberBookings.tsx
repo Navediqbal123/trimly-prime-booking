@@ -39,6 +39,10 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
   const isRejecting = isThisActing && acting?.action === 'rejected';
   const isApproving = isThisActing && acting?.action === 'approved';
   const disableBoth = isThisActing;
+  const totalPrice = booking.services && booking.services.length > 0
+    ? booking.services.reduce((sum, s) => sum + (Number(s.price) || 0), 0)
+    : Number(booking.service?.price ?? 0);
+
 
   return (
     <motion.div
@@ -63,8 +67,16 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
       </div>
 
       <div className="space-y-2 mb-4">
-        <p className="text-primary font-medium">{booking.service?.name || 'Service'}</p>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        {(booking.services && booking.services.length > 0
+          ? booking.services
+          : [{ id: booking.service_id, name: booking.service?.name || 'Service', price: booking.service?.price ?? 0, duration: booking.service?.duration }]
+        ).map((s, i) => (
+          <div key={s.id || `${s.name}-${i}`} className="flex items-center justify-between gap-3">
+            <p className="text-primary font-medium truncate">{s.name}</p>
+            <span className="text-sm font-semibold shrink-0">₹{s.price ?? 0}</span>
+          </div>
+        ))}
+        <div className="flex items-center gap-4 text-sm text-muted-foreground pt-1">
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
             <span>{new Date(booking.date).toLocaleDateString()}</span>
@@ -78,7 +90,8 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
       </div>
 
       <div className="flex items-center justify-between pt-4 border-t border-border gap-2">
-        <span className="text-lg font-bold">₹{booking.service?.price ?? 0}</span>
+        <span className="text-lg font-bold">₹{totalPrice}</span>
+
         {isPending && (
           <div className="flex items-center gap-2">
             <Button
@@ -168,10 +181,26 @@ export default function BarberBookings() {
 
   const bookings = rawBookings.map((b) => {
     const s = myServices.find((x) => x.id === b.service_id);
-    return s
-      ? { ...b, service: { name: s.name, price: s.price, ...(b.service || {}) } }
-      : b;
+    const enriched = s
+      ? { ...b, service: { name: s.name, price: s.price, duration: s.duration, ...(b.service || {}) } }
+      : { ...b };
+
+    // Multi-service bookings: resolve every service id to name + own price.
+    const ids = b.service_ids && b.service_ids.length > 0 ? b.service_ids : null;
+    if (!enriched.services && ids) {
+      enriched.services = ids.map((id) => {
+        const found = myServices.find((x) => x.id === id);
+        return {
+          id,
+          name: found?.name || 'Service',
+          price: Number(found?.price ?? 0),
+          duration: found?.duration,
+        };
+      });
+    }
+    return enriched;
   });
+
 
   // Resolve real customer names from profiles (public.profiles.name) for any
   // user_id referenced by the bookings list.

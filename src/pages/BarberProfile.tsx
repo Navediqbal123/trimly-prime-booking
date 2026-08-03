@@ -13,7 +13,10 @@ export default function BarberProfile() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselected = searchParams.get('service');
-  const [selected, setSelected] = useState<string | null>(preselected);
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    preselected ? preselected.split(',').filter(Boolean) : [],
+  );
+
 
   const { data: shop, isLoading: loadingShop } = useQuery({
     queryKey: ['approvedShopProfile', shopId],
@@ -35,8 +38,9 @@ export default function BarberProfile() {
   });
 
   useEffect(() => {
-    if (!selected && services.length > 0) setSelected(services[0].id);
-  }, [services, selected]);
+    if (selectedIds.length === 0 && services.length > 0) setSelectedIds([services[0].id]);
+  }, [services, selectedIds.length]);
+
 
   if (loadingShop || loadingServices) {
     return (
@@ -59,12 +63,17 @@ export default function BarberProfile() {
 
   const { rating, reviews } = shopRating(shop.id);
   const description = shopDescription(shop.id);
-  const svc = services.find((s) => s.id === selected);
+  const chosen = services.filter((s) => selectedIds.includes(s.id));
+  const total = chosen.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
+
+  const toggle = (id: string) =>
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const goBook = () => {
-    if (!selected) return;
-    navigate(`/book/${shop.id}?service=${selected}`);
+    if (chosen.length === 0) return;
+    navigate(`/book/${shop.id}?service=${selectedIds.join(',')}`);
   };
+
 
   return (
     <div className="animate-fade-in pt-2 lg:pt-0 pb-8">
@@ -125,22 +134,30 @@ export default function BarberProfile() {
         ) : (
           <div className="space-y-2.5">
             {services.map((s, i) => {
-              const active = selected === s.id;
+              const active = selectedIds.includes(s.id);
               return (
                 <motion.button
                   key={s.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.03 }}
-                  onClick={() => setSelected(s.id)}
+                  onClick={() => toggle(s.id)}
                   className={cn(
-                    'w-full text-left rounded-2xl p-4 border-2 transition-all flex items-center justify-between gap-4 bg-white text-black',
+                    'w-full text-left rounded-2xl p-4 border-2 transition-all flex items-center gap-4 bg-white text-black',
                     active
                       ? 'border-gold shadow-[0_0_20px_-6px_hsl(var(--gold)/0.6)]'
                       : 'border-black/10 hover:border-gold/60',
                   )}
                 >
-                  <div className="min-w-0">
+                  <span
+                    className={cn(
+                      'w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-all',
+                      active ? 'bg-gold border-gold' : 'border-black/25',
+                    )}
+                  >
+                    {active && <Check className="w-4 h-4 text-black" />}
+                  </span>
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-display font-semibold text-black truncate">{s.name}</span>
                       {s.home_service && <HomeIcon className="w-3.5 h-3.5 text-gold shrink-0" />}
@@ -149,14 +166,7 @@ export default function BarberProfile() {
                       <Clock className="w-3 h-3" /> {s.duration} min
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-lg font-bold text-black">₹{s.price}</span>
-                    {active && (
-                      <span className="w-6 h-6 rounded-full bg-gold flex items-center justify-center">
-                        <Check className="w-3.5 h-3.5 text-black" />
-                      </span>
-                    )}
-                  </div>
+                  <span className="text-lg font-bold text-black shrink-0">₹{s.price}</span>
                 </motion.button>
               );
             })}
@@ -166,11 +176,16 @@ export default function BarberProfile() {
 
       <Button
         onClick={goBook}
-        disabled={!svc}
+        disabled={chosen.length === 0}
         className="w-full h-14 btn-gold font-semibold text-base rounded-xl disabled:opacity-40 shadow-[0_8px_30px_-8px_hsl(var(--gold)/0.6)]"
       >
-        {svc ? <>Book {svc.name} · ₹{svc.price}</> : 'Select a service'}
+        {chosen.length === 0
+          ? 'Select a service'
+          : chosen.length === 1
+            ? `Book ${chosen[0].name} · ₹${total}`
+            : `Book ${chosen.length} services · ₹${total}`}
       </Button>
+
     </div>
   );
 }
