@@ -163,12 +163,12 @@ export default function BookingPage() {
 
 
   const handleBook = async () => {
-    if (!selectedService || !selectedDate || !selectedTime) {
-      toast.error('Please select a service, date and time');
+    if (selectedServices.length === 0 || !selectedDate || !selectedTime) {
+      toast.error('Please select at least one service, a date and time');
       return;
     }
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!shopId || !uuidRegex.test(shopId) || !uuidRegex.test(selectedService)) {
+    if (!shopId || !uuidRegex.test(shopId) || !selectedServices.every((id) => uuidRegex.test(id))) {
       toast.error('Invalid IDs');
       return;
     }
@@ -190,11 +190,13 @@ export default function BookingPage() {
 
     const response = await createBooking({
       barber_id: shopId,
-      service_id: selectedService,
+      service_id: selectedServices[0],
+      service_ids: selectedServices,
       date: dateStr,
       time_slot: selectedTime,
       home_service: homeService,
     });
+
 
     if (response.success) {
       toast.success('Booking confirmed!');
