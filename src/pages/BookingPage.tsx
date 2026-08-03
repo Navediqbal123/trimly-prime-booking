@@ -38,11 +38,12 @@ export default function BookingPage() {
   const preselectedServiceId = searchParams.get('service');
 
 
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [homeService, setHomeService] = useState(false);
   const [loading, setLoading] = useState(false);
+
 
   const { data: shop, isLoading: loadingShop } = useQuery({
     queryKey: ['barber', shopId],
