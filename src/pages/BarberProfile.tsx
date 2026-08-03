@@ -38,8 +38,9 @@ export default function BarberProfile() {
   });
 
   useEffect(() => {
-    if (!selected && services.length > 0) setSelected(services[0].id);
-  }, [services, selected]);
+    if (selectedIds.length === 0 && services.length > 0) setSelectedIds([services[0].id]);
+  }, [services, selectedIds.length]);
+
 
   if (loadingShop || loadingServices) {
     return (
