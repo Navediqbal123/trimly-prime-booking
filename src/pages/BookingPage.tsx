@@ -402,7 +402,7 @@ export default function BookingPage() {
             <p className="text-xs text-black/50 mt-2">Checking availability…</p>
           )}
 
-          {selectedServiceData?.home_service && (
+          {anyHomeService && (
             <div className="mt-5 p-4 rounded-xl bg-white border border-black/10 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <Home className="w-4 h-4 text-black" />
@@ -429,35 +429,58 @@ export default function BookingPage() {
           <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-black/60 mb-3">Summary</h2>
           <div className="rounded-2xl bg-[#0d0d0d] border border-gold/30 p-5 text-white">
             <div className="space-y-3 text-sm">
-              {[
-                ['Service', selectedServiceData?.name || '—'],
-                ['Date', selectedDate ? format(selectedDate, 'EEE, MMM d') : '—'],
-                ['Time', selectedTime || '—'],
-                ['Duration', selectedServiceData ? `${selectedServiceData.duration} min` : '—'],
-              ].map(([label, value]) => (
-                <div key={label} className="flex justify-between items-center">
-                  <span className="text-white/55">{label}</span>
-                  <span className="text-white font-medium">{value}</span>
-                </div>
-              ))}
-              {selectedServiceData && (
-                <div className="flex justify-between items-center">
-                  <span className="text-white/55">Price</span>
-                  <span className="text-white font-medium">₹{selectedServiceData.price}</span>
-                </div>
-              )}
-              {homeService && (
-                <div className="flex justify-between items-center">
-                  <span className="text-white/55">Type</span>
-                  <span className="font-medium flex items-center gap-1 text-gold">
-                    <Home className="w-3 h-3" /> Home Service
-                  </span>
-                </div>
-              )}
+              {/* Selected services, each listed with its own price */}
+              <div className="space-y-2.5">
+                <span className="text-[11px] uppercase tracking-[0.16em] text-white/45">
+                  Selected Services
+                </span>
+                {chosenServices.length === 0 ? (
+                  <p className="text-white/55">No services selected yet</p>
+                ) : (
+                  chosenServices.map((s) => (
+                    <div key={s.id} className="flex justify-between items-start gap-3">
+                      <div className="min-w-0">
+                        <p className="text-white font-medium truncate">{s.name}</p>
+                        <p className="text-[11px] text-white/45 flex items-center gap-1 mt-0.5">
+                          <Clock className="w-3 h-3" /> {s.duration} min
+                        </p>
+                      </div>
+                      <span className="text-white font-semibold shrink-0">₹{s.price}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="border-t border-white/10 pt-3 space-y-3">
+                {[
+                  ['Date', selectedDate ? format(selectedDate, 'EEE, MMM d') : '—'],
+                  ['Time', selectedTime || '—'],
+                  ['Total Duration', totalDuration > 0 ? `${totalDuration} min` : '—'],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex justify-between items-center">
+                    <span className="text-white/55">{label}</span>
+                    <span className="text-white font-medium">{value}</span>
+                  </div>
+                ))}
+                {homeService && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-white/55">Type</span>
+                    <span className="font-medium flex items-center gap-1 text-gold">
+                      <Home className="w-3 h-3" /> Home Service
+                    </span>
+                  </div>
+                )}
+              </div>
+
               <div className="border-t border-white/10 pt-4 mt-4 flex justify-between items-center">
-                <span className="text-sm font-medium text-white/70">Total</span>
+                <span className="text-sm font-medium text-white/70">
+                  Grand Total
+                  {chosenServices.length > 1 && (
+                    <span className="text-white/40"> ({chosenServices.length} services)</span>
+                  )}
+                </span>
                 <span className="text-3xl font-bold leading-none gradient-gold-text">
-                  ₹{selectedServiceData?.price ?? 0}
+                  ₹{totalPrice}
                 </span>
               </div>
             </div>
@@ -466,7 +489,8 @@ export default function BookingPage() {
 
         <Button
           onClick={handleBook}
-          disabled={loading || !selectedService || !selectedDate || !selectedTime}
+          disabled={loading || selectedServices.length === 0 || !selectedDate || !selectedTime}
+
           className="w-full h-14 btn-gold font-semibold text-base rounded-xl disabled:opacity-40 transition-all shadow-[0_8px_30px_-8px_hsl(var(--gold)/0.6)]"
         >
           {loading ? (
