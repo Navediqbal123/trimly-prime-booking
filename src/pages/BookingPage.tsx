@@ -276,47 +276,65 @@ export default function BookingPage() {
           </div>
         </motion.div>
 
-        {/* Service */}
+        {/* Services — multi-select */}
         <section className="mb-8">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-black/60 mb-3">Service</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-black/60">
+              Services
+            </h2>
+            <span className="text-[11px] text-black/50">
+              {selectedServices.length > 0
+                ? `${selectedServices.length} selected`
+                : 'Select one or more'}
+            </span>
+          </div>
           {services.length === 0 ? (
             <div className="rounded-2xl p-8 text-center bg-white border border-black/10">
               <Scissors className="w-9 h-9 text-black/30 mx-auto mb-2" />
               <p className="text-sm text-black/60">No services added yet by this barber.</p>
             </div>
           ) : (
-            <Select
-              value={selectedService ?? undefined}
-              onValueChange={(val) => {
-                setSelectedService(val);
-                const svc = services.find((s) => s.id === val);
-                if (svc && !svc.home_service) setHomeService(false);
-              }}
-            >
-              <SelectTrigger className="w-full h-14 bg-white border border-black/15 rounded-xl px-4 text-black hover:border-black/40 transition-colors">
-                <SelectValue placeholder="Choose a service" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-black/10 text-black">
-                {services.map((service) => (
-                  <SelectItem key={service.id} value={service.id} className="py-3 text-black focus:bg-black/5 focus:text-black">
-                    <div className="flex items-center justify-between gap-6 w-full">
-                      <div className="flex flex-col text-left">
-                        <span className="font-medium text-sm flex items-center gap-1.5">
-                          {service.name}
-                          {service.home_service && <Home className="w-3 h-3 text-black" />}
-                        </span>
-                        <span className="text-[11px] text-black/60 flex items-center gap-1 mt-0.5">
-                          <Clock className="w-3 h-3" /> {service.duration} min
-                        </span>
-                      </div>
-                      <span className="text-sm font-semibold text-black">₹{service.price}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2.5">
+              {services.map((service) => {
+                const active = selectedServices.includes(service.id);
+                return (
+                  <button
+                    key={service.id}
+                    type="button"
+                    onClick={() => toggleService(service.id)}
+                    className={cn(
+                      'w-full text-left rounded-2xl p-4 border-2 bg-white text-black transition-all flex items-center gap-4',
+                      active
+                        ? 'border-gold shadow-[0_0_20px_-6px_hsl(var(--gold)/0.6)]'
+                        : 'border-black/10 hover:border-gold/60',
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-all',
+                        active ? 'bg-gold border-gold' : 'border-black/25',
+                      )}
+                    >
+                      {active && <Check className="w-4 h-4 text-black" />}
+                    </span>
+                    <span className="flex-1 min-w-0">
+                      <span className="font-semibold text-black flex items-center gap-1.5 truncate">
+                        {service.name}
+                        {service.home_service && <Home className="w-3.5 h-3.5 text-gold shrink-0" />}
+                      </span>
+                      <span className="text-[11px] text-black/60 flex items-center gap-1 mt-0.5">
+                        <Clock className="w-3 h-3" /> {service.duration} min
+                      </span>
+                    </span>
+                    <span className="text-lg font-bold text-black shrink-0">₹{service.price}</span>
+                  </button>
+                );
+              })}
+            </div>
           )}
         </section>
+
+
 
         {/* Date — dark calendar */}
         <section className="mb-8">
