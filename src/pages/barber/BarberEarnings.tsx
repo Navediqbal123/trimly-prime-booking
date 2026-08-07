@@ -114,7 +114,7 @@ export default function BarberEarnings() {
     last7Days.forEach(b => {
       try {
         const d = format(parseISO(b.date), 'MMM dd');
-        if (days[d] !== undefined) days[d] += b.service?.price || 0;
+        if (days[d] !== undefined) days[d] += amountOf(b);
       } catch {}
     });
     return Object.entries(days).map(([date, amount]) => ({ date, amount }));
