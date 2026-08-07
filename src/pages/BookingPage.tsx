@@ -195,6 +195,7 @@ export default function BookingPage() {
       date: dateStr,
       time_slot: selectedTime,
       home_service: homeService,
+      total_amount: totalPrice,
     });
 
 

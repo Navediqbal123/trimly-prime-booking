@@ -4,6 +4,7 @@ import { IndianRupee, TrendingUp, Calendar, Loader2, RefreshCw } from 'lucide-re
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 import { getBarberBookings, getMyServices, BookingData, ServiceData } from '@/lib/api';
 import { format, subDays, isAfter, parseISO } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
@@ -11,6 +12,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 export default function BarberEarnings() {
   const [rawBookings, setRawBookings] = useState<BookingData[]>([]);
   const [services, setServices] = useState<ServiceData[]>([]);
+  const [nameMap, setNameMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
@@ -23,6 +25,30 @@ export default function BarberEarnings() {
   };
 
   useEffect(() => { fetchData(); }, []);
+
+  // Customer names are fetched separately (no join on profiles) using
+  // customer_id / user_id from the bookings response.
+  useEffect(() => {
+    const ids = Array.from(
+      new Set(
+        rawBookings
+          .map((b) => b.customer_id || b.user_id)
+          .filter((v): v is string => !!v),
+      ),
+    );
+    if (ids.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.from('profiles').select('id, name').in('id', ids);
+      if (error || cancelled) return;
+      const map: Record<string, string> = {};
+      for (const row of data || []) {
+        if (row?.id) map[row.id as string] = (row as { name?: string }).name || '';
+      }
+      setNameMap(map);
+    })();
+    return () => { cancelled = true; };
+  }, [rawBookings]);
 
   const serviceMap = useMemo(() => {
     const m = new Map<string, ServiceData>();
@@ -40,14 +66,31 @@ export default function BarberEarnings() {
     [rawBookings, serviceMap]
   );
 
+  /** Total value of a booking: multi-service sum when present, else single service price. */
+  const amountOf = (b: BookingData) => {
+    if (b.services && b.services.length > 0) {
+      return b.services.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
+    }
+    if (b.service_ids && b.service_ids.length > 0) {
+      const sum = b.service_ids.reduce((acc, id) => acc + (Number(serviceMap.get(id)?.price) || 0), 0);
+      if (sum > 0) return sum;
+    }
+    return Number(b.service?.price) || 0;
+  };
+
+  const nameFor = (b: BookingData) => {
+    const uid = b.customer_id || b.user_id;
+    return b.user?.full_name || b.user?.name || (uid ? nameMap[uid] : '') || 'Customer';
+  };
+
   const completedBookings = useMemo(
     () => bookings.filter(b => b.status === 'completed'),
     [bookings]
   );
 
   const totalEarnings = useMemo(
-    () => completedBookings.reduce((sum, b) => sum + (b.service?.price || 0), 0),
-    [completedBookings]
+    () => completedBookings.reduce((sum, b) => sum + amountOf(b), 0),
+    [completedBookings, serviceMap]
   );
 
   const last7Days = useMemo(() => {
@@ -58,8 +101,8 @@ export default function BarberEarnings() {
   }, [completedBookings]);
 
   const weeklyEarnings = useMemo(
-    () => last7Days.reduce((sum, b) => sum + (b.service?.price || 0), 0),
-    [last7Days]
+    () => last7Days.reduce((sum, b) => sum + amountOf(b), 0),
+    [last7Days, serviceMap]
   );
 
   const chartData = useMemo(() => {
@@ -71,7 +114,7 @@ export default function BarberEarnings() {
     last7Days.forEach(b => {
       try {
         const d = format(parseISO(b.date), 'MMM dd');
-        if (days[d] !== undefined) days[d] += b.service?.price || 0;
+        if (days[d] !== undefined) days[d] += amountOf(b);
       } catch {}
     });
     return Object.entries(days).map(([date, amount]) => ({ date, amount }));
@@ -185,12 +228,17 @@ export default function BarberEarnings() {
               {completedBookings.slice(0, 10).map(b => (
                 <div key={b.id} className="flex items-center justify-between py-3 border-b border-border last:border-0">
                   <div>
-                    <p className="font-medium">{b.service?.name || 'Service'}</p>
+                    <p className="font-medium">
+                      {(b.services && b.services.length > 0
+                        ? b.services.map(s => s.name).join(', ')
+                        : b.service?.name) || 'Service'}
+                    </p>
+                    <p className="text-sm text-muted-foreground">{nameFor(b)}</p>
                     <p className="text-sm text-muted-foreground">
                       {b.date} • {b.time_slot}
                     </p>
                   </div>
-                  <span className="font-bold text-green-500">₹{b.service?.price || 0}</span>
+                  <span className="font-bold text-green-500">₹{amountOf(b)}</span>
                 </div>
               ))}
             </div>

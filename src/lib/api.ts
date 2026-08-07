@@ -166,6 +166,8 @@ export interface CreateBookingData {
   date: string;
   time_slot: string;
   home_service: boolean;
+  /** Combined price of all selected services */
+  total_amount?: number;
 }
 
 
