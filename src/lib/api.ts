@@ -222,6 +222,17 @@ export interface BookingData {
     price: number;
     duration?: number;
   }[];
+  /** Backend alias for the multi-service array */
+  services_list?: {
+    id?: string;
+    name: string;
+    price: number;
+    duration?: number;
+  }[];
+  /** Extra charge applied for home service, when the backend provides one */
+  home_service_price?: number;
+  home_service_charge?: number;
+  total_amount?: number;
 
   user?: {
     name?: string;

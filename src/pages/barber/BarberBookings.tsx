@@ -39,58 +39,88 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
   const isRejecting = isThisActing && acting?.action === 'rejected';
   const isApproving = isThisActing && acting?.action === 'approved';
   const disableBoth = isThisActing;
-  const totalPrice = booking.services && booking.services.length > 0
-    ? booking.services.reduce((sum, s) => sum + (Number(s.price) || 0), 0)
-    : Number(booking.service?.price ?? 0);
 
+  const serviceList =
+    booking.services_list && booking.services_list.length > 0
+      ? booking.services_list
+      : booking.services && booking.services.length > 0
+        ? booking.services
+        : [{
+            id: booking.service_id,
+            name: booking.service?.name || 'Service',
+            price: Number(booking.service?.price ?? 0),
+            duration: booking.service?.duration,
+          }];
+
+  const homeCharge = Number(booking.home_service_price ?? booking.home_service_charge ?? 0);
+  const servicesTotal = serviceList.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
+  const grandTotal = servicesTotal + (booking.home_service ? homeCharge : 0);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card border border-border rounded-xl p-5 hover:border-primary/50 transition-all"
+      className="bg-card border border-border rounded-2xl p-5 shadow-sm hover:border-primary/50 hover:shadow-md transition-all duration-300"
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
             <User className="w-5 h-5 text-primary" />
           </div>
-          <div>
-            <p className="font-medium">{customerName}</p>
-            <p className="text-sm text-muted-foreground">Booking #{booking.id.slice(0, 8)}</p>
+          <div className="min-w-0">
+            <p className="font-semibold text-base truncate">{customerName}</p>
+            <p className="text-xs text-muted-foreground">Booking #{booking.id.slice(0, 8)}</p>
           </div>
         </div>
-        <span className={cn('flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium', config.className)}>
+        <span className={cn('flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium shrink-0', config.className)}>
           <StatusIcon className="w-3 h-3" />
           {config.label}
         </span>
       </div>
 
-      <div className="space-y-2 mb-4">
-        {(booking.services && booking.services.length > 0
-          ? booking.services
-          : [{ id: booking.service_id, name: booking.service?.name || 'Service', price: booking.service?.price ?? 0, duration: booking.service?.duration }]
-        ).map((s, i) => (
-          <div key={s.id || `${s.name}-${i}`} className="flex items-center justify-between gap-3">
-            <p className="text-primary font-medium truncate">{s.name}</p>
-            <span className="text-sm font-semibold shrink-0">₹{s.price ?? 0}</span>
-          </div>
-        ))}
-        <div className="flex items-center gap-4 text-sm text-muted-foreground pt-1">
-          <div className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" />
-            <span>{new Date(booking.date).toLocaleDateString()}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
-            <span>{booking.time_slot}</span>
-          </div>
+      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
+        <div className="flex items-center gap-1.5">
+          <Calendar className="w-4 h-4" />
+          <span>{new Date(booking.date).toLocaleDateString('en-IN')}</span>
         </div>
-        {booking.home_service && <div className="text-sm text-green-500">🏠 Home Service</div>}
+        <div className="flex items-center gap-1.5">
+          <Clock className="w-4 h-4" />
+          <span>{booking.time_slot}</span>
+        </div>
       </div>
 
-      <div className="flex items-center justify-between pt-4 border-t border-border gap-2">
-        <span className="text-lg font-bold">₹{totalPrice}</span>
+      <div className="rounded-xl border border-border/70 bg-muted/30 divide-y divide-border/70 overflow-hidden mb-4">
+        <p className="px-4 py-2 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+          Services ({serviceList.length})
+        </p>
+        {serviceList.map((s, i) => (
+          <div key={s.id || `${s.name}-${i}`} className="flex items-start justify-between gap-3 px-4 py-3">
+            <div className="min-w-0">
+              <p className="font-medium truncate">{s.name}</p>
+              {s.duration ? (
+                <p className="text-xs text-muted-foreground mt-0.5">{s.duration} min</p>
+              ) : null}
+            </div>
+            <span className="font-semibold shrink-0">₹{Number(s.price ?? 0)}</span>
+          </div>
+        ))}
+        {booking.home_service && (
+          <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
+              🏠 Home Service
+            </span>
+            <span className="font-semibold shrink-0">
+              {homeCharge > 0 ? `₹${homeCharge}` : 'Included'}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-border">
+        <div>
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Grand Total</p>
+          <span className="text-xl font-bold">₹{grandTotal}</span>
+        </div>
 
         {isPending && (
           <div className="flex items-center gap-2">
@@ -115,6 +145,7 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
           </div>
         )}
       </div>
+
 
       {booking.status === 'approved' && (
         <div className="mt-4 pt-4 border-t border-border">
@@ -185,18 +216,31 @@ export default function BarberBookings() {
       ? { ...b, service: { name: s.name, price: s.price, duration: s.duration, ...(b.service || {}) } }
       : { ...b };
 
-    // Multi-service bookings: resolve every service id to name + own price.
-    const ids = b.service_ids && b.service_ids.length > 0 ? b.service_ids : null;
-    if (!enriched.services && ids) {
-      enriched.services = ids.map((id) => {
-        const found = myServices.find((x) => x.id === id);
+    // Multi-service bookings: prefer services_list from the API, then service_ids.
+    const list = b.services_list && b.services_list.length > 0 ? b.services_list : null;
+    if (list) {
+      enriched.services_list = list.map((item, i) => {
+        const found = myServices.find((x) => x.id === item.id);
         return {
-          id,
-          name: found?.name || 'Service',
-          price: Number(found?.price ?? 0),
-          duration: found?.duration,
+          id: item.id ?? `svc-${i}`,
+          name: item.name || found?.name || 'Service',
+          price: Number(item.price ?? found?.price ?? 0),
+          duration: item.duration ?? found?.duration,
         };
       });
+    } else {
+      const ids = b.service_ids && b.service_ids.length > 0 ? b.service_ids : null;
+      if (!enriched.services && ids) {
+        enriched.services = ids.map((id) => {
+          const found = myServices.find((x) => x.id === id);
+          return {
+            id,
+            name: found?.name || 'Service',
+            price: Number(found?.price ?? 0),
+            duration: found?.duration,
+          };
+        });
+      }
     }
     return enriched;
   });
