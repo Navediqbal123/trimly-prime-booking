@@ -216,18 +216,31 @@ export default function BarberBookings() {
       ? { ...b, service: { name: s.name, price: s.price, duration: s.duration, ...(b.service || {}) } }
       : { ...b };
 
-    // Multi-service bookings: resolve every service id to name + own price.
-    const ids = b.service_ids && b.service_ids.length > 0 ? b.service_ids : null;
-    if (!enriched.services && ids) {
-      enriched.services = ids.map((id) => {
-        const found = myServices.find((x) => x.id === id);
+    // Multi-service bookings: prefer services_list from the API, then service_ids.
+    const list = b.services_list && b.services_list.length > 0 ? b.services_list : null;
+    if (list) {
+      enriched.services_list = list.map((item, i) => {
+        const found = myServices.find((x) => x.id === item.id);
         return {
-          id,
-          name: found?.name || 'Service',
-          price: Number(found?.price ?? 0),
-          duration: found?.duration,
+          id: item.id ?? `svc-${i}`,
+          name: item.name || found?.name || 'Service',
+          price: Number(item.price ?? found?.price ?? 0),
+          duration: item.duration ?? found?.duration,
         };
       });
+    } else {
+      const ids = b.service_ids && b.service_ids.length > 0 ? b.service_ids : null;
+      if (!enriched.services && ids) {
+        enriched.services = ids.map((id) => {
+          const found = myServices.find((x) => x.id === id);
+          return {
+            id,
+            name: found?.name || 'Service',
+            price: Number(found?.price ?? 0),
+            duration: found?.duration,
+          };
+        });
+      }
     }
     return enriched;
   });
