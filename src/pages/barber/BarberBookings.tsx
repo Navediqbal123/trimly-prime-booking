@@ -186,6 +186,9 @@ export default function BarberBookings() {
   const [acting, setActing] = useState<{ id: string; action: 'approved' | 'rejected' } | null>(null);
   const [otpInputs, setOtpInputs] = useState<Record<string, string>>({});
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  // Optimistic status overrides keyed by booking id (applied instantly on click).
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
+
 
   const {
     data: rawBookings = [],
