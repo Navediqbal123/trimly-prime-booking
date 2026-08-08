@@ -248,8 +248,42 @@ export default function BarberBookings() {
         });
       }
     }
+    enriched.status = statusOverrides[b.id] || b.status;
     return enriched;
   });
+
+  // Group bookings with the same customer + date + time slot into a single card,
+  // merging all of their services together.
+  const groupedBookings: GroupedBooking[] = (() => {
+    const map = new Map<string, GroupedBooking>();
+    for (const b of bookings) {
+      const uid = b.user_id || b.customer_id || 'unknown';
+      const key = `${uid}|${b.date}|${b.time_slot}|${b.status}`;
+      const items =
+        b.services_list && b.services_list.length > 0
+          ? b.services_list
+          : b.services && b.services.length > 0
+            ? b.services
+            : [{
+                id: b.service_id,
+                name: b.service?.name || 'Service',
+                price: Number(b.service?.price ?? 0),
+                duration: b.service?.duration,
+              }];
+      const existing = map.get(key);
+      if (existing) {
+        existing.ids.push(b.id);
+        existing.services_list = [...(existing.services_list || []), ...items];
+        existing.home_service = existing.home_service || b.home_service;
+        if (!existing.otp && b.otp) existing.otp = b.otp;
+      } else {
+        map.set(key, { ...b, ids: [b.id], services_list: items });
+      }
+    }
+    return Array.from(map.values());
+  })();
+
+
 
 
   // Resolve real customer names from profiles (public.profiles.name) for any
