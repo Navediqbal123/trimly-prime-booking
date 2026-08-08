@@ -26,6 +26,7 @@ export function NotificationBell({ className }: { className?: string }) {
   const [items, setItems] = useState<NotificationData[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ProfileInfo>>({});
   const [loading, setLoading] = useState(false);
+  const [, setTick] = useState(0);
 
   const unread = items.filter((n) => !n.read).length;
 
