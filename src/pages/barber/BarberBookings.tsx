@@ -19,11 +19,13 @@ const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; cl
   cancelled: { icon: XCircle, label: 'Cancelled', className: 'text-red-500 bg-red-500/10' },
 };
 
+type GroupedBooking = BookingData & { ids: string[] };
+
 type BookingCardProps = {
-  booking: BookingData;
+  booking: GroupedBooking;
   customerName: string;
   acting: { id: string; action: 'approved' | 'rejected' } | null;
-  onStatus: (e: React.MouseEvent, id: string, status: 'approved' | 'rejected') => void;
+  onStatus: (e: React.MouseEvent, ids: string[], status: 'approved' | 'rejected') => void;
   otpValue: string;
   onOtpChange: (v: string) => void;
   onVerify: () => void;
@@ -35,10 +37,11 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
   const config = statusConfig[status] || statusConfig.pending;
   const StatusIcon = config.icon;
   const isPending = booking.status === 'pending';
-  const isThisActing = acting?.id === booking.id;
+  const isThisActing = !!acting && booking.ids.includes(acting.id);
   const isRejecting = isThisActing && acting?.action === 'rejected';
   const isApproving = isThisActing && acting?.action === 'approved';
   const disableBoth = isThisActing;
+
 
   const serviceList =
     booking.services_list && booking.services_list.length > 0
