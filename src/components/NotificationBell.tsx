@@ -11,14 +11,14 @@ type ProfileInfo = { name?: string | null; avatar_url?: string | null };
 function timeAgo(iso: string) {
   const d = new Date(iso).getTime();
   if (isNaN(d)) return '';
-  const s = Math.floor((Date.now() - d) / 1000);
-  if (s < 60) return `${s}s ago`;
+  const s = Math.max(0, Math.floor((Date.now() - d) / 1000));
+  if (s < 60) return 'Just now';
   const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m ago`;
+  if (m < 60) return m === 1 ? '1 min ago' : `${m} min ago`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
+  if (h < 24) return h === 1 ? '1 hour ago' : `${h} hours ago`;
   const day = Math.floor(h / 24);
-  return `${day}d ago`;
+  return day === 1 ? '1 day ago' : `${day} days ago`;
 }
 
 export function NotificationBell({ className }: { className?: string }) {
