@@ -114,21 +114,9 @@ export function AppSidebar() {
             >
               {isOpen ? <X /> : <Menu />}
             </Button>
-            <AnimatePresence>
-              {!isOpen && (
-                <motion.div
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -8 }}
-                  transition={{ duration: 0.25, ease: 'easeOut' }}
-                  className="flex items-center"
-                >
-                  <span className="text-3xl sm:text-4xl font-display font-extrabold tracking-wide" style={{ color: '#000000' }}>
-                    Barber Lane
-                  </span>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <span className="text-3xl sm:text-4xl font-display font-extrabold tracking-wide" style={{ color: '#000000' }}>
+              Barber Lane
+            </span>
           </div>
           <NotificationBell />
         </div>

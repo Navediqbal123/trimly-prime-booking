@@ -11,14 +11,14 @@ type ProfileInfo = { name?: string | null; avatar_url?: string | null };
 function timeAgo(iso: string) {
   const d = new Date(iso).getTime();
   if (isNaN(d)) return '';
-  const s = Math.floor((Date.now() - d) / 1000);
-  if (s < 60) return `${s}s ago`;
+  const s = Math.max(0, Math.floor((Date.now() - d) / 1000));
+  if (s < 60) return 'Just now';
   const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m ago`;
+  if (m < 60) return m === 1 ? '1 min ago' : `${m} min ago`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
+  if (h < 24) return h === 1 ? '1 hour ago' : `${h} hours ago`;
   const day = Math.floor(h / 24);
-  return `${day}d ago`;
+  return day === 1 ? '1 day ago' : `${day} days ago`;
 }
 
 export function NotificationBell({ className }: { className?: string }) {
@@ -26,6 +26,7 @@ export function NotificationBell({ className }: { className?: string }) {
   const [items, setItems] = useState<NotificationData[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ProfileInfo>>({});
   const [loading, setLoading] = useState(false);
+  const [, setTick] = useState(0);
 
   const unread = items.filter((n) => !n.read).length;
 
@@ -64,8 +65,13 @@ export function NotificationBell({ className }: { className?: string }) {
 
   useEffect(() => {
     load();
-    const t = setInterval(load, 60000);
-    return () => clearInterval(t);
+    const t = setInterval(load, 30000);
+    // Re-render every 20s so relative timestamps stay live.
+    const tick = setInterval(() => setTick((v) => v + 1), 20000);
+    return () => {
+      clearInterval(t);
+      clearInterval(tick);
+    };
   }, []);
 
   useEffect(() => {

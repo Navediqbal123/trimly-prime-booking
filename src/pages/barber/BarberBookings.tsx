@@ -337,8 +337,9 @@ export default function BarberBookings() {
     try {
       const res = await verifyBookingOtp(bookingId, otp);
       if (res.success) {
-        toast.success('OTP verified — booking completed');
+        toast.success('Service Completed');
         setOtpInputs((p) => ({ ...p, [bookingId]: '' }));
+        setStatusOverrides((p) => ({ ...p, [bookingId]: 'completed' }));
         qc.invalidateQueries({ queryKey: ['barberBookings'] });
         qc.invalidateQueries({ queryKey: ['myBookings'] });
         qc.invalidateQueries({ queryKey: ['bookedSlots'] });
