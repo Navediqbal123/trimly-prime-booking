@@ -350,51 +350,62 @@ export default function BarberBookings() {
     }
   };
 
-  const handleStatus = async (
+  const handleStatus = (
     e: React.MouseEvent,
-    id: string,
+    ids: string[],
     status: 'approved' | 'rejected',
   ) => {
     e.preventDefault();
     e.stopPropagation();
     if (acting) return;
-    setActing({ id, action: status });
-    try {
-      const res = await updateBookingStatus(id, status);
-      if (res.success) {
-        toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
-        qc.invalidateQueries({ queryKey: ['barberBookings'] });
-        qc.invalidateQueries({ queryKey: ['myBookings'] });
-        qc.invalidateQueries({ queryKey: ['bookedSlots'] });
-      } else {
-        toast.error(res.error || 'Action failed');
+
+    // Optimistic: flip status instantly, then confirm with the API in background.
+    setStatusOverrides((p) => {
+      const next = { ...p };
+      for (const id of ids) next[id] = status;
+      return next;
+    });
+    toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
+
+    void (async () => {
+      const results = await Promise.all(ids.map((id) => updateBookingStatus(id, status)));
+      const failed = results.some((r) => !r.success);
+      if (failed) {
+        toast.error(results.find((r) => !r.success)?.error || 'Action failed, reverted');
+        setStatusOverrides((p) => {
+          const next = { ...p };
+          for (const id of ids) delete next[id];
+          return next;
+        });
       }
-    } finally {
-      setActing(null);
-    }
+      qc.invalidateQueries({ queryKey: ['barberBookings'] });
+      qc.invalidateQueries({ queryKey: ['myBookings'] });
+      qc.invalidateQueries({ queryKey: ['bookedSlots'] });
+    })();
   };
 
-  const pendingBookings = bookings.filter((b) => b.status === 'pending');
-  const upcomingBookings = bookings.filter(
+  const pendingBookings = groupedBookings.filter((b) => b.status === 'pending');
+  const upcomingBookings = groupedBookings.filter(
     (b) => b.status === 'pending' || b.status === 'confirmed' || b.status === 'approved'
   );
-  const pastBookings = bookings.filter(
+  const pastBookings = groupedBookings.filter(
     (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected'
   );
 
-  const renderBookingCard = (booking: BookingData) => (
+  const renderBookingCard = (booking: GroupedBooking) => (
     <BookingCard
-      key={booking.id}
+      key={booking.ids.join('-')}
       booking={booking}
       customerName={nameFor(booking)}
       acting={acting}
       onStatus={handleStatus}
-      otpValue={otpInputs[booking.id] || ''}
-      onOtpChange={(v) => setOtpInputs((p) => ({ ...p, [booking.id]: v }))}
-      onVerify={() => handleVerifyOtp(booking.id)}
-      verifying={verifyingId === booking.id}
+      otpValue={otpInputs[booking.ids[0]] || ''}
+      onOtpChange={(v) => setOtpInputs((p) => ({ ...p, [booking.ids[0]]: v }))}
+      onVerify={() => handleVerifyOtp(booking.ids[0])}
+      verifying={verifyingId === booking.ids[0]}
     />
   );
+
 
   if (loading) {
     return (
