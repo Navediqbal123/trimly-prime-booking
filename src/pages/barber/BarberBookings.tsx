@@ -131,7 +131,7 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
               type="button"
               size="sm"
               disabled={disableBoth}
-              onClick={(e) => onStatus(e, booking.id, 'rejected')}
+              onClick={(e) => onStatus(e, booking.ids, 'rejected')}
               className="bg-red-500 hover:bg-red-600 text-white disabled:opacity-60"
             >
               {isRejecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" /> Reject</>}
@@ -140,7 +140,7 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
               type="button"
               size="sm"
               disabled={disableBoth}
-              onClick={(e) => onStatus(e, booking.id, 'approved')}
+              onClick={(e) => onStatus(e, booking.ids, 'approved')}
               className="bg-green-500 hover:bg-green-600 text-white disabled:opacity-60"
             >
               {isApproving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" /> Accept</>}
