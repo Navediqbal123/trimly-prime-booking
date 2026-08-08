@@ -65,8 +65,13 @@ export function NotificationBell({ className }: { className?: string }) {
 
   useEffect(() => {
     load();
-    const t = setInterval(load, 60000);
-    return () => clearInterval(t);
+    const t = setInterval(load, 30000);
+    // Re-render every 20s so relative timestamps stay live.
+    const tick = setInterval(() => setTick((v) => v + 1), 20000);
+    return () => {
+      clearInterval(t);
+      clearInterval(tick);
+    };
   }, []);
 
   useEffect(() => {
