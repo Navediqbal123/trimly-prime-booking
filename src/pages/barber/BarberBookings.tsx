@@ -19,11 +19,13 @@ const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; cl
   cancelled: { icon: XCircle, label: 'Cancelled', className: 'text-red-500 bg-red-500/10' },
 };
 
+type GroupedBooking = BookingData & { ids: string[] };
+
 type BookingCardProps = {
-  booking: BookingData;
+  booking: GroupedBooking;
   customerName: string;
   acting: { id: string; action: 'approved' | 'rejected' } | null;
-  onStatus: (e: React.MouseEvent, id: string, status: 'approved' | 'rejected') => void;
+  onStatus: (e: React.MouseEvent, ids: string[], status: 'approved' | 'rejected') => void;
   otpValue: string;
   onOtpChange: (v: string) => void;
   onVerify: () => void;
@@ -35,10 +37,11 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
   const config = statusConfig[status] || statusConfig.pending;
   const StatusIcon = config.icon;
   const isPending = booking.status === 'pending';
-  const isThisActing = acting?.id === booking.id;
+  const isThisActing = !!acting && booking.ids.includes(acting.id);
   const isRejecting = isThisActing && acting?.action === 'rejected';
   const isApproving = isThisActing && acting?.action === 'approved';
   const disableBoth = isThisActing;
+
 
   const serviceList =
     booking.services_list && booking.services_list.length > 0
@@ -128,7 +131,7 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
               type="button"
               size="sm"
               disabled={disableBoth}
-              onClick={(e) => onStatus(e, booking.id, 'rejected')}
+              onClick={(e) => onStatus(e, booking.ids, 'rejected')}
               className="bg-red-500 hover:bg-red-600 text-white disabled:opacity-60"
             >
               {isRejecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" /> Reject</>}
@@ -137,7 +140,7 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
               type="button"
               size="sm"
               disabled={disableBoth}
-              onClick={(e) => onStatus(e, booking.id, 'approved')}
+              onClick={(e) => onStatus(e, booking.ids, 'approved')}
               className="bg-green-500 hover:bg-green-600 text-white disabled:opacity-60"
             >
               {isApproving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" /> Accept</>}
@@ -183,6 +186,9 @@ export default function BarberBookings() {
   const [acting, setActing] = useState<{ id: string; action: 'approved' | 'rejected' } | null>(null);
   const [otpInputs, setOtpInputs] = useState<Record<string, string>>({});
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  // Optimistic status overrides keyed by booking id (applied instantly on click).
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
+
 
   const {
     data: rawBookings = [],
@@ -242,8 +248,42 @@ export default function BarberBookings() {
         });
       }
     }
+    enriched.status = statusOverrides[b.id] || b.status;
     return enriched;
   });
+
+  // Group bookings with the same customer + date + time slot into a single card,
+  // merging all of their services together.
+  const groupedBookings: GroupedBooking[] = (() => {
+    const map = new Map<string, GroupedBooking>();
+    for (const b of bookings) {
+      const uid = b.user_id || b.customer_id || 'unknown';
+      const key = `${uid}|${b.date}|${b.time_slot}|${b.status}`;
+      const items =
+        b.services_list && b.services_list.length > 0
+          ? b.services_list
+          : b.services && b.services.length > 0
+            ? b.services
+            : [{
+                id: b.service_id,
+                name: b.service?.name || 'Service',
+                price: Number(b.service?.price ?? 0),
+                duration: b.service?.duration,
+              }];
+      const existing = map.get(key);
+      if (existing) {
+        existing.ids.push(b.id);
+        existing.services_list = [...(existing.services_list || []), ...items];
+        existing.home_service = existing.home_service || b.home_service;
+        if (!existing.otp && b.otp) existing.otp = b.otp;
+      } else {
+        map.set(key, { ...b, ids: [b.id], services_list: items });
+      }
+    }
+    return Array.from(map.values());
+  })();
+
+
 
 
   // Resolve real customer names from profiles (public.profiles.name) for any
@@ -310,51 +350,62 @@ export default function BarberBookings() {
     }
   };
 
-  const handleStatus = async (
+  const handleStatus = (
     e: React.MouseEvent,
-    id: string,
+    ids: string[],
     status: 'approved' | 'rejected',
   ) => {
     e.preventDefault();
     e.stopPropagation();
     if (acting) return;
-    setActing({ id, action: status });
-    try {
-      const res = await updateBookingStatus(id, status);
-      if (res.success) {
-        toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
-        qc.invalidateQueries({ queryKey: ['barberBookings'] });
-        qc.invalidateQueries({ queryKey: ['myBookings'] });
-        qc.invalidateQueries({ queryKey: ['bookedSlots'] });
-      } else {
-        toast.error(res.error || 'Action failed');
+
+    // Optimistic: flip status instantly, then confirm with the API in background.
+    setStatusOverrides((p) => {
+      const next = { ...p };
+      for (const id of ids) next[id] = status;
+      return next;
+    });
+    toast.success(status === 'approved' ? 'Booking accepted' : 'Booking rejected');
+
+    void (async () => {
+      const results = await Promise.all(ids.map((id) => updateBookingStatus(id, status)));
+      const failed = results.some((r) => !r.success);
+      if (failed) {
+        toast.error(results.find((r) => !r.success)?.error || 'Action failed, reverted');
+        setStatusOverrides((p) => {
+          const next = { ...p };
+          for (const id of ids) delete next[id];
+          return next;
+        });
       }
-    } finally {
-      setActing(null);
-    }
+      qc.invalidateQueries({ queryKey: ['barberBookings'] });
+      qc.invalidateQueries({ queryKey: ['myBookings'] });
+      qc.invalidateQueries({ queryKey: ['bookedSlots'] });
+    })();
   };
 
-  const pendingBookings = bookings.filter((b) => b.status === 'pending');
-  const upcomingBookings = bookings.filter(
+  const pendingBookings = groupedBookings.filter((b) => b.status === 'pending');
+  const upcomingBookings = groupedBookings.filter(
     (b) => b.status === 'pending' || b.status === 'confirmed' || b.status === 'approved'
   );
-  const pastBookings = bookings.filter(
+  const pastBookings = groupedBookings.filter(
     (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected'
   );
 
-  const renderBookingCard = (booking: BookingData) => (
+  const renderBookingCard = (booking: GroupedBooking) => (
     <BookingCard
-      key={booking.id}
+      key={booking.ids.join('-')}
       booking={booking}
       customerName={nameFor(booking)}
       acting={acting}
       onStatus={handleStatus}
-      otpValue={otpInputs[booking.id] || ''}
-      onOtpChange={(v) => setOtpInputs((p) => ({ ...p, [booking.id]: v }))}
-      onVerify={() => handleVerifyOtp(booking.id)}
-      verifying={verifyingId === booking.id}
+      otpValue={otpInputs[booking.ids[0]] || ''}
+      onOtpChange={(v) => setOtpInputs((p) => ({ ...p, [booking.ids[0]]: v }))}
+      onVerify={() => handleVerifyOtp(booking.ids[0])}
+      verifying={verifyingId === booking.ids[0]}
     />
   );
+
 
   if (loading) {
     return (
