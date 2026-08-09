@@ -35,9 +35,9 @@ export default function MyBookings() {
       if (!res.success) throw new Error(res.error || 'Failed to fetch bookings');
       return res.data || [];
     },
-    // Real-time freshness: poll every 10s + refetch on focus so new/updated
+    // Real-time freshness: poll every 15s + refetch on focus so new/updated
     // bookings show without a manual refresh.
-    refetchInterval: 10000,
+    refetchInterval: 15000,
     refetchOnWindowFocus: true,
     staleTime: 0,
   });
