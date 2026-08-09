@@ -66,6 +66,17 @@ export default function MyBookings() {
     const status = booking.status as keyof typeof statusConfig;
     const config = statusConfig[status] || statusConfig.pending;
     const StatusIcon = config.icon;
+    const services =
+      booking.services_list && booking.services_list.length > 0
+        ? booking.services_list
+        : booking.services && booking.services.length > 0
+          ? booking.services
+          : booking.service
+            ? [{ id: booking.service_id, name: booking.service.name, price: booking.service.price }]
+            : [];
+    const total =
+      Number(booking.total_amount ?? 0) ||
+      services.reduce((sum, s) => sum + Number(s.price ?? 0), 0);
 
     return (
       <motion.div
