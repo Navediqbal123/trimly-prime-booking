@@ -25,7 +25,7 @@ export default function MyBookings() {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   // Keep "Just now / 2 min ago" labels live between refetches.
-  useTimeTick(20000);
+  useTimeTick(60000);
 
 
   const { data: bookings = [], isLoading: loading, isFetching, refetch } = useQuery({
