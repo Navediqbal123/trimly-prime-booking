@@ -4,22 +4,10 @@ import { Bell, Loader2, ArrowLeft, Inbox, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getNotifications, markNotificationsRead, NotificationData } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
+import { timeAgo, useTimeTick } from '@/lib/timeAgo';
 
 type ProfileInfo = { name?: string | null; avatar_url?: string | null };
 
-
-function timeAgo(iso: string) {
-  const d = new Date(iso).getTime();
-  if (isNaN(d)) return '';
-  const s = Math.max(0, Math.floor((Date.now() - d) / 1000));
-  if (s < 60) return 'Just now';
-  const m = Math.floor(s / 60);
-  if (m < 60) return m === 1 ? '1 min ago' : `${m} min ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return h === 1 ? '1 hour ago' : `${h} hours ago`;
-  const day = Math.floor(h / 24);
-  return day === 1 ? '1 day ago' : `${day} days ago`;
-}
 
 export function NotificationBell({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
