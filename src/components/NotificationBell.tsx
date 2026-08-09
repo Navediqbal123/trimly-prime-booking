@@ -41,27 +41,24 @@ export function NotificationBell({ className }: { className?: string }) {
     }
   };
 
-  const load = async () => {
-    setLoading(true);
+  const load = async (silent = false) => {
+    if (!silent) setLoading(true);
     const res = await getNotifications();
     if (res.success && Array.isArray(res.data)) {
       setItems(res.data);
       loadProfiles(res.data);
     }
-    setLoading(false);
+    if (!silent) setLoading(false);
   };
 
 
   useEffect(() => {
     load();
-    const t = setInterval(load, 30000);
-    // Re-render every 20s so relative timestamps stay live.
-    const tick = setInterval(() => setTick((v) => v + 1), 20000);
-    return () => {
-      clearInterval(t);
-      clearInterval(tick);
-    };
+    // Refresh notifications + unread badge count every 30s in the background.
+    const t = setInterval(() => load(true), 30000);
+    return () => clearInterval(t);
   }, []);
+
 
   useEffect(() => {
     if (open) {
