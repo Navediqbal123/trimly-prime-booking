@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { getBarberBookings, getMyServices, updateBookingStatus, verifyBookingOtp, BookingData } from '@/lib/api';
+import { timeAgo, useTimeTick } from '@/lib/timeAgo';
 import { supabase } from '@/lib/supabase';
 
 const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; className: string }> = {
