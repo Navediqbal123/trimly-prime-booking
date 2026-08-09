@@ -80,11 +80,27 @@ export default function MyBookings() {
               <h3 className="font-semibold">{booking.barber?.shop_name || 'Barber Shop'}</h3>
               <p className="text-sm text-primary">{booking.service?.name || 'Service'}</p>
             </div>
-            <span className={cn('flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium', config.className)}>
-              <StatusIcon className="w-3 h-3" />
-              {config.label}
-            </span>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <span className={cn('flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium', config.className)}>
+                <StatusIcon className="w-3 h-3" />
+                {config.label}
+              </span>
+              {booking.created_at && (
+                <span className="text-[11px] text-muted-foreground">{timeAgo(booking.created_at)}</span>
+              )}
+            </div>
           </div>
+
+          {services.length > 1 && (
+            <div className="mt-3 rounded-xl border border-border/70 divide-y divide-border/70 overflow-hidden">
+              {services.map((s, i) => (
+                <div key={s.id || `${s.name}-${i}`} className="flex items-center justify-between px-3 py-2 text-sm">
+                  <span className="truncate">{s.name || 'Service'}</span>
+                  <span className="font-semibold shrink-0">₹{Number(s.price ?? 0)}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-3">
             <div className="flex items-center gap-1">
@@ -95,12 +111,11 @@ export default function MyBookings() {
               <Clock className="w-4 h-4" />
               <span>{booking.time_slot}</span>
             </div>
-            {booking.service?.price != null && (
-              <div className="flex items-center gap-1">
-                <span className="font-medium text-foreground">₹{booking.service.price}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-1">
+              <span className="font-medium text-foreground">₹{total}</span>
+            </div>
           </div>
+
 
           {booking.status === 'approved' && booking.otp && (
             <motion.div
