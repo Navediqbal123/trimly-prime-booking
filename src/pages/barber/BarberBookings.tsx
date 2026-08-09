@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { getBarberBookings, getMyServices, updateBookingStatus, verifyBookingOtp, BookingData } from '@/lib/api';
+import { timeAgo, useTimeTick } from '@/lib/timeAgo';
 import { supabase } from '@/lib/supabase';
 
 const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; className: string }> = {
@@ -72,7 +73,10 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
           </div>
           <div className="min-w-0">
             <p className="font-semibold text-base truncate">{customerName}</p>
-            <p className="text-xs text-muted-foreground">Booking #{booking.id.slice(0, 8)}</p>
+            <p className="text-xs text-muted-foreground">
+              Booking #{booking.id.slice(0, 8)}
+              {booking.created_at ? ` · ${timeAgo(booking.created_at)}` : ''}
+            </p>
           </div>
         </div>
         <span className={cn('flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium shrink-0', config.className)}>
@@ -80,6 +84,7 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
           {config.label}
         </span>
       </div>
+
 
       <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
         <div className="flex items-center gap-1.5">
@@ -188,6 +193,8 @@ export default function BarberBookings() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   // Optimistic status overrides keyed by booking id (applied instantly on click).
   const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
+  // Keep relative "Just now / 5 min ago" labels live.
+  useTimeTick(20000);
 
 
   const {
@@ -202,7 +209,7 @@ export default function BarberBookings() {
       if (!res.success) throw new Error(res.error || 'Failed to fetch bookings');
       return res.data || [];
     },
-    refetchInterval: 10000,
+    refetchInterval: 15000,
     refetchOnWindowFocus: true,
     staleTime: 0,
   });

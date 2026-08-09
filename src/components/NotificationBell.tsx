@@ -4,29 +4,18 @@ import { Bell, Loader2, ArrowLeft, Inbox, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getNotifications, markNotificationsRead, NotificationData } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
+import { timeAgo, useTimeTick } from '@/lib/timeAgo';
 
 type ProfileInfo = { name?: string | null; avatar_url?: string | null };
 
-
-function timeAgo(iso: string) {
-  const d = new Date(iso).getTime();
-  if (isNaN(d)) return '';
-  const s = Math.max(0, Math.floor((Date.now() - d) / 1000));
-  if (s < 60) return 'Just now';
-  const m = Math.floor(s / 60);
-  if (m < 60) return m === 1 ? '1 min ago' : `${m} min ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return h === 1 ? '1 hour ago' : `${h} hours ago`;
-  const day = Math.floor(h / 24);
-  return day === 1 ? '1 day ago' : `${day} days ago`;
-}
 
 export function NotificationBell({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationData[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ProfileInfo>>({});
   const [loading, setLoading] = useState(false);
-  const [, setTick] = useState(0);
+  // Re-render periodically so relative timestamps stay live.
+  useTimeTick(20000);
 
   const unread = items.filter((n) => !n.read).length;
 
@@ -52,27 +41,24 @@ export function NotificationBell({ className }: { className?: string }) {
     }
   };
 
-  const load = async () => {
-    setLoading(true);
+  const load = async (silent = false) => {
+    if (!silent) setLoading(true);
     const res = await getNotifications();
     if (res.success && Array.isArray(res.data)) {
       setItems(res.data);
       loadProfiles(res.data);
     }
-    setLoading(false);
+    if (!silent) setLoading(false);
   };
 
 
   useEffect(() => {
     load();
-    const t = setInterval(load, 30000);
-    // Re-render every 20s so relative timestamps stay live.
-    const tick = setInterval(() => setTick((v) => v + 1), 20000);
-    return () => {
-      clearInterval(t);
-      clearInterval(tick);
-    };
+    // Refresh notifications + unread badge count every 30s in the background.
+    const t = setInterval(() => load(true), 30000);
+    return () => clearInterval(t);
   }, []);
+
 
   useEffect(() => {
     if (open) {
