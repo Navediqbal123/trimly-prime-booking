@@ -209,7 +209,7 @@ export default function BarberBookings() {
       if (!res.success) throw new Error(res.error || 'Failed to fetch bookings');
       return res.data || [];
     },
-    refetchInterval: 10000,
+    refetchInterval: 15000,
     refetchOnWindowFocus: true,
     staleTime: 0,
   });
