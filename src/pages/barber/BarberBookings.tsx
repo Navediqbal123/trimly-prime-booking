@@ -193,6 +193,8 @@ export default function BarberBookings() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   // Optimistic status overrides keyed by booking id (applied instantly on click).
   const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
+  // Keep relative "Just now / 5 min ago" labels live.
+  useTimeTick(20000);
 
 
   const {
