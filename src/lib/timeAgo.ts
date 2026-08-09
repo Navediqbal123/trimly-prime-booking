@@ -12,11 +12,17 @@ export function timeAgo(iso?: string | null): string {
   const h = Math.floor(m / 60);
   if (h < 24) return h === 1 ? '1 hour ago' : `${h} hours ago`;
   const d = Math.floor(h / 24);
-  return d === 1 ? '1 day ago' : `${d} days ago`;
+  if (d < 7) return d === 1 ? '1 day ago' : `${d} days ago`;
+  const w = Math.floor(d / 7);
+  if (w < 5) return w === 1 ? '1 week ago' : `${w} weeks ago`;
+  const mo = Math.floor(d / 30);
+  if (mo < 12) return mo === 1 ? '1 month ago' : `${mo} months ago`;
+  const y = Math.floor(d / 365);
+  return y === 1 ? '1 year ago' : `${y} years ago`;
 }
 
 /** Re-renders the component periodically so relative timestamps stay live. */
-export function useTimeTick(intervalMs = 20000) {
+export function useTimeTick(intervalMs = 60000) {
   const [, setTick] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setTick((v) => v + 1), intervalMs);

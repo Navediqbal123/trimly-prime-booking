@@ -15,7 +15,7 @@ export function NotificationBell({ className }: { className?: string }) {
   const [profiles, setProfiles] = useState<Record<string, ProfileInfo>>({});
   const [loading, setLoading] = useState(false);
   // Re-render periodically so relative timestamps stay live.
-  useTimeTick(20000);
+  useTimeTick(60000);
 
   const unread = items.filter((n) => !n.read).length;
 
