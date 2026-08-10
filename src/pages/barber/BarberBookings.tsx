@@ -74,7 +74,9 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
             <User className="w-5 h-5 text-primary" />
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-base truncate">{customerName}</p>
+            <p className="font-semibold text-base truncate">
+              {customerName || `Booking #${booking.id.slice(0, 8)}`}
+            </p>
             <p className="text-xs text-muted-foreground">
               Booking #{booking.id.slice(0, 8)}
               {booking.created_at ? ` · ${timeAgo(booking.created_at)}` : ''}
@@ -238,7 +240,7 @@ export default function BarberBookings() {
         const found = myServices.find((x) => x.id === item.id);
         return {
           id: item.id ?? `svc-${i}`,
-          name: item.name || found?.name || 'Service',
+          name: item.name || found?.name || '',
           price: Number(item.price ?? found?.price ?? 0),
           duration: item.duration ?? found?.duration,
         };
@@ -250,7 +252,7 @@ export default function BarberBookings() {
           const found = myServices.find((x) => x.id === id);
           return {
             id,
-            name: found?.name || 'Service',
+            name: found?.name || '',
             price: Number(found?.price ?? 0),
             duration: found?.duration,
           };
@@ -275,7 +277,7 @@ export default function BarberBookings() {
             ? b.services
             : [{
                 id: b.service_id,
-                name: b.service?.name || 'Service',
+                name: b.service?.name || '',
                 price: Number(b.service?.price ?? 0),
                 duration: b.service?.duration,
               }];
