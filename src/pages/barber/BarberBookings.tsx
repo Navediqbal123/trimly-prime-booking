@@ -25,6 +25,7 @@ type GroupedBooking = BookingData & { ids: string[] };
 type BookingCardProps = {
   booking: GroupedBooking;
   customerName: string;
+  customerAvatar: string;
   acting: { id: string; action: 'approved' | 'rejected' } | null;
   onStatus: (e: React.MouseEvent, ids: string[], status: 'approved' | 'rejected') => void;
   otpValue: string;
@@ -33,7 +34,7 @@ type BookingCardProps = {
   verifying: boolean;
 };
 
-function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpChange, onVerify, verifying }: BookingCardProps) {
+function BookingCard({ booking, customerName, customerAvatar, acting, onStatus, otpValue, onOtpChange, onVerify, verifying }: BookingCardProps) {
   const status = booking.status as keyof typeof statusConfig;
   const config = statusConfig[status] || statusConfig.pending;
   const StatusIcon = config.icon;
@@ -70,9 +71,24 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
     >
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <User className="w-5 h-5 text-primary" />
-          </div>
+          {customerAvatar ? (
+            <img
+              src={customerAvatar}
+              alt={customerName ? `${customerName} profile photo` : 'Customer profile photo'}
+              loading="lazy"
+              className="w-11 h-11 rounded-full object-cover border border-border shrink-0"
+            />
+          ) : (
+            <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              {customerName ? (
+                <span className="text-sm font-semibold text-primary">
+                  {customerName.trim().charAt(0).toUpperCase()}
+                </span>
+              ) : (
+                <User className="w-5 h-5 text-primary" />
+              )}
+            </div>
+          )}
           <div className="min-w-0">
             <p className="font-semibold text-base truncate">
               {customerName || `Booking #${booking.id.slice(0, 8)}`}
@@ -308,22 +324,27 @@ export default function BarberBookings() {
   );
   const userIdsKey = userIds.slice().sort().join(',');
 
-  const { data: nameMap = {} } = useQuery({
-    queryKey: ['bookingCustomerNames', userIdsKey],
+  const { data: profileMap = {} } = useQuery({
+    queryKey: ['bookingCustomerProfiles', userIdsKey],
     queryFn: async () => {
       if (userIds.length === 0) return {};
-      const map: Record<string, string> = {};
+      const map: Record<string, { name: string; avatar_url: string }> = {};
       // Prefer full_name, fall back to name/email if the column is missing.
       const full = await supabase
         .from('profiles')
-        .select('id, full_name, name, email')
+        .select('id, full_name, name, email, avatar_url')
         .in('id', userIds);
       const rows = full.error
-        ? (await supabase.from('profiles').select('id, name, email').in('id', userIds)).data
+        ? (await supabase.from('profiles').select('id, name, email, avatar_url').in('id', userIds)).data
         : full.data;
       for (const row of rows || []) {
-        const r = row as { id?: string; full_name?: string; name?: string; email?: string };
-        if (r?.id) map[r.id] = r.full_name || r.name || r.email || '';
+        const r = row as { id?: string; full_name?: string; name?: string; email?: string; avatar_url?: string };
+        if (r?.id) {
+          map[r.id] = {
+            name: r.full_name || r.name || r.email || '',
+            avatar_url: r.avatar_url || '',
+          };
+        }
       }
       return map;
     },
@@ -336,11 +357,17 @@ export default function BarberBookings() {
     return (
       b.user?.full_name ||
       b.user?.name ||
-      (uid ? nameMap[uid] : '') ||
+      (uid ? profileMap[uid]?.name : '') ||
       b.user?.email ||
       ''
     );
   };
+
+  const avatarFor = (b: BookingData) => {
+    const uid = b.user_id || b.customer_id;
+    return (uid ? profileMap[uid]?.avatar_url : '') || '';
+  };
+
 
 
   const handleVerifyOtp = async (bookingId: string) => {
@@ -414,6 +441,7 @@ export default function BarberBookings() {
       key={booking.ids.join('-')}
       booking={booking}
       customerName={nameFor(booking)}
+      customerAvatar={avatarFor(booking)}
       acting={acting}
       onStatus={handleStatus}
       otpValue={otpInputs[booking.ids[0]] || ''}

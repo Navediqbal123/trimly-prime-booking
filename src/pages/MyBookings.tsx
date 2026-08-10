@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { getMyBookings, cancelBooking, BookingData, getApprovedBarbers, getBarberServices, ServiceData } from '@/lib/api';
+import { listAllShopMedia } from '@/lib/shopMediaStore';
+import { shopImage } from '@/lib/shopMedia';
 import { timeAgo, useTimeTick } from '@/lib/timeAgo';
 import { toast } from 'sonner';
 
@@ -75,6 +77,13 @@ export default function MyBookings() {
     enabled: barberIds.length > 0,
     staleTime: 60_000,
   });
+  // Shop photos uploaded by barbers (Barber Hub → My Shop).
+  const { data: shopPhotos = {} } = useQuery({
+    queryKey: ['bookingShopPhotos'],
+    queryFn: listAllShopMedia,
+    staleTime: 60_000,
+  });
+
 
 
   const handleCancelBooking = async (bookingId: string) => {
@@ -126,6 +135,9 @@ export default function MyBookings() {
     });
 
     const shopName = booking.barber?.shop_name || shopMap[booking.barber_id] || '';
+    const photo =
+      (shopPhotos[booking.barber_id] && shopPhotos[booking.barber_id][0]) ||
+      (booking.barber_id ? shopImage(booking.barber_id) : '');
     const serviceTitle = services.map((s) => s.name).filter(Boolean).join(' + ');
     const total =
       Number(booking.total_amount ?? 0) ||
@@ -139,10 +151,20 @@ export default function MyBookings() {
         className="bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300"
       >
         <div className="p-4">
-          <div className="flex items-start justify-between mb-2">
-            <div className="min-w-0">
-              {shopName && <h3 className="font-semibold truncate">{shopName}</h3>}
-              {serviceTitle && <p className="text-sm text-primary">{serviceTitle}</p>}
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <div className="flex items-center gap-3 min-w-0">
+              {photo && (
+                <img
+                  src={photo}
+                  alt={shopName ? `${shopName} barber shop` : 'Barber shop'}
+                  loading="lazy"
+                  className="w-14 h-14 rounded-xl object-cover border border-border shrink-0"
+                />
+              )}
+              <div className="min-w-0">
+                {shopName && <h3 className="font-semibold truncate">{shopName}</h3>}
+                {serviceTitle && <p className="text-sm text-primary">{serviceTitle}</p>}
+              </div>
             </div>
             <div className="flex flex-col items-end gap-1 shrink-0">
               <span className={cn('flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium', config.className)}>
