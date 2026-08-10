@@ -308,14 +308,18 @@ export default function BarberBookings() {
     queryKey: ['bookingCustomerNames', userIdsKey],
     queryFn: async () => {
       if (userIds.length === 0) return {};
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, name')
-        .in('id', userIds);
-      if (error) return {};
       const map: Record<string, string> = {};
-      for (const row of data || []) {
-        if (row?.id) map[row.id as string] = (row as { name?: string }).name || '';
+      // Prefer full_name, fall back to name/email if the column is missing.
+      const full = await supabase
+        .from('profiles')
+        .select('id, full_name, name, email')
+        .in('id', userIds);
+      const rows = full.error
+        ? (await supabase.from('profiles').select('id, name, email').in('id', userIds)).data
+        : full.data;
+      for (const row of rows || []) {
+        const r = row as { id?: string; full_name?: string; name?: string; email?: string };
+        if (r?.id) map[r.id] = r.full_name || r.name || r.email || '';
       }
       return map;
     },
@@ -330,9 +334,10 @@ export default function BarberBookings() {
       b.user?.name ||
       (uid ? nameMap[uid] : '') ||
       b.user?.email ||
-      'Customer'
+      ''
     );
   };
+
 
   const handleVerifyOtp = async (bookingId: string) => {
     const otp = (otpInputs[bookingId] || '').trim();
