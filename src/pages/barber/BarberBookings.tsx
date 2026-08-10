@@ -44,17 +44,19 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
   const disableBoth = isThisActing;
 
 
-  const serviceList =
+  const serviceList = (
     booking.services_list && booking.services_list.length > 0
       ? booking.services_list
       : booking.services && booking.services.length > 0
         ? booking.services
         : [{
             id: booking.service_id,
-            name: booking.service?.name || 'Service',
+            name: booking.service?.name || '',
             price: Number(booking.service?.price ?? 0),
             duration: booking.service?.duration,
-          }];
+          }]
+  ).filter((s) => !!s.name);
+
 
   const homeCharge = Number(booking.home_service_price ?? booking.home_service_charge ?? 0);
   const servicesTotal = serviceList.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
@@ -72,7 +74,9 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
             <User className="w-5 h-5 text-primary" />
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-base truncate">{customerName}</p>
+            <p className="font-semibold text-base truncate">
+              {customerName || `Booking #${booking.id.slice(0, 8)}`}
+            </p>
             <p className="text-xs text-muted-foreground">
               Booking #{booking.id.slice(0, 8)}
               {booking.created_at ? ` · ${timeAgo(booking.created_at)}` : ''}
@@ -236,7 +240,7 @@ export default function BarberBookings() {
         const found = myServices.find((x) => x.id === item.id);
         return {
           id: item.id ?? `svc-${i}`,
-          name: item.name || found?.name || 'Service',
+          name: item.name || found?.name || '',
           price: Number(item.price ?? found?.price ?? 0),
           duration: item.duration ?? found?.duration,
         };
@@ -248,7 +252,7 @@ export default function BarberBookings() {
           const found = myServices.find((x) => x.id === id);
           return {
             id,
-            name: found?.name || 'Service',
+            name: found?.name || '',
             price: Number(found?.price ?? 0),
             duration: found?.duration,
           };
@@ -273,7 +277,7 @@ export default function BarberBookings() {
             ? b.services
             : [{
                 id: b.service_id,
-                name: b.service?.name || 'Service',
+                name: b.service?.name || '',
                 price: Number(b.service?.price ?? 0),
                 duration: b.service?.duration,
               }];
@@ -308,14 +312,18 @@ export default function BarberBookings() {
     queryKey: ['bookingCustomerNames', userIdsKey],
     queryFn: async () => {
       if (userIds.length === 0) return {};
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, name')
-        .in('id', userIds);
-      if (error) return {};
       const map: Record<string, string> = {};
-      for (const row of data || []) {
-        if (row?.id) map[row.id as string] = (row as { name?: string }).name || '';
+      // Prefer full_name, fall back to name/email if the column is missing.
+      const full = await supabase
+        .from('profiles')
+        .select('id, full_name, name, email')
+        .in('id', userIds);
+      const rows = full.error
+        ? (await supabase.from('profiles').select('id, name, email').in('id', userIds)).data
+        : full.data;
+      for (const row of rows || []) {
+        const r = row as { id?: string; full_name?: string; name?: string; email?: string };
+        if (r?.id) map[r.id] = r.full_name || r.name || r.email || '';
       }
       return map;
     },
@@ -330,9 +338,10 @@ export default function BarberBookings() {
       b.user?.name ||
       (uid ? nameMap[uid] : '') ||
       b.user?.email ||
-      'Customer'
+      ''
     );
   };
+
 
   const handleVerifyOtp = async (bookingId: string) => {
     const otp = (otpInputs[bookingId] || '').trim();

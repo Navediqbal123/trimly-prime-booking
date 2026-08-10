@@ -6,7 +6,7 @@ import { Calendar, Clock, CheckCircle, XCircle, AlertCircle, Loader2, RefreshCw 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { getMyBookings, cancelBooking, BookingData } from '@/lib/api';
+import { getMyBookings, cancelBooking, BookingData, getApprovedBarbers, getBarberServices, ServiceData } from '@/lib/api';
 import { timeAgo, useTimeTick } from '@/lib/timeAgo';
 import { toast } from 'sonner';
 
@@ -42,6 +42,41 @@ export default function MyBookings() {
     staleTime: 0,
   });
 
+  // Resolve real shop names for every barber referenced by the bookings.
+  const { data: shopMap = {} } = useQuery({
+    queryKey: ['bookingShopNames'],
+    queryFn: async () => {
+      const res = await getApprovedBarbers();
+      const map: Record<string, string> = {};
+      for (const b of res.data || []) {
+        if (b?.id && b.shop_name) map[b.id] = b.shop_name;
+      }
+      return map;
+    },
+    staleTime: 60_000,
+  });
+
+  // Resolve real service names/prices for every barber referenced by bookings.
+  const barberIds = Array.from(new Set(bookings.map((b) => b.barber_id).filter(Boolean)));
+  const barberIdsKey = barberIds.slice().sort().join(',');
+
+  const { data: serviceMap = {} } = useQuery({
+    queryKey: ['bookingServiceCatalog', barberIdsKey],
+    queryFn: async () => {
+      const map: Record<string, ServiceData> = {};
+      const results = await Promise.all(barberIds.map((id) => getBarberServices(id)));
+      for (const res of results) {
+        for (const s of res.data || []) {
+          if (s?.id) map[s.id] = s;
+        }
+      }
+      return map;
+    },
+    enabled: barberIds.length > 0,
+    staleTime: 60_000,
+  });
+
+
   const handleCancelBooking = async (bookingId: string) => {
     setCancellingId(bookingId);
     const response = await cancelBooking(bookingId);
@@ -66,14 +101,32 @@ export default function MyBookings() {
     const status = booking.status as keyof typeof statusConfig;
     const config = statusConfig[status] || statusConfig.pending;
     const StatusIcon = config.icon;
-    const services =
+    // Build the real service list: prefer backend arrays, then service_ids,
+    // then the single service — always resolving names/prices from the catalog.
+    const rawList =
       booking.services_list && booking.services_list.length > 0
         ? booking.services_list
         : booking.services && booking.services.length > 0
           ? booking.services
-          : booking.service
-            ? [{ id: booking.service_id, name: booking.service.name, price: booking.service.price }]
-            : [];
+          : booking.service_ids && booking.service_ids.length > 0
+            ? booking.service_ids.map((id) => ({ id, name: '', price: 0 }))
+            : booking.service
+              ? [{ id: booking.service_id, name: booking.service.name, price: booking.service.price }]
+              : booking.service_id
+                ? [{ id: booking.service_id, name: '', price: 0 }]
+                : [];
+
+    const services = rawList.map((s, i) => {
+      const cat = s.id ? serviceMap[s.id] : undefined;
+      return {
+        id: s.id || `${i}`,
+        name: s.name || cat?.name || '',
+        price: Number(s.price ?? 0) || Number(cat?.price ?? 0),
+      };
+    });
+
+    const shopName = booking.barber?.shop_name || shopMap[booking.barber_id] || '';
+    const serviceTitle = services.map((s) => s.name).filter(Boolean).join(' + ');
     const total =
       Number(booking.total_amount ?? 0) ||
       services.reduce((sum, s) => sum + Number(s.price ?? 0), 0);
@@ -87,9 +140,9 @@ export default function MyBookings() {
       >
         <div className="p-4">
           <div className="flex items-start justify-between mb-2">
-            <div>
-              <h3 className="font-semibold">{booking.barber?.shop_name || 'Barber Shop'}</h3>
-              <p className="text-sm text-primary">{booking.service?.name || 'Service'}</p>
+            <div className="min-w-0">
+              {shopName && <h3 className="font-semibold truncate">{shopName}</h3>}
+              {serviceTitle && <p className="text-sm text-primary">{serviceTitle}</p>}
             </div>
             <div className="flex flex-col items-end gap-1 shrink-0">
               <span className={cn('flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium', config.className)}>
@@ -104,14 +157,15 @@ export default function MyBookings() {
 
           {services.length > 1 && (
             <div className="mt-3 rounded-xl border border-border/70 divide-y divide-border/70 overflow-hidden">
-              {services.map((s, i) => (
+              {services.filter((s) => s.name).map((s, i) => (
                 <div key={s.id || `${s.name}-${i}`} className="flex items-center justify-between px-3 py-2 text-sm">
-                  <span className="truncate">{s.name || 'Service'}</span>
+                  <span className="truncate">{s.name}</span>
                   <span className="font-semibold shrink-0">₹{Number(s.price ?? 0)}</span>
                 </div>
               ))}
             </div>
           )}
+
 
           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-3">
             <div className="flex items-center gap-1">

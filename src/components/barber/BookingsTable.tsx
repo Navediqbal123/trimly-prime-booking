@@ -164,11 +164,38 @@ export function BookingsTable({ bookings, onRefresh, loading }: BookingsTablePro
                             >
                               <User className="w-4 h-4 text-primary" />
                             </motion.div>
-                            <span className="font-medium">Customer</span>
+                            <span className="font-medium">
+                              {booking.user?.full_name ||
+                                booking.user?.name ||
+                                booking.user?.email ||
+                                `#${booking.id.slice(0, 8)}`}
+                            </span>
                           </div>
                         </TableCell>
-                        <TableCell>{booking.service?.name || 'N/A'}</TableCell>
-                        <TableCell className="font-semibold">₹{booking.service?.price ?? 0}</TableCell>
+                        <TableCell>
+                          {(booking.services_list && booking.services_list.length > 0
+                            ? booking.services_list
+                            : booking.services && booking.services.length > 0
+                              ? booking.services
+                              : booking.service
+                                ? [booking.service]
+                                : []
+                          )
+                            .map((s) => s.name)
+                            .filter(Boolean)
+                            .join(', ') || `#${booking.service_id?.slice(0, 8) ?? ''}`}
+                        </TableCell>
+                        <TableCell className="font-semibold">
+                          ₹{Number(booking.total_amount ?? 0) ||
+                            (booking.services_list && booking.services_list.length > 0
+                              ? booking.services_list
+                              : booking.services && booking.services.length > 0
+                                ? booking.services
+                                : booking.service
+                                  ? [booking.service]
+                                  : []
+                            ).reduce((sum, s) => sum + Number(s.price ?? 0), 0)}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4 text-muted-foreground" />
