@@ -71,9 +71,24 @@ function BookingCard({ booking, customerName, customerAvatar, acting, onStatus, 
     >
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <User className="w-5 h-5 text-primary" />
-          </div>
+          {customerAvatar ? (
+            <img
+              src={customerAvatar}
+              alt={customerName ? `${customerName} profile photo` : 'Customer profile photo'}
+              loading="lazy"
+              className="w-11 h-11 rounded-full object-cover border border-border shrink-0"
+            />
+          ) : (
+            <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              {customerName ? (
+                <span className="text-sm font-semibold text-primary">
+                  {customerName.trim().charAt(0).toUpperCase()}
+                </span>
+              ) : (
+                <User className="w-5 h-5 text-primary" />
+              )}
+            </div>
+          )}
           <div className="min-w-0">
             <p className="font-semibold text-base truncate">
               {customerName || `Booking #${booking.id.slice(0, 8)}`}
