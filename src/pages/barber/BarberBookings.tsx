@@ -25,6 +25,7 @@ type GroupedBooking = BookingData & { ids: string[] };
 type BookingCardProps = {
   booking: GroupedBooking;
   customerName: string;
+  customerAvatar: string;
   acting: { id: string; action: 'approved' | 'rejected' } | null;
   onStatus: (e: React.MouseEvent, ids: string[], status: 'approved' | 'rejected') => void;
   otpValue: string;
@@ -33,7 +34,7 @@ type BookingCardProps = {
   verifying: boolean;
 };
 
-function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpChange, onVerify, verifying }: BookingCardProps) {
+function BookingCard({ booking, customerName, customerAvatar, acting, onStatus, otpValue, onOtpChange, onVerify, verifying }: BookingCardProps) {
   const status = booking.status as keyof typeof statusConfig;
   const config = statusConfig[status] || statusConfig.pending;
   const StatusIcon = config.icon;
@@ -425,6 +426,7 @@ export default function BarberBookings() {
       key={booking.ids.join('-')}
       booking={booking}
       customerName={nameFor(booking)}
+      customerAvatar={avatarFor(booking)}
       acting={acting}
       onStatus={handleStatus}
       otpValue={otpInputs[booking.ids[0]] || ''}
