@@ -308,22 +308,27 @@ export default function BarberBookings() {
   );
   const userIdsKey = userIds.slice().sort().join(',');
 
-  const { data: nameMap = {} } = useQuery({
-    queryKey: ['bookingCustomerNames', userIdsKey],
+  const { data: profileMap = {} } = useQuery({
+    queryKey: ['bookingCustomerProfiles', userIdsKey],
     queryFn: async () => {
       if (userIds.length === 0) return {};
-      const map: Record<string, string> = {};
+      const map: Record<string, { name: string; avatar_url: string }> = {};
       // Prefer full_name, fall back to name/email if the column is missing.
       const full = await supabase
         .from('profiles')
-        .select('id, full_name, name, email')
+        .select('id, full_name, name, email, avatar_url')
         .in('id', userIds);
       const rows = full.error
-        ? (await supabase.from('profiles').select('id, name, email').in('id', userIds)).data
+        ? (await supabase.from('profiles').select('id, name, email, avatar_url').in('id', userIds)).data
         : full.data;
       for (const row of rows || []) {
-        const r = row as { id?: string; full_name?: string; name?: string; email?: string };
-        if (r?.id) map[r.id] = r.full_name || r.name || r.email || '';
+        const r = row as { id?: string; full_name?: string; name?: string; email?: string; avatar_url?: string };
+        if (r?.id) {
+          map[r.id] = {
+            name: r.full_name || r.name || r.email || '',
+            avatar_url: r.avatar_url || '',
+          };
+        }
       }
       return map;
     },
@@ -336,11 +341,17 @@ export default function BarberBookings() {
     return (
       b.user?.full_name ||
       b.user?.name ||
-      (uid ? nameMap[uid] : '') ||
+      (uid ? profileMap[uid]?.name : '') ||
       b.user?.email ||
       ''
     );
   };
+
+  const avatarFor = (b: BookingData) => {
+    const uid = b.user_id || b.customer_id;
+    return (uid ? profileMap[uid]?.avatar_url : '') || '';
+  };
+
 
 
   const handleVerifyOtp = async (bookingId: string) => {
