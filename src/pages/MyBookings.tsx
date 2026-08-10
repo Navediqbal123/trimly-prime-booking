@@ -77,6 +77,13 @@ export default function MyBookings() {
     enabled: barberIds.length > 0,
     staleTime: 60_000,
   });
+  // Shop photos uploaded by barbers (Barber Hub → My Shop).
+  const { data: shopPhotos = {} } = useQuery({
+    queryKey: ['bookingShopPhotos'],
+    queryFn: listAllShopMedia,
+    staleTime: 60_000,
+  });
+
 
 
   const handleCancelBooking = async (bookingId: string) => {
