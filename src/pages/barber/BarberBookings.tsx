@@ -44,17 +44,19 @@ function BookingCard({ booking, customerName, acting, onStatus, otpValue, onOtpC
   const disableBoth = isThisActing;
 
 
-  const serviceList =
+  const serviceList = (
     booking.services_list && booking.services_list.length > 0
       ? booking.services_list
       : booking.services && booking.services.length > 0
         ? booking.services
         : [{
             id: booking.service_id,
-            name: booking.service?.name || 'Service',
+            name: booking.service?.name || '',
             price: Number(booking.service?.price ?? 0),
             duration: booking.service?.duration,
-          }];
+          }]
+  ).filter((s) => !!s.name);
+
 
   const homeCharge = Number(booking.home_service_price ?? booking.home_service_charge ?? 0);
   const servicesTotal = serviceList.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
