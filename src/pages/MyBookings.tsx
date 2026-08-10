@@ -42,6 +42,41 @@ export default function MyBookings() {
     staleTime: 0,
   });
 
+  // Resolve real shop names for every barber referenced by the bookings.
+  const { data: shopMap = {} } = useQuery({
+    queryKey: ['bookingShopNames'],
+    queryFn: async () => {
+      const res = await getApprovedBarbers();
+      const map: Record<string, string> = {};
+      for (const b of res.data || []) {
+        if (b?.id && b.shop_name) map[b.id] = b.shop_name;
+      }
+      return map;
+    },
+    staleTime: 60_000,
+  });
+
+  // Resolve real service names/prices for every barber referenced by bookings.
+  const barberIds = Array.from(new Set(bookings.map((b) => b.barber_id).filter(Boolean)));
+  const barberIdsKey = barberIds.slice().sort().join(',');
+
+  const { data: serviceMap = {} } = useQuery({
+    queryKey: ['bookingServiceCatalog', barberIdsKey],
+    queryFn: async () => {
+      const map: Record<string, ServiceData> = {};
+      const results = await Promise.all(barberIds.map((id) => getBarberServices(id)));
+      for (const res of results) {
+        for (const s of res.data || []) {
+          if (s?.id) map[s.id] = s;
+        }
+      }
+      return map;
+    },
+    enabled: barberIds.length > 0,
+    staleTime: 60_000,
+  });
+
+
   const handleCancelBooking = async (bookingId: string) => {
     setCancellingId(bookingId);
     const response = await cancelBooking(bookingId);
