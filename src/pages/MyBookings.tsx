@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { getMyBookings, cancelBooking, BookingData, getApprovedBarbers, getBarberServices, ServiceData } from '@/lib/api';
+import { listAllShopMedia } from '@/lib/shopMediaStore';
+import { shopImage } from '@/lib/shopMedia';
 import { timeAgo, useTimeTick } from '@/lib/timeAgo';
 import { toast } from 'sonner';
 
