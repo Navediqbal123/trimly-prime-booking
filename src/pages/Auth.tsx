@@ -320,7 +320,18 @@ export default function Auth() {
                     {errors.password && (
                       <motion.p {...fadeSlide} className="text-sm text-destructive">{errors.password}</motion.p>
                     )}
+                    {!isSignUp && (
+                      <div className="text-right">
+                        <Link
+                          to="/forgot-password"
+                          className="text-sm text-primary hover:underline font-medium"
+                        >
+                          Forgot Password?
+                        </Link>
+                      </div>
+                    )}
                   </motion.div>
+
 
                   <motion.div variants={childFade}>
                     <Button
