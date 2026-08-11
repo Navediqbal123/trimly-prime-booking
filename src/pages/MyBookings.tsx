@@ -282,7 +282,7 @@ export default function MyBookings() {
 
         <TabsContent value="upcoming" className="space-y-4">
           {upcomingBookings.length > 0 ? (
-            upcomingBookings.map((booking) => <BookingCard key={booking.id} booking={booking} />)
+            upcomingBookings.map((g) => <BookingCard key={g[0].id} group={g} />)
           ) : (
             <div className="text-center py-12 bg-card rounded-xl border border-border">
               <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -294,7 +294,7 @@ export default function MyBookings() {
 
         <TabsContent value="past" className="space-y-4">
           {pastBookings.length > 0 ? (
-            pastBookings.map((booking) => <BookingCard key={booking.id} booking={booking} />)
+            pastBookings.map((g) => <BookingCard key={g[0].id} group={g} />)
           ) : (
             <div className="text-center py-12 bg-card rounded-xl border border-border">
               <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
