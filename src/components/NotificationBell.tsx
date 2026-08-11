@@ -160,7 +160,7 @@ export function NotificationBell({ className }: { className?: string }) {
                   items.map((n, i) => {
                     const pid = n.actor_id || n.customer_id || n.user_id;
                     const prof = pid ? profiles[pid] : undefined;
-                    const name = n.name || prof?.name || 'Barber Lane';
+                    const name = n.name || prof?.name || 'Trimly';
                     const avatar = n.avatar_url || prof?.avatar_url || '';
                     return (
                       <motion.div

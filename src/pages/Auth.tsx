@@ -175,7 +175,7 @@ export default function Auth() {
             transition={{ delay: 0.5, duration: 0.4 }}
             className="text-5xl font-display font-bold gradient-text mb-4"
           >
-            BarberLane
+            Trimly
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -209,7 +209,7 @@ export default function Auth() {
               <Scissors className="w-6 h-6 text-primary" />
             </div>
             <span className="text-3xl font-display font-bold gradient-text">
-              BarberLane
+              Trimly
             </span>
           </motion.div>
 
