@@ -162,6 +162,11 @@ export function NotificationBell({ className }: { className?: string }) {
                     const prof = pid ? profiles[pid] : undefined;
                     const name = n.name || prof?.name || 'Trimly';
                     const avatar = n.avatar_url || prof?.avatar_url || '';
+                    // OTPs are shown only here (not on the bookings page).
+                    const otp =
+                      (n as any).otp ||
+                      n.message?.match(/otp[^0-9]{0,15}(\d{4,6})/i)?.[1] ||
+                      '';
                     return (
                       <motion.div
                         key={n.id}
