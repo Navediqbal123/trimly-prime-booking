@@ -191,9 +191,20 @@ export function NotificationBell({ className }: { className?: string }) {
                             <p className="text-sm text-black/80 leading-relaxed mt-0.5 break-words">
                               {n.message}
                             </p>
+                            {otp && (
+                              <div className="mt-3 rounded-xl border-2 border-primary/40 bg-primary/10 px-4 py-3">
+                                <p className="text-[10px] uppercase tracking-wider text-black/60 font-semibold mb-1">
+                                  Verification OTP
+                                </p>
+                                <p className="text-3xl font-display font-bold text-black tracking-[0.3em]">
+                                  {otp}
+                                </p>
+                              </div>
+                            )}
                             <p className="text-[11px] text-black/50 mt-2 text-right">
                               {timeAgo(n.created_at)}
                             </p>
+
                           </div>
                         </div>
                       </motion.div>
