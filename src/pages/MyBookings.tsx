@@ -86,32 +86,39 @@ export default function MyBookings() {
 
 
 
-  const handleCancelBooking = async (bookingId: string) => {
-    setCancellingId(bookingId);
-    const response = await cancelBooking(bookingId);
-    if (response.success) {
+  const handleCancelGroup = async (group: BookingData[]) => {
+    setCancellingId(group[0].id);
+    const results = await Promise.all(group.map((b) => cancelBooking(b.id)));
+    if (results.every((r) => r.success)) {
       toast.success('Booking cancelled successfully');
-      qc.invalidateQueries({ queryKey: ['myBookings'] });
-      qc.invalidateQueries({ queryKey: ['bookedSlots'] });
     } else {
-      toast.error(response.error || 'Failed to cancel booking');
+      toast.error(results.find((r) => !r.success)?.error || 'Failed to cancel booking');
     }
+    qc.invalidateQueries({ queryKey: ['myBookings'] });
+    qc.invalidateQueries({ queryKey: ['bookedSlots'] });
     setCancellingId(null);
   };
 
-  const upcomingBookings = bookings.filter(
-    (b) => b.status === 'pending' || b.status === 'confirmed' || b.status === 'approved'
+  // Group every booking with the same barber + date + time slot into ONE card.
+  const groups = (() => {
+    const map = new Map<string, BookingData[]>();
+    for (const b of bookings) {
+      const key = `${b.barber_id}|${b.date}|${b.time_slot}`;
+      const list = map.get(key);
+      if (list) list.push(b);
+      else map.set(key, [b]);
+    }
+    return Array.from(map.values());
+  })();
+
+  const upcomingBookings = groups.filter((g) =>
+    ['pending', 'confirmed', 'approved'].includes(g[0].status)
   );
-  const pastBookings = bookings.filter(
-    (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected'
+  const pastBookings = groups.filter((g) =>
+    ['completed', 'cancelled', 'rejected'].includes(g[0].status)
   );
 
-  const BookingCard = ({ booking }: { booking: BookingData }) => {
-    const status = booking.status as keyof typeof statusConfig;
-    const config = statusConfig[status] || statusConfig.pending;
-    const StatusIcon = config.icon;
-    // Build the real service list: prefer backend arrays, then service_ids,
-    // then the single service — always resolving names/prices from the catalog.
+  const resolveServices = (booking: BookingData) => {
     const rawList =
       booking.services_list && booking.services_list.length > 0
         ? booking.services_list
@@ -125,7 +132,7 @@ export default function MyBookings() {
                 ? [{ id: booking.service_id, name: '', price: 0 }]
                 : [];
 
-    const services = rawList.map((s, i) => {
+    return rawList.map((s, i) => {
       const cat = s.id ? serviceMap[s.id] : undefined;
       return {
         id: s.id || `${i}`,
@@ -133,15 +140,32 @@ export default function MyBookings() {
         price: Number(s.price ?? 0) || Number(cat?.price ?? 0),
       };
     });
+  };
+
+  const BookingCard = ({ group }: { group: BookingData[] }) => {
+    const booking = group[0];
+    const status = booking.status as keyof typeof statusConfig;
+    const config = statusConfig[status] || statusConfig.pending;
+    const StatusIcon = config.icon;
+
+    // Merge all services from every booking in the group (dedup by id).
+    const seen = new Set<string>();
+    const services = group
+      .flatMap(resolveServices)
+      .filter((s) => {
+        const key = s.id || s.name;
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
 
     const shopName = booking.barber?.shop_name || shopMap[booking.barber_id] || '';
     const photo =
       (shopPhotos[booking.barber_id] && shopPhotos[booking.barber_id][0]) ||
       (booking.barber_id ? shopImage(booking.barber_id) : '');
     const serviceTitle = services.map((s) => s.name).filter(Boolean).join(' + ');
-    const total =
-      Number(booking.total_amount ?? 0) ||
-      services.reduce((sum, s) => sum + Number(s.price ?? 0), 0);
+    const total = services.reduce((sum, s) => sum + Number(s.price ?? 0), 0) ||
+      group.reduce((sum, b) => sum + Number(b.total_amount ?? 0), 0);
 
     return (
       <motion.div
@@ -199,26 +223,9 @@ export default function MyBookings() {
               <span>{booking.time_slot}</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="font-medium text-foreground">₹{total}</span>
+              <span className="font-medium text-foreground">Total ₹{total}</span>
             </div>
           </div>
-
-
-          {booking.status === 'approved' && booking.otp && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mt-4 rounded-xl p-4 bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/40"
-            >
-              <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2">
-                Your Verification OTP
-              </p>
-              <p className="text-4xl font-display font-bold gradient-text tracking-[0.3em] mb-2">
-                {booking.otp}
-              </p>
-              <p className="text-xs text-muted-foreground">Show this OTP to your barber when you arrive</p>
-            </motion.div>
-          )}
 
           {(booking.status === 'pending' || booking.status === 'confirmed' || booking.status === 'approved') && (
             <div className="flex gap-2 mt-4">
@@ -226,7 +233,7 @@ export default function MyBookings() {
                 variant="outline"
                 size="sm"
                 className="text-destructive hover:bg-destructive/10"
-                onClick={() => handleCancelBooking(booking.id)}
+                onClick={() => handleCancelGroup(group)}
                 disabled={cancellingId === booking.id}
               >
                 {cancellingId === booking.id ? (
@@ -241,6 +248,7 @@ export default function MyBookings() {
       </motion.div>
     );
   };
+
 
   if (loading) {
     return (
@@ -274,7 +282,7 @@ export default function MyBookings() {
 
         <TabsContent value="upcoming" className="space-y-4">
           {upcomingBookings.length > 0 ? (
-            upcomingBookings.map((booking) => <BookingCard key={booking.id} booking={booking} />)
+            upcomingBookings.map((g) => <BookingCard key={g[0].id} group={g} />)
           ) : (
             <div className="text-center py-12 bg-card rounded-xl border border-border">
               <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -286,7 +294,7 @@ export default function MyBookings() {
 
         <TabsContent value="past" className="space-y-4">
           {pastBookings.length > 0 ? (
-            pastBookings.map((booking) => <BookingCard key={booking.id} booking={booking} />)
+            pastBookings.map((g) => <BookingCard key={g[0].id} group={g} />)
           ) : (
             <div className="text-center py-12 bg-card rounded-xl border border-border">
               <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />

@@ -9,6 +9,8 @@ import { AdminOnlyRoute, BarberOnlyRoute } from "@/components/RoleRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import DiscoverBarbers from "./pages/DiscoverBarbers";
 import MyBookings from "./pages/MyBookings";
@@ -48,7 +50,10 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/auth" element={<Auth />} />
-      
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
+
       <Route 
         element={
           <ProtectedRoute>

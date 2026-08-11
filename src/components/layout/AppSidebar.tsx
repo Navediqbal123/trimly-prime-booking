@@ -115,7 +115,7 @@ export function AppSidebar() {
               {isOpen ? <X /> : <Menu />}
             </Button>
             <span className="text-3xl sm:text-4xl font-display font-extrabold tracking-wide" style={{ color: '#000000' }}>
-              Barber Lane
+              Trimly
             </span>
           </div>
           <NotificationBell />
@@ -163,7 +163,7 @@ export function AppSidebar() {
                 <Scissors className="w-6 h-6" />
               </div>
               <span className="text-3xl font-display font-extrabold tracking-wide leading-none" style={{ color: '#000000' }}>
-                Barber Lane
+                Trimly
               </span>
             </Link>
             <NotificationBell className="hidden lg:block" />

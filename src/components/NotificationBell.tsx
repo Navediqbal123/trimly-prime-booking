@@ -160,8 +160,13 @@ export function NotificationBell({ className }: { className?: string }) {
                   items.map((n, i) => {
                     const pid = n.actor_id || n.customer_id || n.user_id;
                     const prof = pid ? profiles[pid] : undefined;
-                    const name = n.name || prof?.name || 'Barber Lane';
+                    const name = n.name || prof?.name || 'Trimly';
                     const avatar = n.avatar_url || prof?.avatar_url || '';
+                    // OTPs are shown only here (not on the bookings page).
+                    const otp =
+                      (n as any).otp ||
+                      n.message?.match(/otp[^0-9]{0,15}(\d{4,6})/i)?.[1] ||
+                      '';
                     return (
                       <motion.div
                         key={n.id}
@@ -191,9 +196,20 @@ export function NotificationBell({ className }: { className?: string }) {
                             <p className="text-sm text-black/80 leading-relaxed mt-0.5 break-words">
                               {n.message}
                             </p>
+                            {otp && (
+                              <div className="mt-3 rounded-xl border-2 border-primary/40 bg-primary/10 px-4 py-3">
+                                <p className="text-[10px] uppercase tracking-wider text-black/60 font-semibold mb-1">
+                                  Verification OTP
+                                </p>
+                                <p className="text-3xl font-display font-bold text-black tracking-[0.3em]">
+                                  {otp}
+                                </p>
+                              </div>
+                            )}
                             <p className="text-[11px] text-black/50 mt-2 text-right">
                               {timeAgo(n.created_at)}
                             </p>
+
                           </div>
                         </div>
                       </motion.div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scissors, Mail, Lock, Loader2, Eye, EyeOff, User, Phone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -175,7 +175,7 @@ export default function Auth() {
             transition={{ delay: 0.5, duration: 0.4 }}
             className="text-5xl font-display font-bold gradient-text mb-4"
           >
-            BarberLane
+            Trimly
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -209,7 +209,7 @@ export default function Auth() {
               <Scissors className="w-6 h-6 text-primary" />
             </div>
             <span className="text-3xl font-display font-bold gradient-text">
-              BarberLane
+              Trimly
             </span>
           </motion.div>
 
@@ -320,7 +320,18 @@ export default function Auth() {
                     {errors.password && (
                       <motion.p {...fadeSlide} className="text-sm text-destructive">{errors.password}</motion.p>
                     )}
+                    {!isSignUp && (
+                      <div className="text-right">
+                        <Link
+                          to="/forgot-password"
+                          className="text-sm text-primary hover:underline font-medium"
+                        >
+                          Forgot Password?
+                        </Link>
+                      </div>
+                    )}
                   </motion.div>
+
 
                   <motion.div variants={childFade}>
                     <Button
