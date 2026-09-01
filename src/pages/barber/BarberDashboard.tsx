@@ -7,8 +7,10 @@ import {
   getBarberBookings, 
   getMyServices, 
   getMyBarberProfile,
+  getBarberDashboardStats,
   BookingData, 
-  ServiceData 
+  ServiceData,
+  BarberDashboardStats,
 } from '@/lib/api';
 import { StatsCards } from '@/components/barber/StatsCards';
 import { EarningsChart } from '@/components/barber/EarningsChart';
@@ -35,6 +37,7 @@ const itemVariants = {
 export default function BarberDashboard() {
   const [bookings, setBookings] = useState<BookingData[]>([]);
   const [services, setServices] = useState<ServiceData[]>([]);
+  const [stats, setStats] = useState<BarberDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [servicesLoading, setServicesLoading] = useState(false);
   const [bookingsLoading, setBookingsLoading] = useState(false);
@@ -59,10 +62,18 @@ export default function BarberDashboard() {
     }
 
     // Fetch bookings and services in parallel (bookings table only — no profiles join)
-    const [bookingsRes, servicesRes] = await Promise.all([
+    const [bookingsRes, servicesRes, statsRes] = await Promise.all([
       getBarberBookings(),
       getMyServices(),
+      getBarberDashboardStats(),
     ]);
+
+    if (statsRes.success && statsRes.data) {
+      setStats(statsRes.data);
+    } else {
+      console.warn('Dashboard stats fetch failed, using booking-derived stats:', statsRes.error);
+      setStats(null);
+    }
 
     if (bookingsRes.success && bookingsRes.data) {
       const list = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
@@ -153,7 +164,7 @@ export default function BarberDashboard() {
       </motion.div>
 
       <motion.div variants={itemVariants}>
-        <StatsCards services={services} bookings={bookings} />
+        <StatsCards services={services} bookings={bookings} stats={stats} />
       </motion.div>
 
       <motion.div variants={itemVariants}>

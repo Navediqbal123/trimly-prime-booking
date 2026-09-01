@@ -335,6 +335,40 @@ export async function getBarberBookings(): Promise<ApiResponse<BookingData[]>> {
   return apiCall<BookingData[]>('/api/booking/barber', { method: 'GET' });
 }
 
+export interface BarberDashboardStats {
+  total_bookings: number;
+  pending: number;
+  approved: number;
+  completed: number;
+  cancelled: number;
+  total_earnings: number;
+}
+
+/** Stats straight from GET /api/barber/dashboard (auth token attached automatically). */
+export async function getBarberDashboardStats(): Promise<ApiResponse<BarberDashboardStats>> {
+  const res = await apiCall<any>('/api/barber/dashboard', { method: 'GET' });
+  if (!res.success) return { success: false, error: res.error };
+  const raw = (res.data?.data ?? res.data?.stats ?? res.data ?? {}) as Record<string, any>;
+  const num = (...keys: string[]) => {
+    for (const k of keys) {
+      const v = raw[k];
+      if (v !== undefined && v !== null && !Number.isNaN(Number(v))) return Number(v);
+    }
+    return 0;
+  };
+  return {
+    success: true,
+    data: {
+      total_bookings: num('total_bookings', 'totalBookings', 'total'),
+      pending: num('pending', 'pending_bookings', 'pendingBookings'),
+      approved: num('approved', 'approved_bookings', 'approvedBookings'),
+      completed: num('completed', 'completed_bookings', 'completedBookings'),
+      cancelled: num('cancelled', 'canceled', 'cancelled_bookings', 'cancelledBookings'),
+      total_earnings: num('total_earnings', 'totalEarnings', 'earnings', 'revenue'),
+    },
+  };
+}
+
 // getMyServices moved above near addService
 
 export interface UpdateServiceData {
