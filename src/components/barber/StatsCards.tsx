@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
-import { Scissors, Calendar, IndianRupee, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, IndianRupee, CheckCircle, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ServiceData, BookingData } from '@/lib/api';
+import { bookingAmount, buildServiceMap } from '@/lib/bookingAmount';
 import { useCountUp } from '@/hooks/useCountUp';
+
 
 interface StatsCardsProps {
   services: ServiceData[];
