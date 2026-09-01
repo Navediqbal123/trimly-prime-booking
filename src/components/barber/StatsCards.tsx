@@ -75,15 +75,16 @@ function StatCard({ title, value, prefix = '', icon: Icon, color, bgColor, index
 
 export function StatsCards({ services, bookings, isLoading }: StatsCardsProps) {
   const serviceMap = buildServiceMap(services);
+  const statusOf = (b: BookingData) => String(b.status ?? '').toLowerCase().trim();
 
   const totalBookings = bookings.length;
-  const completedBookings = bookings.filter((b) => b.status === 'completed').length;
-  const pendingBookings = bookings.filter((b) => b.status === 'pending').length;
+  const completed = bookings.filter((b) => statusOf(b) === 'completed');
+  const completedBookings = completed.length;
+  const pendingBookings = bookings.filter((b) => statusOf(b) === 'pending').length;
 
   // Earnings come strictly from completed bookings, priced via the services list
-  const totalEarnings = bookings
-    .filter((b) => b.status === 'completed')
-    .reduce((sum, b) => sum + bookingAmount(b, serviceMap), 0);
+  const totalEarnings = completed.reduce((sum, b) => sum + bookingAmount(b, serviceMap), 0);
+
 
   const stats = [
     { 
