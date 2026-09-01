@@ -49,22 +49,24 @@ export default function BarberDashboard() {
     }
     setError(null);
 
-    // Try to get profile - if it fails, still show dashboard with empty data
+    // Resolve internal barber_id (never the auth user id) to scope bookings
     const profileResponse = await getMyBarberProfile();
-    
+    const barberId = profileResponse.success ? profileResponse.data?.id : undefined;
+
     if (!profileResponse.success) {
       // For any profile error, show dashboard with empty state instead of blocking
       console.warn('Profile fetch failed, showing empty dashboard:', profileResponse.error);
     }
 
-    // Fetch bookings and services in parallel
+    // Fetch bookings and services in parallel (bookings table only — no profiles join)
     const [bookingsRes, servicesRes] = await Promise.all([
       getBarberBookings(),
       getMyServices(),
     ]);
 
     if (bookingsRes.success && bookingsRes.data) {
-      setBookings(bookingsRes.data);
+      const list = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
+      setBookings(barberId ? list.filter((b) => !b.barber_id || b.barber_id === barberId) : list);
     }
     if (servicesRes.success && servicesRes.data) {
       setServices(servicesRes.data);
@@ -72,6 +74,7 @@ export default function BarberDashboard() {
       console.error('Services fetch failed:', servicesRes.error);
       toast.error(servicesRes.error || 'Failed to load services');
     }
+
 
 
     setLoading(false);
