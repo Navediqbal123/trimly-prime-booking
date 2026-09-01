@@ -177,14 +177,12 @@ export default function BarberEarnings() {
                 <div key={b.id} className="flex items-center justify-between py-3 border-b border-border last:border-0">
                   <div>
                     <p className="font-medium">
-                      {(b.services && b.services.length > 0
-                        ? b.services.map(s => s.name).join(', ')
-                        : b.service?.name) || 'Service'}
+                      {bookingServiceNames(b, serviceMap).join(', ') || 'Service'}
                     </p>
-                    <p className="text-sm text-muted-foreground">{nameFor(b)}</p>
                     <p className="text-sm text-muted-foreground">
                       {b.date} • {b.time_slot}
                     </p>
+
                   </div>
                   <span className="font-bold text-green-500">₹{amountOf(b)}</span>
                 </div>
