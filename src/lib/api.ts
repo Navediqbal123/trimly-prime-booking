@@ -351,6 +351,20 @@ export async function updateService(serviceId: string, data: UpdateServiceData):
   });
 }
 
+export interface UpdateShopData {
+  shop_name: string;
+  location: string;
+  description?: string;
+  phone?: string;
+}
+
+export async function updateMyShop(data: UpdateShopData): Promise<ApiResponse> {
+  return apiCall('/api/barber/my-shop', {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
 export async function cancelBooking(bookingId: string): Promise<ApiResponse> {
   return apiCall(`/api/booking/cancel/${bookingId}`, { method: 'PATCH' });
 }

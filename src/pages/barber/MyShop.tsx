@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { getMyBarberProfile, BarberProfileData } from '@/lib/api';
+import { getMyBarberProfile, updateMyShop, BarberProfileData } from '@/lib/api';
 import { listShopMedia, uploadShopImage, deleteShopImage } from '@/lib/shopMediaStore';
 import { shopImage } from '@/lib/shopMedia';
 
@@ -38,8 +38,8 @@ export default function MyShop() {
       setFormData({
         shopName: res.data.shop_name || '',
         location: res.data.location || '',
-        description: '',
-        phone: '',
+        description: (res.data as any).description || '',
+        phone: (res.data as any).phone || '',
       });
       const media = await listShopMedia(res.data.id);
       setImages(media);
@@ -92,9 +92,23 @@ export default function MyShop() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    // Backend doesn't have a shop update endpoint yet — save locally
-    toast.success('Shop details saved locally. Backend update coming soon.');
-    setSaving(false);
+    try {
+      const res = await updateMyShop({
+        shop_name: formData.shopName.trim(),
+        location: formData.location.trim(),
+        description: formData.description.trim(),
+        phone: formData.phone.trim(),
+      });
+      if (res.success) {
+        toast.success('Shop details updated successfully');
+      } else {
+        toast.error(res.error || 'Failed to update shop details');
+      }
+    } catch {
+      toast.error('Failed to update shop details');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
