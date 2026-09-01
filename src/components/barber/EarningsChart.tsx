@@ -3,23 +3,26 @@ import { motion } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp } from 'lucide-react';
-import { BookingData } from '@/lib/api';
+import { BookingData, ServiceData } from '@/lib/api';
+import { bookingAmount, buildServiceMap } from '@/lib/bookingAmount';
 
 interface EarningsChartProps {
   bookings: BookingData[];
+  services?: ServiceData[];
 }
 
-export function EarningsChart({ bookings }: EarningsChartProps) {
+export function EarningsChart({ bookings, services = [] }: EarningsChartProps) {
   const chartData = useMemo(() => {
-    // Group bookings by date and calculate earnings
+    const serviceMap = buildServiceMap(services);
+    // Group completed bookings by date and calculate earnings
     const earningsByDate: Record<string, number> = {};
-    
+
     bookings
       .filter(b => b.status === 'completed')
       .forEach(booking => {
         const date = booking.date;
-        const price = booking.service?.price || 0;
-        earningsByDate[date] = (earningsByDate[date] || 0) + price;
+        if (!date) return;
+        earningsByDate[date] = (earningsByDate[date] || 0) + bookingAmount(booking, serviceMap);
       });
 
     // Convert to array and sort by date
@@ -33,7 +36,8 @@ export function EarningsChart({ bookings }: EarningsChartProps) {
       .slice(-7); // Last 7 entries
 
     return data;
-  }, [bookings]);
+  }, [bookings, services]);
+
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {

@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
-import { Scissors, Calendar, IndianRupee, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, IndianRupee, CheckCircle, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ServiceData, BookingData } from '@/lib/api';
+import { bookingAmount, buildServiceMap } from '@/lib/bookingAmount';
 import { useCountUp } from '@/hooks/useCountUp';
+
 
 interface StatsCardsProps {
   services: ServiceData[];
@@ -72,20 +74,16 @@ function StatCard({ title, value, prefix = '', icon: Icon, color, bgColor, index
 }
 
 export function StatsCards({ services, bookings, isLoading }: StatsCardsProps) {
-  // Calculate stats from real data
-  const totalServices = services.length;
+  const serviceMap = buildServiceMap(services);
+
   const totalBookings = bookings.length;
-  
-  // Active bookings (pending or confirmed)
-  const activeBookings = bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').length;
-  
-  // Cancelled bookings
-  const cancelledBookings = bookings.filter(b => b.status === 'cancelled').length;
-  
-  // Calculate total earnings from completed/pending/confirmed bookings
+  const completedBookings = bookings.filter((b) => b.status === 'completed').length;
+  const pendingBookings = bookings.filter((b) => b.status === 'pending').length;
+
+  // Earnings come strictly from completed bookings, priced via the services list
   const totalEarnings = bookings
-    .filter(b => b.status === 'completed' || b.status === 'confirmed' || b.status === 'pending')
-    .reduce((sum, b) => sum + (b.service?.price || 0), 0);
+    .filter((b) => b.status === 'completed')
+    .reduce((sum, b) => sum + bookingAmount(b, serviceMap), 0);
 
   const stats = [
     { 
@@ -96,18 +94,18 @@ export function StatsCards({ services, bookings, isLoading }: StatsCardsProps) {
       bgColor: 'bg-blue-500/10',
     },
     { 
-      title: 'Active Bookings', 
-      value: activeBookings, 
+      title: 'Completed', 
+      value: completedBookings, 
       icon: CheckCircle,
       color: 'text-green-500',
       bgColor: 'bg-green-500/10',
     },
     { 
-      title: 'Cancelled', 
-      value: cancelledBookings, 
-      icon: XCircle,
-      color: 'text-red-500',
-      bgColor: 'bg-red-500/10',
+      title: 'Pending', 
+      value: pendingBookings, 
+      icon: Clock,
+      color: 'text-amber-500',
+      bgColor: 'bg-amber-500/10',
     },
     { 
       title: 'Total Earnings', 
@@ -119,6 +117,7 @@ export function StatsCards({ services, bookings, isLoading }: StatsCardsProps) {
       formatAsCurrency: true,
     },
   ];
+
 
   return (
     <motion.div

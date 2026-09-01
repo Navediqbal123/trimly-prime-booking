@@ -154,8 +154,9 @@ export default function BarberDashboard() {
       </motion.div>
 
       <motion.div variants={itemVariants}>
-        <EarningsChart bookings={bookings} />
+        <EarningsChart bookings={bookings} services={services} />
       </motion.div>
+
 
       <motion.div variants={itemVariants}>
         <ServicesTable services={services} onRefresh={refreshServices} loading={servicesLoading} />
