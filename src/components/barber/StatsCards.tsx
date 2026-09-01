@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { Calendar, IndianRupee, CheckCircle, Clock } from 'lucide-react';
+import { Calendar, IndianRupee, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ServiceData, BookingData } from '@/lib/api';
+import { ServiceData, BookingData, BarberDashboardStats } from '@/lib/api';
 import { bookingAmount, buildServiceMap } from '@/lib/bookingAmount';
 import { useCountUp } from '@/hooks/useCountUp';
 
@@ -9,6 +9,8 @@ import { useCountUp } from '@/hooks/useCountUp';
 interface StatsCardsProps {
   services: ServiceData[];
   bookings: BookingData[];
+  /** Server-provided stats from GET /api/barber/dashboard (preferred when present) */
+  stats?: BarberDashboardStats | null;
   isLoading?: boolean;
 }
 
@@ -73,17 +75,23 @@ function StatCard({ title, value, prefix = '', icon: Icon, color, bgColor, index
   );
 }
 
-export function StatsCards({ services, bookings, isLoading }: StatsCardsProps) {
+export function StatsCards({ services, bookings, stats: apiStats, isLoading }: StatsCardsProps) {
   const serviceMap = buildServiceMap(services);
   const statusOf = (b: BookingData) => String(b.status ?? '').toLowerCase().trim();
 
-  const totalBookings = bookings.length;
   const completed = bookings.filter((b) => statusOf(b) === 'completed');
-  const completedBookings = completed.length;
-  const pendingBookings = bookings.filter((b) => statusOf(b) === 'pending').length;
+  const totalBookings = apiStats?.total_bookings ?? bookings.length;
+  const completedBookings = apiStats?.completed ?? completed.length;
+  const pendingBookings = apiStats?.pending ?? bookings.filter((b) => statusOf(b) === 'pending').length;
+  const approvedBookings =
+    apiStats?.approved ?? bookings.filter((b) => statusOf(b) === 'approved').length;
+  const cancelledBookings =
+    apiStats?.cancelled ??
+    bookings.filter((b) => ['cancelled', 'canceled', 'rejected'].includes(statusOf(b))).length;
 
-  // Earnings come strictly from completed bookings, priced via the services list
-  const totalEarnings = completed.reduce((sum, b) => sum + bookingAmount(b, serviceMap), 0);
+  // Earnings come from the API when available, else from completed bookings priced via services
+  const totalEarnings =
+    apiStats?.total_earnings ?? completed.reduce((sum, b) => sum + bookingAmount(b, serviceMap), 0);
 
 
   const stats = [
@@ -100,6 +108,20 @@ export function StatsCards({ services, bookings, isLoading }: StatsCardsProps) {
       icon: CheckCircle,
       color: 'text-green-500',
       bgColor: 'bg-green-500/10',
+    },
+    {
+      title: 'Approved',
+      value: approvedBookings,
+      icon: CheckCircle,
+      color: 'text-emerald-500',
+      bgColor: 'bg-emerald-500/10',
+    },
+    {
+      title: 'Cancelled',
+      value: cancelledBookings,
+      icon: XCircle,
+      color: 'text-red-500',
+      bgColor: 'bg-red-500/10',
     },
     { 
       title: 'Pending', 
@@ -124,7 +146,7 @@ export function StatsCards({ services, bookings, isLoading }: StatsCardsProps) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4"
     >
       {stats.map((stat, index) => (
         <StatCard
