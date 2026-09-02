@@ -1,0 +1,3096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Terms of Use | Trimlyhub</title>
+
+    <meta
+        name="description"
+        content="Read the Trimlyhub Terms of Use governing access to and use of the Trimlyhub platform, bookings, customers, barbers, salons, payments, reviews, and services."
+    >
+
+    <meta
+        name="robots"
+        content="index, follow"
+    >
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        /* =========================
+           GLOBAL
+        ========================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            background: #fffaf3;
+            color: #1f2937;
+            line-height: 1.7;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font-family: inherit;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            background: rgba(255, 255, 255, 0.95);
+
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+
+            border-bottom:
+                1px solid rgba(245, 139, 0, 0.12);
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: auto;
+
+            padding: 14px 24px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+
+        /* =========================
+           TRIMLYHUB LOGO
+        ========================= */
+
+        .logo {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            font-size: 23px;
+            font-weight: 800;
+
+            white-space: nowrap;
+        }
+
+        .logo img {
+            width: 43px;
+            height: 43px;
+
+            object-fit: cover;
+
+            border-radius: 12px;
+
+            display: block;
+        }
+
+        .logo-text {
+            display: flex;
+            align-items: center;
+
+            gap: 0;
+        }
+
+        .logo-text .trimly {
+            color: #f28c00;
+        }
+
+        .logo-text .hub {
+            color: #171717;
+        }
+
+
+        /* =========================
+           NAVIGATION
+        ========================= */
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+
+            gap: 28px;
+        }
+
+        .nav-links a {
+            color: #4b5563;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            transition: 0.25s ease;
+        }
+
+        .nav-links a:hover {
+            color: #f28c00;
+        }
+
+        .nav-contact {
+            padding: 10px 18px;
+
+            border-radius: 10px;
+
+            background: #fff1dc;
+
+            color: #e77d00 !important;
+        }
+
+        .nav-contact:hover {
+            background: #ffe4bd;
+        }
+
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            position: relative;
+
+            overflow: hidden;
+
+            padding: 80px 20px 85px;
+
+            text-align: center;
+
+            background:
+                radial-gradient(
+                    circle at 10% 20%,
+                    rgba(255, 166, 0, 0.16),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 90% 30%,
+                    rgba(245, 139, 0, 0.14),
+                    transparent 28%
+                ),
+                linear-gradient(
+                    135deg,
+                    #fff4e2,
+                    #ffffff
+                );
+        }
+
+        .hero::before {
+            content: "";
+
+            position: absolute;
+
+            width: 260px;
+            height: 260px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(245, 139, 0, 0.08);
+
+            top: -130px;
+            left: -100px;
+        }
+
+        .hero::after {
+            content: "";
+
+            position: absolute;
+
+            width: 300px;
+            height: 300px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255, 174, 0, 0.07);
+
+            bottom: -170px;
+            right: -120px;
+        }
+
+        .hero-content {
+            position: relative;
+
+            z-index: 2;
+
+            max-width: 820px;
+
+            margin: auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 8px 16px;
+
+            border-radius: 50px;
+
+            background: #fff0d8;
+
+            color: #e57c00;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size:
+                clamp(38px, 6vw, 58px);
+
+            line-height: 1.1;
+
+            font-weight: 800;
+
+            letter-spacing: -1.5px;
+
+            margin-bottom: 18px;
+
+            color: #171717;
+        }
+
+        .hero h1 span {
+            color: #f28c00;
+        }
+
+        .hero p {
+            max-width: 710px;
+
+            margin: auto;
+
+            color: #667085;
+
+            font-size: 16px;
+        }
+
+
+        /* =========================
+           POLICY WRAPPER
+        ========================= */
+
+        .terms-wrapper {
+            max-width: 1120px;
+
+            margin: -35px auto 0;
+
+            padding:
+                0 20px 90px;
+
+            position: relative;
+
+            z-index: 5;
+        }
+
+
+        /* =========================
+           META
+        ========================= */
+
+        .terms-meta {
+            background: #ffffff;
+
+            border:
+                1px solid #f0e5d6;
+
+            border-radius: 18px;
+
+            padding: 18px 22px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 14px 35px rgba(
+                    85,
+                    53,
+                    10,
+                    0.06
+                );
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            flex-wrap: wrap;
+        }
+
+        .terms-meta strong {
+            color: #171717;
+
+            font-size: 13px;
+        }
+
+        .terms-meta span {
+            color: #e77d00;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================
+           LAYOUT
+        ========================= */
+
+        .terms-layout {
+            display: grid;
+
+            grid-template-columns:
+                250px 1fr;
+
+            gap: 28px;
+
+            align-items: start;
+        }
+
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .terms-sidebar {
+            position: sticky;
+
+            top: 90px;
+
+            background: #ffffff;
+
+            border:
+                1px solid #f0e5d6;
+
+            border-radius: 20px;
+
+            padding: 22px;
+
+            box-shadow:
+                0 15px 35px rgba(
+                    85,
+                    53,
+                    10,
+                    0.06
+                );
+        }
+
+        .terms-sidebar h3 {
+            font-size: 15px;
+
+            color: #171717;
+
+            margin-bottom: 14px;
+        }
+
+        .terms-sidebar a {
+            display: block;
+
+            padding: 8px 10px;
+
+            margin-bottom: 3px;
+
+            border-radius: 8px;
+
+            color: #667085;
+
+            font-size: 12px;
+
+            transition: 0.2s ease;
+        }
+
+        .terms-sidebar a:hover {
+            color: #e77d00;
+
+            background: #fff5e8;
+        }
+
+
+        /* =========================
+           CONTENT
+        ========================= */
+
+        .terms-content {
+            background: #ffffff;
+
+            border:
+                1px solid #f0e5d6;
+
+            border-radius: 24px;
+
+            padding:
+                42px 45px;
+
+            box-shadow:
+                0 18px 45px rgba(
+                    85,
+                    53,
+                    10,
+                    0.07
+                );
+        }
+
+
+        /* =========================
+           INTRO
+        ========================= */
+
+        .terms-intro {
+            padding-bottom: 30px;
+
+            margin-bottom: 30px;
+
+            border-bottom:
+                1px solid #f0e5d6;
+        }
+
+        .terms-intro h2 {
+            font-size: 25px;
+
+            color: #171717;
+
+            margin-bottom: 12px;
+        }
+
+        .terms-intro p {
+            color: #667085;
+
+            font-size: 14px;
+
+            margin-bottom: 12px;
+        }
+
+        .terms-intro p:last-child {
+            margin-bottom: 0;
+        }
+
+
+        /* =========================
+           SECTIONS
+        ========================= */
+
+        .terms-section {
+            margin-bottom: 38px;
+
+            scroll-margin-top: 100px;
+        }
+
+        .terms-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .terms-section h2 {
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 12px;
+
+            font-size: 21px;
+
+            line-height: 1.4;
+
+            color: #171717;
+
+            margin-bottom: 13px;
+        }
+
+        .section-number {
+            flex: 0 0 auto;
+
+            width: 32px;
+            height: 32px;
+
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: #fff0d8;
+
+            color: #e77d00;
+
+            font-size: 12px;
+
+            font-weight: 800;
+        }
+
+        .terms-section p {
+            color: #596579;
+
+            font-size: 13.5px;
+
+            margin-bottom: 12px;
+        }
+
+        .terms-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .terms-section ul {
+            margin:
+                10px 0 15px 20px;
+        }
+
+        .terms-section li {
+            color: #596579;
+
+            font-size: 13.5px;
+
+            margin-bottom: 8px;
+
+            padding-left: 4px;
+        }
+
+        .terms-section li::marker {
+            color: #f28c00;
+        }
+
+        .terms-section strong {
+            color: #303846;
+        }
+
+
+        /* =========================
+           HIGHLIGHT
+        ========================= */
+
+        .highlight-box {
+            margin: 18px 0;
+
+            padding: 18px 20px;
+
+            border-radius: 13px;
+
+            background: #fff8ed;
+
+            border-left:
+                4px solid #f28c00;
+        }
+
+        .highlight-box p {
+            margin: 0;
+
+            color: #5b4a34;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           INFO BOX
+        ========================= */
+
+        .info-box {
+            margin-top: 18px;
+
+            padding: 18px 20px;
+
+            border-radius: 13px;
+
+            background: #fffaf3;
+
+            border:
+                1px solid #f2e3cf;
+        }
+
+        .info-box h4 {
+            color: #171717;
+
+            font-size: 14px;
+
+            margin-bottom: 6px;
+        }
+
+        .info-box p {
+            margin: 0;
+
+            font-size: 13px;
+        }
+
+        .info-box a {
+            color: #e77d00;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================
+           CONTACT BOX
+        ========================= */
+
+        .contact-box {
+            margin-top: 18px;
+
+            padding: 22px;
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #fff4e2,
+                    #fffaf3
+                );
+
+            border:
+                1px solid #f1ddc0;
+        }
+
+        .contact-box h3 {
+            color: #171717;
+
+            font-size: 16px;
+
+            margin-bottom: 8px;
+        }
+
+        .contact-box p {
+            margin-bottom: 7px;
+        }
+
+        .contact-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-box a {
+            color: #e77d00;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            background: #17130e;
+
+            color: white;
+
+            padding:
+                55px 20px 25px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+
+            margin: auto;
+        }
+
+        .footer-top {
+            display: grid;
+
+            grid-template-columns:
+                1.5fr 1fr 1fr;
+
+            gap: 45px;
+
+            padding-bottom: 40px;
+
+            border-bottom:
+                1px solid rgba(
+                    255,
+                    255,
+                    255,
+                    0.1
+                );
+        }
+
+        .footer-brand .logo {
+            margin-bottom: 15px;
+        }
+
+        .footer-brand .logo-text .trimly {
+            color: #f28c00;
+        }
+
+        .footer-brand .logo-text .hub {
+            color: white;
+        }
+
+        .footer-brand p {
+            max-width: 400px;
+
+            color: #a9a29a;
+
+            font-size: 13px;
+
+            line-height: 1.8;
+        }
+
+        .footer-column h4 {
+            font-size: 14px;
+
+            margin-bottom: 18px;
+        }
+
+        .footer-column a {
+            display: block;
+
+            color: #a9a29a;
+
+            font-size: 13px;
+
+            margin-bottom: 10px;
+
+            transition: 0.2s ease;
+        }
+
+        .footer-column a:hover {
+            color: #f28c00;
+        }
+
+        .footer-bottom {
+            padding-top: 22px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            color: #756e66;
+
+            font-size: 12px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            .terms-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .terms-sidebar {
+                display: none;
+            }
+
+            .footer-top {
+                grid-template-columns:
+                    1fr 1fr;
+            }
+        }
+
+
+        @media (max-width: 650px) {
+
+            .navbar {
+                padding:
+                    13px 16px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .logo img {
+                width: 38px;
+                height: 38px;
+
+                border-radius: 10px;
+            }
+
+            .logo-text {
+                gap: 0;
+            }
+
+            .nav-links {
+                gap: 8px;
+            }
+
+            .nav-links a:not(.nav-contact) {
+                display: none;
+            }
+
+            .nav-contact {
+                padding:
+                    8px 13px;
+
+                font-size:
+                    12px !important;
+            }
+
+
+            .hero {
+                padding:
+                    65px 18px 75px;
+            }
+
+            .hero h1 {
+                font-size: 38px;
+            }
+
+            .hero p {
+                font-size: 14px;
+            }
+
+
+            .terms-wrapper {
+                padding:
+                    0 15px 70px;
+
+                margin-top: -30px;
+            }
+
+
+            .terms-meta {
+                padding:
+                    15px 17px;
+            }
+
+
+            .terms-content {
+                padding:
+                    28px 20px;
+
+                border-radius: 20px;
+            }
+
+
+            .terms-intro h2 {
+                font-size: 22px;
+            }
+
+
+            .terms-section h2 {
+                font-size: 18px;
+            }
+
+
+            .terms-section p,
+            .terms-section li {
+                font-size: 13px;
+            }
+
+
+            .section-number {
+                width: 29px;
+                height: 29px;
+            }
+
+
+            .footer-top {
+                grid-template-columns:
+                    1fr;
+
+                gap: 30px;
+            }
+
+
+            .footer-bottom {
+                flex-direction: column;
+
+                text-align: center;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header>
+
+        <nav class="navbar">
+
+
+            <a
+                href="/"
+                class="logo"
+            >
+
+                <img
+                    src="trimly-logo.png"
+                    alt="Trimlyhub Logo"
+                >
+
+
+                <span class="logo-text">
+
+                    <span class="trimly">
+                        Trimly
+                    </span><span class="hub">hub</span>
+
+                </span>
+
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="/">
+                    Home
+                </a>
+
+                <a href="privacy-policy.html">
+                    Privacy
+                </a>
+
+                <a href="refund-policy.html">
+                    Refunds
+                </a>
+
+                <a
+                    href="contact-us.html"
+                    class="nav-contact"
+                >
+                    Contact Us
+                </a>
+
+            </div>
+
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- =========================
+         HERO
+    ========================= -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+
+            <div class="hero-badge">
+                📄 Trimlyhub Terms
+            </div>
+
+
+            <h1>
+                Terms of <span>Use</span>
+            </h1>
+
+
+            <p>
+                These Terms of Use explain the rules and conditions
+                governing your access to and use of Trimlyhub,
+                including bookings, services, payments, accounts,
+                reviews, and interactions with barbers and salons.
+            </p>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         TERMS CONTENT
+    ========================= -->
+
+    <main class="terms-wrapper">
+
+
+        <!-- META -->
+
+        <div class="terms-meta">
+
+            <div>
+
+                <strong>
+                    Terms of Use
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Last Updated: 2 September 2026
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="terms-layout">
+
+
+            <!-- =========================
+                 SIDEBAR
+            ========================= -->
+
+            <aside class="terms-sidebar">
+
+                <h3>
+                    On this page
+                </h3>
+
+
+                <a href="#introduction">
+                    Introduction
+                </a>
+
+                <a href="#platform">
+                    About Trimlyhub
+                </a>
+
+                <a href="#eligibility">
+                    Eligibility
+                </a>
+
+                <a href="#account">
+                    Accounts
+                </a>
+
+                <a href="#customer">
+                    Customer Terms
+                </a>
+
+                <a href="#provider">
+                    Barber & Salon Terms
+                </a>
+
+                <a href="#provider-responsibility">
+                    Provider Responsibilities
+                </a>
+
+                <a href="#services">
+                    Services & Pricing
+                </a>
+
+                <a href="#booking">
+                    Bookings
+                </a>
+
+                <a href="#payments">
+                    Payments
+                </a>
+
+                <a href="#cancellation">
+                    Cancellation & Refunds
+                </a>
+
+                <a href="#commission">
+                    Commission
+                </a>
+
+                <a href="#quality">
+                    Service Quality
+                </a>
+
+                <a href="#reviews">
+                    Reviews & Content
+                </a>
+
+                <a href="#intellectual">
+                    Intellectual Property
+                </a>
+
+                <a href="#prohibited">
+                    Prohibited Activities
+                </a>
+
+                <a href="#communication">
+                    Communication Features
+                </a>
+
+                <a href="#location">
+                    Location Features
+                </a>
+
+                <a href="#privacy">
+                    Privacy
+                </a>
+
+                <a href="#promotions">
+                    Promotions & Advertising
+                </a>
+
+                <a href="#thirdparty">
+                    Third-Party Services
+                </a>
+
+                <a href="#availability">
+                    Platform Availability
+                </a>
+
+                <a href="#disclaimer">
+                    Disclaimer
+                </a>
+
+                <a href="#liability">
+                    Limitation of Liability
+                </a>
+
+                <a href="#indemnification">
+                    Indemnification
+                </a>
+
+                <a href="#termination">
+                    Suspension & Termination
+                </a>
+
+                <a href="#grievance">
+                    Support & Grievance
+                </a>
+
+                <a href="#disputes">
+                    Dispute Resolution
+                </a>
+
+                <a href="#law">
+                    Governing Law
+                </a>
+
+                <a href="#international">
+                    International Expansion
+                </a>
+
+                <a href="#changes">
+                    Changes to Terms
+                </a>
+
+                <a href="#contact">
+                    Contact Us
+                </a>
+
+            </aside>
+
+
+
+            <!-- =========================
+                 TERMS CONTENT
+            ========================= -->
+
+            <article class="terms-content">
+
+
+                <!-- INTRODUCTION -->
+
+                <div
+                    class="terms-intro"
+                    id="introduction"
+                >
+
+                    <h2>
+                        Welcome to Trimlyhub
+                    </h2>
+
+
+                    <p>
+                        These Terms of Use ("Terms") govern your access
+                        to and use of the Trimlyhub website, application,
+                        platform, and related services.
+                    </p>
+
+
+                    <p>
+                        Trimlyhub provides a platform that helps
+                        customers discover and book services offered
+                        by independent barbers, salons, and other
+                        participating service providers.
+                    </p>
+
+
+                    <div class="highlight-box">
+
+                        <p>
+                            <strong>
+                                Please read these Terms carefully.
+                            </strong>
+
+                            By accessing or using Trimlyhub, creating
+                            an account, making a booking, or otherwise
+                            using our services, you agree to be bound
+                            by these Terms and our Privacy Policy and
+                            Cancellation & Refund Policy.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- 1 -->
+
+                <section
+                    class="terms-section"
+                    id="platform"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            1
+                        </span>
+
+                        About Trimlyhub
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub is a technology platform that
+                        facilitates connections between customers and
+                        independent barbers, salons, and other
+                        participating grooming service providers.
+                    </p>
+
+
+                    <p>
+                        Unless expressly stated otherwise, Trimlyhub
+                        does not itself provide the barbering, salon,
+                        grooming, or other services listed by
+                        independent providers.
+                    </p>
+
+
+                    <p>
+                        The service provider is generally responsible
+                        for performing the service booked by a
+                        customer.
+                    </p>
+
+
+                    <div class="highlight-box">
+
+                        <p>
+                            Trimlyhub's role may include providing
+                            discovery, profile, booking, payment,
+                            communication, review, and other
+                            technology features that support the
+                            marketplace.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- 2 -->
+
+                <section
+                    class="terms-section"
+                    id="eligibility"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            2
+                        </span>
+
+                        Eligibility
+
+                    </h2>
+
+
+                    <p>
+                        You may use Trimlyhub only if you are legally
+                        capable of entering into a binding agreement
+                        under applicable law.
+                    </p>
+
+
+                    <p>
+                        By using Trimlyhub, you represent that the
+                        information you provide is accurate and that
+                        you have the legal authority to accept these
+                        Terms.
+                    </p>
+
+
+                    <p>
+                        If you use Trimlyhub on behalf of a business
+                        or organization, you represent that you have
+                        authority to bind that entity to these Terms.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 3 -->
+
+                <section
+                    class="terms-section"
+                    id="account"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            3
+                        </span>
+
+                        User Accounts
+
+                    </h2>
+
+
+                    <p>
+                        Some Trimlyhub features may require you to
+                        create an account.
+                    </p>
+
+
+                    <p>
+                        You agree to provide accurate, complete, and
+                        current information and to keep your account
+                        information updated.
+                    </p>
+
+
+                    <ul>
+
+                        <li>
+                            Keep your login credentials confidential.
+                        </li>
+
+                        <li>
+                            Do not allow unauthorized persons to use
+                            your account.
+                        </li>
+
+                        <li>
+                            Notify Trimlyhub if you believe your
+                            account has been compromised.
+                        </li>
+
+                        <li>
+                            Do not create accounts using false or
+                            misleading information.
+                        </li>
+
+                    </ul>
+
+
+                    <p>
+                        You are responsible for activity conducted
+                        through your account unless caused by a
+                        circumstance for which you are not legally
+                        responsible.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 4 -->
+
+                <section
+                    class="terms-section"
+                    id="customer"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            4
+                        </span>
+
+                        Customer Terms
+
+                    </h2>
+
+
+                    <p>
+                        Customers may use Trimlyhub to discover
+                        participating service providers, view
+                        services and prices, make appointments,
+                        manage bookings, and provide reviews or
+                        feedback.
+                    </p>
+
+
+                    <p>
+                        Customers agree to provide accurate booking
+                        information and to arrive at the selected
+                        provider's location at the scheduled time.
+                    </p>
+
+
+                    <p>
+                        Customers must treat service providers,
+                        employees, staff, and other users respectfully
+                        and must not misuse the platform.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 5 -->
+
+                <section
+                    class="terms-section"
+                    id="provider"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            5
+                        </span>
+
+                        Barber & Salon Provider Terms
+
+                    </h2>
+
+
+                    <p>
+                        Barbers, salons, and other service providers
+                        may use Trimlyhub to create business profiles,
+                        list services, set prices, receive bookings,
+                        and manage appointments.
+                    </p>
+
+
+                    <p>
+                        Providers are independent businesses or
+                        professionals unless a separate written
+                        agreement with Trimlyhub expressly states
+                        otherwise.
+                    </p>
+
+
+                    <p>
+                        Providers are responsible for ensuring that
+                        they are legally permitted to provide the
+                        services they list on Trimlyhub.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 6 -->
+
+                <section
+                    class="terms-section"
+                    id="provider-responsibility"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            6
+                        </span>
+
+                        Provider Responsibilities
+
+                    </h2>
+
+
+                    <p>
+                        Service providers are responsible for the
+                        accuracy and legality of information they
+                        publish on Trimlyhub.
+                    </p>
+
+
+                    <ul>
+
+                        <li>
+                            Provide accurate business and contact
+                            information.
+                        </li>
+
+                        <li>
+                            List accurate services and prices.
+                        </li>
+
+                        <li>
+                            Maintain appropriate professional
+                            standards.
+                        </li>
+
+                        <li>
+                            Honour confirmed appointments where
+                            reasonably possible.
+                        </li>
+
+                        <li>
+                            Follow applicable health, safety,
+                            licensing, tax, consumer, and business
+                            requirements.
+                        </li>
+
+                        <li>
+                            Obtain any permissions, licences, or
+                            registrations required for their
+                            activities.
+                        </li>
+
+                        <li>
+                            Avoid misleading customers about their
+                            services or qualifications.
+                        </li>
+
+                    </ul>
+
+
+                    <p>
+                        Trimlyhub may review, restrict, suspend, or
+                        remove provider profiles that violate these
+                        Terms or applicable platform standards.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 7 -->
+
+                <section
+                    class="terms-section"
+                    id="services"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            7
+                        </span>
+
+                        Services, Availability & Pricing
+
+                    </h2>
+
+
+                    <p>
+                        Services listed on Trimlyhub are generally
+                        offered by independent service providers.
+                    </p>
+
+
+                    <p>
+                        Providers are responsible for maintaining
+                        accurate service descriptions, prices,
+                        availability, and appointment information.
+                    </p>
+
+
+                    <p>
+                        Prices may change from time to time. The price
+                        displayed at the time of a confirmed booking
+                        will generally apply to that booking, subject
+                        to applicable corrections, taxes, fees, or
+                        other disclosed conditions.
+                    </p>
+
+
+                    <p>
+                        Trimlyhub may display information supplied by
+                        providers and may take reasonable steps to
+                        identify or correct inaccurate information.
+                        However, Trimlyhub does not guarantee that
+                        every listing will always be complete,
+                        current, or error-free.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 8 -->
+
+                <section
+                    class="terms-section"
+                    id="booking"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            8
+                        </span>
+
+                        Bookings & Appointments
+
+                    </h2>
+
+
+                    <p>
+                        A booking becomes confirmed when Trimlyhub
+                        or the applicable provider confirms the
+                        appointment through the platform or other
+                        authorized booking process.
+                    </p>
+
+
+                    <p>
+                        Customers should carefully review the selected
+                        provider, service, date, time, location, price,
+                        and other booking details before completing
+                        the booking.
+                    </p>
+
+
+                    <p>
+                        Trimlyhub may send booking confirmations,
+                        reminders, updates, or other service-related
+                        communications.
+                    </p>
+
+
+                    <p>
+                        A provider may need to contact a customer
+                        regarding a booking where necessary to
+                        facilitate the appointment.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 9 -->
+
+                <section
+                    class="terms-section"
+                    id="payments"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            9
+                        </span>
+
+                        Payments
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub may provide online payment
+                        functionality for eligible bookings and
+                        services.
+                    </p>
+
+
+                    <p>
+                        Payments may be processed through third-party
+                        payment gateways or financial service
+                        providers.
+                    </p>
+
+
+                    <p>
+                        By initiating a payment, you authorize the
+                        applicable payment provider to process the
+                        transaction according to the payment method
+                        and applicable terms.
+                    </p>
+
+
+                    <div class="highlight-box">
+
+                        <p>
+                            Trimlyhub will never require you to share
+                            your UPI PIN, card PIN, CVV, OTP, password,
+                            or banking credentials through a support
+                            message. Never share such information with
+                            anyone claiming to represent Trimlyhub.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- 10 -->
+
+                <section
+                    class="terms-section"
+                    id="cancellation"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            10
+                        </span>
+
+                        Cancellation & Refunds
+
+                    </h2>
+
+
+                    <p>
+                        Bookings may be subject to the Trimlyhub
+                        Cancellation & Refund Policy and any
+                        booking-specific cancellation conditions
+                        displayed before confirmation.
+                    </p>
+
+
+                    <p>
+                        Unless a different condition applies to the
+                        particular booking, an eligible cancellation
+                        made more than two hours before the scheduled
+                        appointment may generally qualify for a full
+                        refund.
+                    </p>
+
+
+                    <p>
+                        Cancellations made less than two hours before
+                        an appointment may qualify for a partial
+                        refund or no refund depending on the
+                        applicable booking conditions.
+                    </p>
+
+
+                    <p>
+                        No-shows and cancellations after the
+                        appointment time will generally not qualify
+                        for a refund unless otherwise determined by
+                        Trimlyhub or required by applicable law.
+                    </p>
+
+
+                    <p>
+                        If a provider cancels a confirmed appointment
+                        and the service cannot reasonably be provided,
+                        the customer may generally be eligible for a
+                        refund.
+                    </p>
+
+
+                    <div class="info-box">
+
+                        <h4>
+                            Full Cancellation & Refund Rules
+                        </h4>
+
+                        <p>
+                            Please review the
+                            <a href="refund-policy.html">
+                                Cancellation & Refund Policy
+                            </a>
+                            for detailed rules regarding refunds,
+                            no-shows, late arrivals, duplicate
+                            payments, provider cancellations, and
+                            refund requests.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- 11 -->
+
+                <section
+                    class="terms-section"
+                    id="commission"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            11
+                        </span>
+
+                        Platform Commission & Fees
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub may charge or receive a commission,
+                        platform fee, service fee, transaction fee,
+                        or other applicable fee in connection with
+                        transactions involving service providers.
+                    </p>
+
+
+                    <p>
+                        The applicable provider-side commission or fee
+                        structure may be communicated separately to
+                        participating providers.
+                    </p>
+
+
+                    <p>
+                        Any customer-facing fee that applies to a
+                        booking should be displayed or communicated
+                        before the customer completes the relevant
+                        transaction, where required.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 12 -->
+
+                <section
+                    class="terms-section"
+                    id="quality"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            12
+                        </span>
+
+                        Service Quality & Provider Responsibility
+
+                    </h2>
+
+
+                    <p>
+                        Service providers are responsible for the
+                        actual services they perform, including their
+                        quality, professionalism, availability,
+                        qualifications, hygiene practices, and
+                        compliance with applicable laws.
+                    </p>
+
+
+                    <p>
+                        Trimlyhub may provide tools that help
+                        customers discover and compare providers,
+                        but listing a provider does not necessarily
+                        constitute a guarantee, certification, or
+                        endorsement of every aspect of that provider's
+                        business or services.
+                    </p>
+
+
+                    <p>
+                        Customers should exercise reasonable judgment
+                        when selecting and using a service provider.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 13 -->
+
+                <section
+                    class="terms-section"
+                    id="reviews"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            13
+                        </span>
+
+                        Reviews, Ratings & User Content
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub may allow users to submit reviews,
+                        ratings, photographs, comments, feedback,
+                        profile information, and other content.
+                    </p>
+
+
+                    <p>
+                        You are responsible for content that you
+                        submit and must have the necessary rights and
+                        permissions to submit it.
+                    </p>
+
+
+                    <p>
+                        Reviews and other content must be honest,
+                        relevant, and based on genuine experiences.
+                    </p>
+
+
+                    <ul>
+
+                        <li>
+                            Do not submit fake reviews.
+                        </li>
+
+                        <li>
+                            Do not manipulate ratings.
+                        </li>
+
+                        <li>
+                            Do not impersonate another person.
+                        </li>
+
+                        <li>
+                            Do not post unlawful, threatening,
+                            abusive, defamatory, or discriminatory
+                            content.
+                        </li>
+
+                        <li>
+                            Do not publish another person's private
+                            information without authorization.
+                        </li>
+
+                    </ul>
+
+
+                    <p>
+                        Trimlyhub may moderate, restrict, edit where
+                        appropriate, or remove content that violates
+                        these Terms, applicable law, or platform
+                        standards.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 14 -->
+
+                <section
+                    class="terms-section"
+                    id="intellectual"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            14
+                        </span>
+
+                        Intellectual Property
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub and its licensors may own or control
+                        the platform, software, design, branding,
+                        logos, graphics, text, interface elements,
+                        databases, and other materials made available
+                        through the platform.
+                    </p>
+
+
+                    <p>
+                        Except as expressly permitted by law or by
+                        Trimlyhub in writing, you may not copy,
+                        reproduce, modify, distribute, sell, license,
+                        reverse engineer, scrape, or commercially
+                        exploit Trimlyhub's protected materials.
+                    </p>
+
+
+                    <p>
+                        "Trimlyhub" and associated branding may not be
+                        used in a way that creates false affiliation,
+                        endorsement, or sponsorship.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 15 -->
+
+                <section
+                    class="terms-section"
+                    id="prohibited"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            15
+                        </span>
+
+                        Prohibited Activities
+
+                    </h2>
+
+
+                    <p>
+                        You must not use Trimlyhub to:
+                    </p>
+
+
+                    <ul>
+
+                        <li>
+                            Break or attempt to break applicable law.
+                        </li>
+
+                        <li>
+                            Commit fraud or facilitate fraudulent
+                            activity.
+                        </li>
+
+                        <li>
+                            Create fake accounts or impersonate
+                            others.
+                        </li>
+
+                        <li>
+                            Manipulate bookings, ratings, reviews,
+                            prices, or platform functionality.
+                        </li>
+
+                        <li>
+                            Harass, threaten, abuse, or harm another
+                            user or service provider.
+                        </li>
+
+                        <li>
+                            Upload malicious software, harmful code,
+                            or security exploits.
+                        </li>
+
+                        <li>
+                            Attempt unauthorized access to accounts,
+                            systems, databases, or infrastructure.
+                        </li>
+
+                        <li>
+                            Scrape or collect platform data through
+                            unauthorized automated methods.
+                        </li>
+
+                        <li>
+                            Use Trimlyhub for unauthorized commercial
+                            solicitation or spam.
+                        </li>
+
+                        <li>
+                            Interfere with the normal operation or
+                            security of the platform.
+                        </li>
+
+                    </ul>
+
+                </section>
+
+
+
+                <!-- 16 -->
+
+                <section
+                    class="terms-section"
+                    id="communication"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            16
+                        </span>
+
+                        Communication Features
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub may introduce communication features
+                        such as chat, calling, messaging, or other
+                        communication tools in the future.
+                    </p>
+
+
+                    <p>
+                        Where such features are available, users must
+                        use them only for legitimate purposes related
+                        to bookings and services and must comply with
+                        applicable laws and platform rules.
+                    </p>
+
+
+                    <p>
+                        Trimlyhub may introduce additional terms or
+                        controls for communication features when they
+                        become available.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 17 -->
+
+                <section
+                    class="terms-section"
+                    id="location"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            17
+                        </span>
+
+                        Location & Map Features
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub may provide location and map
+                        features to help customers find nearby
+                        barbers, salons, or other service providers.
+                    </p>
+
+
+                    <p>
+                        Location information and map results may be
+                        provided using third-party mapping or location
+                        services.
+                    </p>
+
+
+                    <p>
+                        Map information may not always be perfectly
+                        accurate or current. Users should verify
+                        important address and travel information before
+                        relying on it.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 18 -->
+
+                <section
+                    class="terms-section"
+                    id="privacy"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            18
+                        </span>
+
+                        Privacy
+
+                    </h2>
+
+
+                    <p>
+                        Your use of Trimlyhub is also subject to our
+                        Privacy Policy, which explains how we collect,
+                        use, store, protect, and share information.
+                    </p>
+
+
+                    <div class="info-box">
+
+                        <h4>
+                            Privacy Policy
+                        </h4>
+
+                        <p>
+                            Read the full
+                            <a href="privacy-policy.html">
+                                Trimlyhub Privacy Policy
+                            </a>
+                            for more information about data handling
+                            and privacy choices.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- 19 -->
+
+                <section
+                    class="terms-section"
+                    id="promotions"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            19
+                        </span>
+
+                        Promotions, Advertising & Offers
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub may display promotional offers,
+                        discounts, advertisements, sponsored content,
+                        referral programs, or other commercial
+                        communications.
+                    </p>
+
+
+                    <p>
+                        Promotions may be subject to additional
+                        eligibility requirements, expiry dates,
+                        usage limits, and other conditions.
+                    </p>
+
+
+                    <p>
+                        Trimlyhub may modify, suspend, or discontinue
+                        promotional programs where permitted by law.
+                    </p>
+
+
+                    <p>
+                        Third-party advertisements or offers may be
+                        provided by independent businesses. Unless
+                        expressly stated otherwise, Trimlyhub does
+                        not guarantee the quality, accuracy, or
+                        suitability of third-party products or
+                        services.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 20 -->
+
+                <section
+                    class="terms-section"
+                    id="thirdparty"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            20
+                        </span>
+
+                        Third-Party Services & Links
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub may rely on third-party services
+                        for payments, hosting, analytics, maps,
+                        authentication, communications, security,
+                        advertising, and other functionality.
+                    </p>
+
+
+                    <p>
+                        Third-party services may have their own terms,
+                        privacy policies, fees, and requirements.
+                    </p>
+
+
+                    <p>
+                        Trimlyhub is not responsible for independent
+                        third-party websites or services that are
+                        outside our control.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 21 -->
+
+                <section
+                    class="terms-section"
+                    id="availability"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            21
+                        </span>
+
+                        Platform Availability
+
+                    </h2>
+
+
+                    <p>
+                        We aim to keep Trimlyhub available and
+                        reliable, but we do not guarantee that the
+                        platform will always be available,
+                        uninterrupted, secure, or error-free.
+                    </p>
+
+
+                    <p>
+                        Trimlyhub may temporarily become unavailable
+                        due to maintenance, upgrades, technical
+                        problems, security incidents, infrastructure
+                        failures, third-party outages, or other
+                        circumstances.
+                    </p>
+
+
+                    <p>
+                        We may change, suspend, discontinue, or modify
+                        features of the platform from time to time.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 22 -->
+
+                <section
+                    class="terms-section"
+                    id="disclaimer"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            22
+                        </span>
+
+                        Disclaimer
+
+                    </h2>
+
+
+                    <p>
+                        To the maximum extent permitted by applicable
+                        law, Trimlyhub provides its platform and
+                        technology services on an "as available" and
+                        "as is" basis.
+                    </p>
+
+
+                    <p>
+                        We do not guarantee that every provider,
+                        listing, service description, price,
+                        availability indication, review, location,
+                        or other platform information will always be
+                        accurate, complete, current, or error-free.
+                    </p>
+
+
+                    <p>
+                        Trimlyhub does not guarantee a particular
+                        outcome from a service provided by an
+                        independent barber, salon, or other provider.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 23 -->
+
+                <section
+                    class="terms-section"
+                    id="liability"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            23
+                        </span>
+
+                        Limitation of Liability
+
+                    </h2>
+
+
+                    <p>
+                        To the maximum extent permitted by applicable
+                        law, Trimlyhub and its owners, operators,
+                        employees, contractors, affiliates, and
+                        service providers will not be liable for
+                        indirect, incidental, special, consequential,
+                        exemplary, or punitive losses arising from
+                        your use of the platform.
+                    </p>
+
+
+                    <p>
+                        This may include losses arising from service
+                        provider conduct, missed appointments,
+                        customer conduct, inaccurate information,
+                        technical interruptions, third-party
+                        services, or events outside Trimlyhub's
+                        reasonable control.
+                    </p>
+
+
+                    <p>
+                        Nothing in these Terms is intended to exclude
+                        or limit liability that cannot legally be
+                        excluded or limited under applicable law.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 24 -->
+
+                <section
+                    class="terms-section"
+                    id="indemnification"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            24
+                        </span>
+
+                        Indemnification
+
+                    </h2>
+
+
+                    <p>
+                        To the extent permitted by applicable law,
+                        you agree to indemnify and hold harmless
+                        Trimlyhub and its owners, operators,
+                        employees, contractors, and service providers
+                        from claims, losses, liabilities, damages,
+                        costs, and expenses arising from:
+                    </p>
+
+
+                    <ul>
+
+                        <li>
+                            Your violation of these Terms.
+                        </li>
+
+                        <li>
+                            Your unlawful or unauthorized use of the
+                            platform.
+                        </li>
+
+                        <li>
+                            Content you submit to Trimlyhub.
+                        </li>
+
+                        <li>
+                            Your violation of another person's rights.
+                        </li>
+
+                        <li>
+                            Your interaction or transaction with a
+                            service provider or another user.
+                        </li>
+
+                    </ul>
+
+                </section>
+
+
+
+                <!-- 25 -->
+
+                <section
+                    class="terms-section"
+                    id="termination"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            25
+                        </span>
+
+                        Suspension & Termination
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub may restrict, suspend, or terminate
+                        access to an account or platform feature when
+                        reasonably necessary to protect users, the
+                        platform, or our legal and business interests.
+                    </p>
+
+
+                    <p>
+                        Reasons may include suspected fraud, abuse,
+                        security concerns, violation of these Terms,
+                        unlawful activity, repeated cancellations,
+                        misuse of reviews or bookings, or other
+                        serious platform violations.
+                    </p>
+
+
+                    <p>
+                        Users may stop using Trimlyhub at any time.
+                        Certain provisions of these Terms may continue
+                        to apply after termination where their nature
+                        requires continued effect.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 26 -->
+
+                <section
+                    class="terms-section"
+                    id="grievance"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            26
+                        </span>
+
+                        Support & Grievance
+
+                    </h2>
+
+
+                    <p>
+                        If you have a question, complaint, booking
+                        issue, payment concern, refund request, or
+                        other support matter, please contact Trimlyhub
+                        through our support channels.
+                    </p>
+
+
+                    <div class="contact-box">
+
+                        <h3>
+                            Trimlyhub Support
+                        </h3>
+
+
+                        <p>
+
+                            <strong>
+                                Email:
+                            </strong>
+
+                            <a
+                                href="mailto:azharu0054@gmail.com"
+                            >
+                                azharu0054@gmail.com
+                            </a>
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Phone:
+                            </strong>
+
+                            <a
+                                href="tel:+918630153540"
+                            >
+                                +91 8630153540
+                            </a>
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Address:
+                            </strong>
+
+                            Sherkot, Bijnor,
+                            Uttar Pradesh, India
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Support Hours:
+                            </strong>
+
+                            23 Hours Daily
+
+                        </p>
+
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- 27 -->
+
+                <section
+                    class="terms-section"
+                    id="disputes"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            27
+                        </span>
+
+                        Dispute Resolution
+
+                    </h2>
+
+
+                    <p>
+                        We encourage users and service providers to
+                        contact Trimlyhub first so that reasonable
+                        efforts can be made to resolve disputes or
+                        complaints informally.
+                    </p>
+
+
+                    <p>
+                        Nothing in this section prevents a person
+                        from exercising rights or remedies that cannot
+                        legally be waived or restricted.
+                    </p>
+
+
+                    <p>
+                        Where a dispute cannot be resolved
+                        informally, it may be addressed through the
+                        appropriate legal or dispute-resolution
+                        mechanism available under applicable law.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 28 -->
+
+                <section
+                    class="terms-section"
+                    id="law"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            28
+                        </span>
+
+                        Governing Law
+
+                    </h2>
+
+
+                    <p>
+                        These Terms are intended to be governed by
+                        the laws of India, subject to applicable
+                        mandatory legal protections and jurisdictional
+                        requirements.
+                    </p>
+
+
+                    <p>
+                        Any legal proceedings relating to these Terms
+                        or the use of Trimlyhub will be subject to the
+                        jurisdiction of the appropriate courts or
+                        authorities as determined under applicable law.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 29 -->
+
+                <section
+                    class="terms-section"
+                    id="international"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            29
+                        </span>
+
+                        International Expansion
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub is initially intended to operate in
+                        India but may expand to other countries and
+                        regions.
+                    </p>
+
+
+                    <p>
+                        As Trimlyhub expands internationally, we may
+                        introduce additional country-specific terms,
+                        policies, requirements, or notices where
+                        required.
+                    </p>
+
+
+                    <p>
+                        Users accessing Trimlyhub from outside India
+                        are responsible for complying with laws that
+                        apply to their use of the platform in their
+                        location.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 30 -->
+
+                <section
+                    class="terms-section"
+                    id="changes"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            30
+                        </span>
+
+                        Changes to These Terms
+
+                    </h2>
+
+
+                    <p>
+                        Trimlyhub may update these Terms from time to
+                        time to reflect changes in our platform,
+                        services, business practices, technology, or
+                        legal requirements.
+                    </p>
+
+
+                    <p>
+                        The latest version will be made available
+                        through the Trimlyhub website or application
+                        together with the applicable "Last Updated"
+                        date.
+                    </p>
+
+
+                    <p>
+                        Where required by law, we may provide
+                        additional notice regarding material changes.
+                    </p>
+
+
+                    <p>
+                        Your continued use of Trimlyhub after updated
+                        Terms become effective constitutes acceptance
+                        of the updated Terms to the extent permitted
+                        by applicable law.
+                    </p>
+
+                </section>
+
+
+
+                <!-- 31 -->
+
+                <section
+                    class="terms-section"
+                    id="contact"
+                >
+
+                    <h2>
+
+                        <span class="section-number">
+                            31
+                        </span>
+
+                        Contact Trimlyhub
+
+                    </h2>
+
+
+                    <p>
+                        If you have questions regarding these Terms
+                        of Use, please contact Trimlyhub.
+                    </p>
+
+
+                    <div class="contact-box">
+
+                        <h3>
+                            We're Here to Help
+                        </h3>
+
+
+                        <p>
+
+                            <strong>
+                                Email:
+                            </strong>
+
+                            <a
+                                href="mailto:azharu0054@gmail.com"
+                            >
+                                azharu0054@gmail.com
+                            </a>
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Phone:
+                            </strong>
+
+                            <a
+                                href="tel:+918630153540"
+                            >
+                                +91 8630153540
+                            </a>
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Address:
+                            </strong>
+
+                            Sherkot, Bijnor,
+                            Uttar Pradesh, India
+
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- FINAL -->
+
+                <section class="terms-section">
+
+                    <div class="highlight-box">
+
+                        <p>
+                            <strong>
+                                By using Trimlyhub, you acknowledge
+                                that you have read, understood, and
+                                agreed to these Terms of Use, together
+                                with the applicable Privacy Policy and
+                                Cancellation & Refund Policy.
+                            </strong>
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+            </article>
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =========================
+         FOOTER
+    ========================= -->
+
+    <footer>
+
+        <div class="footer-container">
+
+
+            <div class="footer-top">
+
+
+                <!-- BRAND -->
+
+                <div class="footer-brand">
+
+                    <a
+                        href="/"
+                        class="logo"
+                    >
+
+                        <img
+                            src="trimly-logo.png"
+                            alt="Trimlyhub Logo"
+                        >
+
+
+                        <span class="logo-text">
+
+                            <span class="trimly">
+                                Trimly
+                            </span><span class="hub">hub</span>
+
+                        </span>
+
+                    </a>
+
+
+                    <p>
+                        Trimlyhub connects customers with barbers
+                        and salons, making it easier to discover,
+                        compare, and book grooming services.
+                    </p>
+
+                </div>
+
+
+
+                <!-- QUICK LINKS -->
+
+                <div class="footer-column">
+
+                    <h4>
+                        Quick Links
+                    </h4>
+
+
+                    <a href="/">
+                        Home
+                    </a>
+
+
+                    <a href="contact-us.html">
+                        Contact Us
+                    </a>
+
+                </div>
+
+
+
+                <!-- LEGAL -->
+
+                <div class="footer-column">
+
+                    <h4>
+                        Legal
+                    </h4>
+
+
+                    <a href="terms-of-use.html">
+                        Terms of Use
+                    </a>
+
+
+                    <a href="privacy-policy.html">
+                        Privacy Policy
+                    </a>
+
+
+                    <a href="refund-policy.html">
+                        Cancellation & Refund Policy
+                    </a>
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="footer-bottom">
+
+                <div>
+                    © 2026 Trimlyhub.
+                    All rights reserved.
+                </div>
+
+
+                <div>
+                    Made for better grooming experiences.
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </footer>
+
+
+</body>
+</html>

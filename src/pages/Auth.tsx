@@ -391,6 +391,55 @@ export default function Auth() {
           </div>
         </motion.div>
       </div>
+      <footer className="mt-8 pb-6 text-center">
+  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
+    <a
+      href="/terms-of-use.html"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-muted-foreground hover:text-primary transition-colors"
+    >
+      Terms of Use
+    </a>
+
+    <span className="text-muted-foreground/40">•</span>
+
+    <a
+      href="/privacy-policy.html"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-muted-foreground hover:text-primary transition-colors"
+    >
+      Privacy Policy
+    </a>
+
+    <span className="text-muted-foreground/40">•</span>
+
+    <a
+      href="/refund-policy.html"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-muted-foreground hover:text-primary transition-colors"
+    >
+      Refund Policy
+    </a>
+
+    <span className="text-muted-foreground/40">•</span>
+
+    <a
+      href="/contact-us.html"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-muted-foreground hover:text-primary transition-colors"
+    >
+      Contact Us
+    </a>
+  </div>
+
+  <p className="mt-3 text-xs text-muted-foreground">
+    © 2026 Trimlyhub. All rights reserved.
+  </p>
+</footer>
     </div>
   );
 }
