@@ -20,7 +20,6 @@ import {
   Camera,
   ImageIcon,
   Send,
-  Sparkles,
   ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -165,7 +164,7 @@ export default function BecomeBarber() {
         className="max-w-xl mx-auto pb-10 space-y-5"
       >
         {/* HERO */}
-        <section className="relative isolate mt-2 mx-auto w-full max-w-[560px] h-[350px] sm:h-[380px] overflow-hidden rounded-[30px] shadow-[0_18px_50px_rgba(0,0,0,0.35)]">
+        <section className="hero-dark relative isolate mt-2 mx-auto w-full max-w-[560px] h-[350px] sm:h-[380px] overflow-hidden rounded-[30px] shadow-[0_18px_50px_rgba(0,0,0,0.35)]">
           <img
             src={barberHero}
             alt="Premium barbershop interior with leather barber chair"
