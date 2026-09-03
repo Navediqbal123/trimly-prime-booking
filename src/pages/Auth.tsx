@@ -151,7 +151,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex bg-background">
+     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
       {/* Left Side - Branding */}
       <motion.div
         initial={{ opacity: 0, x: -60 }}
@@ -191,7 +191,7 @@ export default function Auth() {
       </motion.div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -390,8 +390,7 @@ export default function Auth() {
             </AnimatePresence>
           </div>
         </motion.div>
-      </div>
-      <footer className="mt-8 pb-6 text-center">
+        <footer className="mt-8 pb-6 text-center">
   <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
     <a
       href="/terms-of-use.html"
@@ -440,6 +439,8 @@ export default function Auth() {
     © 2026 Trimlyhub. All rights reserved.
   </p>
 </footer>
+      </div>
+      
     </div>
   );
 }
