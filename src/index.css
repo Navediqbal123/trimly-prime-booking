@@ -167,6 +167,14 @@
   .page-black div {
     color: #000000;
   }
+  .page-black .hero-dark,
+  .page-black .hero-dark h1,
+  .page-black .hero-dark p,
+  .page-black .hero-dark span,
+  .page-black .hero-dark div {
+    color: inherit;
+  }
+
   .page-black .gradient-text {
     -webkit-text-fill-color: initial;
     color: inherit;
