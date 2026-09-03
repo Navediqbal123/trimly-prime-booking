@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
@@ -12,6 +12,16 @@ import {
   CalendarCheck,
   TrendingUp,
   ShieldCheck,
+  User,
+  Mail,
+  Phone,
+  Building2,
+  Map as MapIcon,
+  Camera,
+  ImageIcon,
+  Send,
+  Sparkles,
+  ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,43 +30,79 @@ import { toast } from 'sonner';
 import { registerBarber } from '@/lib/api';
 import barberHero from '@/assets/barber-hero.jpg';
 
+const STATES = [
+  'Andhra Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Delhi', 'Goa', 'Gujarat', 'Haryana',
+  'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra',
+  'Odisha', 'Punjab', 'Rajasthan', 'Tamil Nadu', 'Telangana', 'Uttar Pradesh', 'Uttarakhand',
+  'West Bengal',
+];
+
+/** Reusable premium field card */
+function FieldCard({
+  icon: Icon,
+  label,
+  helper,
+  children,
+}: {
+  icon: React.ElementType;
+  label: string;
+  helper?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-[0_2px_10px_rgba(16,10,40,0.05)]">
+      <div className="flex items-start gap-3">
+        <div className="w-9 h-9 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
+          <Icon className="w-4.5 h-4.5 text-primary" strokeWidth={1.8} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <Label className="text-sm font-semibold text-black">{label}</Label>
+          {helper && <p className="text-xs text-black/55 mt-0.5">{helper}</p>}
+          <div className="mt-3">{children}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const inputCls =
+  'h-12 rounded-xl bg-white border-black/15 text-black placeholder:text-black/40 focus-visible:ring-primary/30';
+
 export default function BecomeBarber() {
   const { updateLocalRole, isBarber, isBarberPending, refreshBarberStatus } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  // ONLY 2 fields as required by backend: shop_name and location
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     shopName: '',
-    location: '',
+    name: '',
+    email: '',
+    phone: '',
+    shopNumber: '',
+    locality: '',
+    city: '',
+    state: '',
   });
+  const [shopPhotos, setShopPhotos] = useState<(string | null)[]>([null, null, null, null, null]);
+  const [chairPhoto, setChairPhoto] = useState<string | null>(null);
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  const fileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  // Redirect approved barbers to their dashboard
   useEffect(() => {
-    if (isBarber) {
-      navigate('/barber-hub', { replace: true });
-    }
+    if (isBarber) navigate('/barber-hub', { replace: true });
   }, [isBarber, navigate]);
 
-  // If user is already approved, don't render anything (redirect will happen)
-  if (isBarber) {
-    return null;
-  }
+  if (isBarber) return null;
 
-  // If user is already pending, show status
   if (isBarberPending) {
     return (
-      <div className="animate-fade-in">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-2xl mx-auto"
-        >
-          <div className="bg-card border border-border rounded-2xl p-8 text-center">
-            <div className="w-20 h-20 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto mb-6">
-              <Clock className="w-10 h-10 text-yellow-500" />
+      <div className="page-black animate-fade-in">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto">
+          <div className="rounded-3xl border border-black/10 bg-white p-8 text-center shadow-lg">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+              <Clock className="w-10 h-10 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold mb-3">Application Pending</h2>
-            <p className="text-muted-foreground mb-6">
+            <h2 className="text-2xl font-bold mb-3 text-black">Application Pending</h2>
+            <p className="text-black/60 mb-6">
               Your barber application is under review. We'll notify you once it's approved.
             </p>
             <Button variant="outline" onClick={() => navigate('/dashboard')}>
@@ -68,37 +114,36 @@ export default function BecomeBarber() {
     );
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm((p) => ({ ...p, [k]: e.target.value }));
+
+  const pick = (key: string) => fileRefs.current[key]?.click();
+
+  const onFile = (key: string, cb: (url: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) cb(URL.createObjectURL(f));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Validate required fields
-    if (!formData.shopName.trim() || !formData.location.trim()) {
+    const location = [form.locality, form.city, form.state].filter(Boolean).join(', ');
+    if (!form.shopName.trim() || !form.name.trim() || !form.phone.trim() || !form.city.trim() || !form.state) {
       toast.error('Please fill in all required fields');
       setLoading(false);
       return;
     }
 
     try {
-      // Call backend API to register barber
-      const response = await registerBarber({
-        shop_name: formData.shopName,
-        location: formData.location,
-      });
-
-      // Backend may return 200/201 with various shapes — treat any non-error as success
+      const response = await registerBarber({ shop_name: form.shopName, location });
       if (response.success || response.data) {
-        // Update local role to barber_pending immediately
         updateLocalRole('barber_pending');
-        // Cache pending status in localStorage
-        localStorage.setItem('trimly_barber_status', JSON.stringify({ role: 'barber_pending', status: 'pending' }));
+        localStorage.setItem(
+          'trimly_barber_status',
+          JSON.stringify({ role: 'barber_pending', status: 'pending' })
+        );
         toast.success('Request submitted, waiting for admin approval');
-        // Refresh after a short delay to let backend process
         setTimeout(() => refreshBarberStatus(), 3000);
       } else {
         toast.error(response.error || 'Failed to submit application');
@@ -112,41 +157,40 @@ export default function BecomeBarber() {
   };
 
   return (
-    <div className="animate-fade-in">
+    <div className="page-black animate-fade-in overflow-x-hidden">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl mx-auto"
+        transition={{ duration: 0.3 }}
+        className="max-w-xl mx-auto pb-10 space-y-5"
       >
-        {/* Premium hero */}
-        <div className="relative overflow-hidden rounded-3xl mb-6 border border-gold/20 shadow-2xl">
-          <img
-            src={barberHero}
-            alt="Luxury barber chair in a premium barbershop"
-            width={1024}
-            height={640}
-            className="absolute inset-0 w-full h-full object-cover object-right"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(0_0%_4%)] via-[hsl(0_0%_6%/0.92)] to-[hsl(0_0%_6%/0.35)]" />
-          <div className="absolute -left-10 -top-10 w-40 h-40 rounded-full blur-3xl bg-gold/20" />
-          <div className="relative p-6 sm:p-8 max-w-[78%]">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-white/5 px-3 py-1 mb-4 backdrop-blur-sm">
-              <Scissors className="w-3.5 h-3.5 text-gold" />
-              <span className="text-[11px] tracking-[0.18em] uppercase text-gold/90">Trimly Partners</span>
+        {/* HERO */}
+        <section className="relative overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-white via-white to-[#F6F2FF] p-5 shadow-[0_8px_30px_rgba(80,50,160,0.08)]">
+          <div className="flex items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <h1 className="font-display text-[26px] leading-tight font-bold text-black">
+                Open Your Barber Shop
+              </h1>
+              <p className="mt-2 text-sm text-black/60 leading-relaxed">
+                Fill in the details below to get your shop approved on Trimly.
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-display font-bold leading-tight text-white">
-              Open Your
-              <br />
-              <span className="gradient-gold-text">Barber Shop</span>
-            </h1>
-            <p className="mt-3 text-sm text-white/70 max-w-sm">
-              Fill in the details below to get your shop approved on Trimly.
-            </p>
+            <div className="relative w-24 h-24 shrink-0">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#EDE4FF] to-[#F7F3FF]" />
+              <img
+                src={barberHero}
+                alt="Premium barber chair"
+                className="absolute inset-1.5 w-[calc(100%-12px)] h-[calc(100%-12px)] object-cover rounded-full"
+                loading="lazy"
+              />
+              <Sparkles className="absolute -left-1 top-2 w-4 h-4 text-primary/70" />
+              <Sparkles className="absolute -left-2 bottom-4 w-3 h-3 text-primary/40" />
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Benefits */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        {/* BENEFITS 2x2 */}
+        <section className="grid grid-cols-2 gap-3">
           {[
             { label: 'Reach more customers', Icon: Users },
             { label: 'Manage bookings easily', Icon: CalendarCheck },
@@ -155,69 +199,219 @@ export default function BecomeBarber() {
           ].map(({ label, Icon }) => (
             <div
               key={label}
-              className="rounded-2xl border border-border bg-card p-3 shadow-sm hover:shadow-md hover:border-primary/40 transition-all duration-200"
+              className="rounded-2xl border border-black/10 bg-white p-4 shadow-[0_2px_10px_rgba(16,10,40,0.05)] flex flex-col gap-2.5 min-h-[104px]"
             >
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mb-2">
-                <Icon className="w-4.5 h-4.5 text-primary" />
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Icon className="w-5 h-5 text-primary" strokeWidth={1.8} />
               </div>
-              <span className="text-xs font-medium leading-snug block">{label}</span>
+              <span className="text-[13px] font-medium leading-snug text-black">{label}</span>
             </div>
           ))}
-        </div>
+        </section>
 
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* SHOP INFORMATION */}
+          <section className="rounded-3xl border border-black/10 bg-white p-4 shadow-[0_4px_20px_rgba(16,10,40,0.06)] space-y-3">
+            <h2 className="font-display text-lg font-bold text-black px-1">Shop Information</h2>
 
-        {/* Form - ONLY shop_name and location */}
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <h2 className="text-xl font-semibold mb-6">Shop Information</h2>
+            <FieldCard icon={Store} label="Your Shop Name" helper="This will be shown to customers">
+              <Input
+                value={form.shopName}
+                onChange={set('shopName')}
+                placeholder="Enter your shop name"
+                className={inputCls}
+                required
+              />
+            </FieldCard>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="shopName">Shop / Salon Name *</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <FieldCard icon={User} label="1. Name">
+                <Input value={form.name} onChange={set('name')} placeholder="Enter your full name" className={inputCls} required />
+              </FieldCard>
+              <FieldCard icon={Mail} label="2. Email">
+                <Input type="email" value={form.email} onChange={set('email')} placeholder="Enter your email" className={inputCls} />
+              </FieldCard>
+              <FieldCard icon={Phone} label="3. Phone Number">
+                <Input value={form.phone} onChange={set('phone')} placeholder="Enter your phone number" className={inputCls} required />
+              </FieldCard>
+              <FieldCard icon={Building2} label="11. Shop Number">
+                <Input value={form.shopNumber} onChange={set('shopNumber')} placeholder="Enter shop landline number" className={inputCls} />
+              </FieldCard>
+            </div>
+
+            <FieldCard icon={MapPin} label="4. Locality Address">
+              <Input value={form.locality} onChange={set('locality')} placeholder="House no., Building, Street, Locality" className={inputCls} />
+            </FieldCard>
+
+            <FieldCard icon={Building2} label="5. Village / Town or City Address">
+              <Input value={form.city} onChange={set('city')} placeholder="Enter your village, town or city" className={inputCls} required />
+            </FieldCard>
+
+            <FieldCard icon={MapIcon} label="6. State">
               <div className="relative">
-                <Store className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="shopName"
-                  name="shopName"
-                  value={formData.shopName}
-                  onChange={handleChange}
-                  className="pl-10"
-                  placeholder="Classic Cuts Barbershop"
+                <select
+                  value={form.state}
+                  onChange={set('state')}
                   required
-                />
+                  className="h-12 w-full appearance-none rounded-xl border border-black/15 bg-white px-3 pr-10 text-sm text-black outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  <option value="">Select your state</option>
+                  {STATES.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/50" />
+              </div>
+            </FieldCard>
+          </section>
+
+          {/* SHOP PHOTOS */}
+          <section className="rounded-3xl border border-black/10 bg-white p-4 shadow-[0_4px_20px_rgba(16,10,40,0.06)]">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="w-9 h-9 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
+                <ImageIcon className="w-4.5 h-4.5 text-primary" strokeWidth={1.8} />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-black">7. Shop Photos (2–5 photos)</h3>
+                <p className="text-xs text-black/55 mt-0.5">Upload clear photos of your shop (exterior)</p>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="location">Location *</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="location"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  className="pl-10"
-                  placeholder="Delhi, Mumbai, etc."
-                  required
-                />
+            <div className="grid grid-cols-2 gap-3">
+              {shopPhotos.map((src, i) => (
+                <button
+                  type="button"
+                  key={i}
+                  onClick={() => pick(`shop-${i}`)}
+                  className={`relative aspect-video w-full overflow-hidden rounded-2xl border border-dashed ${
+                    i < 2 ? 'border-primary/50 bg-primary/[0.04]' : 'border-black/20 bg-black/[0.02]'
+                  } flex flex-col items-center justify-center gap-1.5`}
+                >
+                  {src ? (
+                    <img src={src} alt={`Shop photo ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                  ) : (
+                    <>
+                      <Camera className="w-5 h-5 text-primary" strokeWidth={1.8} />
+                      <span className="text-xs font-medium text-black">Add Photo</span>
+                      <span className="text-[11px] text-black/50">{i < 2 ? 'Required' : 'Optional'}</span>
+                    </>
+                  )}
+                  <input
+                    ref={(el) => (fileRefs.current[`shop-${i}`] = el)}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={onFile(`shop-${i}`, (url) =>
+                      setShopPhotos((p) => p.map((v, idx) => (idx === i ? url : v)))
+                    )}
+                  />
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* INSIDE CHAIRS */}
+          <section className="rounded-3xl border border-black/10 bg-white p-4 shadow-[0_4px_20px_rgba(16,10,40,0.06)]">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="w-9 h-9 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Scissors className="w-4.5 h-4.5 text-primary" strokeWidth={1.8} />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-black">8. Inside the Chairs (Number of seats)</h3>
+                <p className="text-xs text-black/55 mt-0.5">
+                  Upload a clear photo showing the number of chairs / seats inside your shop
+                </p>
               </div>
             </div>
-
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  Submitting...
-                </>
+            <button
+              type="button"
+              onClick={() => pick('chairs')}
+              className="relative aspect-video w-full overflow-hidden rounded-2xl border border-dashed border-primary/50 bg-primary/[0.04] flex flex-col items-center justify-center gap-1.5"
+            >
+              {chairPhoto ? (
+                <img src={chairPhoto} alt="Inside the shop" className="absolute inset-0 w-full h-full object-cover" />
               ) : (
                 <>
-                  <Scissors className="w-4 h-4 mr-2" />
-                  Submit Application
+                  <Camera className="w-6 h-6 text-primary" strokeWidth={1.8} />
+                  <span className="text-sm font-medium text-black">Upload Photo</span>
+                  <span className="text-[11px] text-black/50">16:9 ratio</span>
                 </>
               )}
-            </Button>
-          </form>
-        </div>
+              <input
+                ref={(el) => (fileRefs.current['chairs'] = el)}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={onFile('chairs', setChairPhoto)}
+              />
+            </button>
+          </section>
+
+          {/* BARBER PROFILE PHOTO */}
+          <section className="rounded-3xl border border-black/10 bg-white p-4 shadow-[0_4px_20px_rgba(16,10,40,0.06)]">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="w-9 h-9 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
+                <User className="w-4.5 h-4.5 text-primary" strokeWidth={1.8} />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-black">9. Barber Profile Photo</h3>
+                <p className="text-xs text-black/55 mt-0.5">Upload your professional profile photo</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => pick('profile')}
+              className="relative aspect-video w-full overflow-hidden rounded-2xl border border-dashed border-primary/50 bg-primary/[0.04] flex flex-col items-center justify-center gap-1.5"
+            >
+              {profilePhoto ? (
+                <img src={profilePhoto} alt="Barber profile" className="absolute inset-0 w-full h-full object-cover" />
+              ) : (
+                <>
+                  <Camera className="w-6 h-6 text-primary" strokeWidth={1.8} />
+                  <span className="text-sm font-medium text-black">Upload Photo</span>
+                  <span className="text-[11px] text-black/50">Required · 16:9 ratio</span>
+                </>
+              )}
+              <input
+                ref={(el) => (fileRefs.current['profile'] = el)}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={onFile('profile', setProfilePhoto)}
+              />
+            </button>
+          </section>
+
+          {/* VERIFICATION NOTICE */}
+          <section className="rounded-2xl border border-primary/20 bg-primary/[0.06] p-4 flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" strokeWidth={1.8} />
+            <div>
+              <p className="text-sm font-medium text-black">
+                We verify all details to ensure trust and safety for our customers.
+              </p>
+              <p className="text-xs text-black/60 mt-1">You will be notified once your shop is approved.</p>
+            </div>
+          </section>
+
+          {/* SUBMIT */}
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full h-14 rounded-2xl text-base font-semibold text-primary-foreground shadow-lg bg-gradient-to-r from-[hsl(262_83%_58%)] to-[hsl(280_80%_60%)] hover:opacity-95"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <Send className="w-5 h-5 mr-2" />
+                Submit for Approval
+              </>
+            )}
+          </Button>
+        </form>
       </motion.div>
     </div>
   );
