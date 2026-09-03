@@ -165,29 +165,34 @@ export default function BecomeBarber() {
         className="max-w-xl mx-auto pb-10 space-y-5"
       >
         {/* HERO */}
-        <section className="relative overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-white via-white to-[#F6F2FF] p-5 shadow-[0_8px_30px_rgba(80,50,160,0.08)]">
-          <div className="flex items-start gap-3">
-            <div className="min-w-0 flex-1">
-              <h1 className="font-display text-[26px] leading-tight font-bold text-black">
-                Open Your Barber Shop
-              </h1>
-              <p className="mt-2 text-sm text-black/60 leading-relaxed">
-                Fill in the details below to get your shop approved on Trimly.
-              </p>
+        <section className="relative isolate mt-2 mx-auto w-full max-w-[560px] h-[350px] sm:h-[380px] overflow-hidden rounded-[30px] shadow-[0_18px_50px_rgba(0,0,0,0.35)]">
+          <img
+            src={barberHero}
+            alt="Premium barbershop interior with leather barber chair"
+            className="absolute inset-0 w-full h-full object-cover object-right"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0705] via-[#0B0705]/85 to-[#0B0705]/25" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0705]/80 via-transparent to-[#0B0705]/30" />
+
+          <div className="relative z-10 h-full flex flex-col justify-center p-7 sm:p-8 max-w-[85%]">
+            <div className="inline-flex self-start items-center gap-2 rounded-full border border-[#E3B85C]/50 bg-white/5 px-3 py-1.5 mb-5 backdrop-blur-sm">
+              <Scissors className="w-3.5 h-3.5 text-[#E3B85C]" strokeWidth={1.8} />
+              <span className="text-[10px] tracking-[0.2em] uppercase text-[#E3B85C]">Trimly Partners</span>
             </div>
-            <div className="relative w-24 h-24 shrink-0">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#EDE4FF] to-[#F7F3FF]" />
-              <img
-                src={barberHero}
-                alt="Premium barber chair"
-                className="absolute inset-1.5 w-[calc(100%-12px)] h-[calc(100%-12px)] object-cover rounded-full"
-                loading="lazy"
-              />
-              <Sparkles className="absolute -left-1 top-2 w-4 h-4 text-primary/70" />
-              <Sparkles className="absolute -left-2 bottom-4 w-3 h-3 text-primary/40" />
-            </div>
+            <h1 className="font-display font-bold leading-[1.1] text-[34px] sm:text-[40px] text-white">
+              Open Your
+              <br />
+              <span className="bg-gradient-to-r from-[#F3D07A] to-[#D9A441] bg-clip-text text-transparent">
+                Barber Shop
+              </span>
+            </h1>
+            <p className="mt-4 text-sm leading-relaxed text-white/75 max-w-[19rem]">
+              Fill in the details below to get your shop approved on Trimly.
+            </p>
           </div>
         </section>
+
 
         {/* BENEFITS 2x2 */}
         <section className="grid grid-cols-2 gap-3">
