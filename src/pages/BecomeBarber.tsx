@@ -6,15 +6,19 @@ import {
   Store,
   MapPin,
   Scissors,
-  CheckCircle,
   Loader2,
   Clock,
+  Users,
+  CalendarCheck,
+  TrendingUp,
+  ShieldCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { registerBarber } from '@/lib/api';
+import barberHero from '@/assets/barber-hero.jpg';
 
 export default function BecomeBarber() {
   const { updateLocalRole, isBarber, isBarberPending, refreshBarberStatus } = useAuth();
@@ -114,31 +118,53 @@ export default function BecomeBarber() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-2xl mx-auto"
       >
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-            <Scissors className="w-8 h-8 text-primary" />
+        {/* Premium hero */}
+        <div className="relative overflow-hidden rounded-3xl mb-6 border border-gold/20 shadow-2xl">
+          <img
+            src={barberHero}
+            alt="Luxury barber chair in a premium barbershop"
+            width={1024}
+            height={640}
+            className="absolute inset-0 w-full h-full object-cover object-right"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(0_0%_4%)] via-[hsl(0_0%_6%/0.92)] to-[hsl(0_0%_6%/0.35)]" />
+          <div className="absolute -left-10 -top-10 w-40 h-40 rounded-full blur-3xl bg-gold/20" />
+          <div className="relative p-6 sm:p-8 max-w-[78%]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-white/5 px-3 py-1 mb-4 backdrop-blur-sm">
+              <Scissors className="w-3.5 h-3.5 text-gold" />
+              <span className="text-[11px] tracking-[0.18em] uppercase text-gold/90">Trimly Partners</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-display font-bold leading-tight text-white">
+              Open Your
+              <br />
+              <span className="gradient-gold-text">Barber Shop</span>
+            </h1>
+            <p className="mt-3 text-sm text-white/70 max-w-sm">
+              Fill in the details below to get your shop approved on Trimly.
+            </p>
           </div>
-          <h1 className="text-3xl font-display font-bold mb-2">Become a Barber</h1>
-          <p className="text-muted-foreground">
-            Join our platform and start accepting bookings
-          </p>
         </div>
 
         {/* Benefits */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {[
-            'Reach more customers',
-            'Manage bookings easily',
-            'Grow your business',
-            'Get paid securely',
-          ].map((benefit) => (
-            <div key={benefit} className="flex items-center gap-2 text-sm">
-              <CheckCircle className="w-4 h-4 text-green-500" />
-              <span>{benefit}</span>
+            { label: 'Reach more customers', Icon: Users },
+            { label: 'Manage bookings easily', Icon: CalendarCheck },
+            { label: 'Grow your business', Icon: TrendingUp },
+            { label: 'Get paid securely', Icon: ShieldCheck },
+          ].map(({ label, Icon }) => (
+            <div
+              key={label}
+              className="rounded-2xl border border-border bg-card p-3 shadow-sm hover:shadow-md hover:border-primary/40 transition-all duration-200"
+            >
+              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mb-2">
+                <Icon className="w-4.5 h-4.5 text-primary" />
+              </div>
+              <span className="text-xs font-medium leading-snug block">{label}</span>
             </div>
           ))}
         </div>
+
 
         {/* Form - ONLY shop_name and location */}
         <div className="bg-card border border-border rounded-2xl p-6">
