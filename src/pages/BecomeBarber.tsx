@@ -182,7 +182,7 @@ export default function BecomeBarber() {
             <h1 className="font-display font-bold leading-[1.1] text-[34px] sm:text-[40px] text-white">
               Open Your
               <br />
-              <span className="bg-gradient-to-r from-[#F3D07A] to-[#D9A441] bg-clip-text text-transparent">
+              <span className="text-[#E9C46A]">
                 Barber Shop
               </span>
             </h1>
