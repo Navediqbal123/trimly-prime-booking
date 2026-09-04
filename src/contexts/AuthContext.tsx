@@ -20,7 +20,14 @@ interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (name: string, email: string, password: string, phone?: string) => Promise<{ error: Error | null }>;
+ signUp: (
+  name: string,
+  email: string,
+  password: string,
+  phone: string | undefined,
+  termsAccepted: boolean,
+  privacyAcknowledged: boolean
+) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   updateLocalRole: (role: UserRole) => void;
   refreshBarberStatus: () => Promise<void>;
@@ -183,35 +190,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error: null };
   };
 
-  const signUp = async (name: string, email: string, password: string, phone?: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: name, name, phone: phone || '' },
+ const signUp = async (
+  name: string,
+  email: string,
+  password: string,
+  phone: string | undefined,
+  termsAccepted: boolean,
+  privacyAcknowledged: boolean
+) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: name,
+        name,
+        phone: phone || '',
+        terms_accepted: termsAccepted,
+        terms_version: '2026-09-02',
+        terms_accepted_at: new Date().toISOString(),
+        privacy_acknowledged: privacyAcknowledged,
+        privacy_version: '2026-09-02',
+        privacy_acknowledged_at: new Date().toISOString(),
       },
-    });
-    if (error) return { error: new Error(error.message) };
+    },
+  });
 
-    const newUserId = data.user?.id;
-    if (newUserId) {
-      try {
-        await supabase.from('profiles').upsert(
+  if (error) return { error: new Error(error.message) };
+
+  const newUserId = data.user?.id;
+
+  if (newUserId && data.session) {
+    try {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert(
           {
             id: newUserId,
             name,
             email,
             phone: phone || null,
             role: 'user',
+            terms_accepted: termsAccepted,
+            terms_version: '2026-09-02',
+            terms_accepted_at: new Date().toISOString(),
+            privacy_acknowledged: privacyAcknowledged,
+            privacy_version: '2026-09-02',
+            privacy_acknowledged_at: new Date().toISOString(),
           },
           { onConflict: 'id' }
         );
-      } catch (err) {
-        console.error('Failed to upsert profile:', err);
+
+      if (profileError) {
+        console.error('Failed to save profile consent:', profileError);
       }
+    } catch (err) {
+      console.error('Failed to upsert profile:', err);
     }
-    return { error: null };
-  };
+  }
+
+  return { error: null };
+};
 
   const signOut = async () => {
     await supabase.auth.signOut();

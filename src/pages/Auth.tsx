@@ -49,6 +49,8 @@ export default function Auth() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [emailExists, setEmailExists] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+const [privacyAcknowledged, setPrivacyAcknowledged] = useState(false);
 
   const { signIn, signUp, user, loading: authLoading } = useAuth();
 
@@ -69,19 +71,39 @@ export default function Auth() {
     setEmailExists(false);
 
     try {
-      if (isSignUp) {
-        const result = signupSchema.safeParse(formData);
-        if (!result.success) {
-          const fieldErrors: Record<string, string> = {};
-          result.error.errors.forEach((err) => {
-            if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
-          });
-          setErrors(fieldErrors);
-          return;
-        }
+     if (isSignUp) {
+  const result = signupSchema.safeParse(formData);
 
-        setLoading(true);
-        const signUpResult = await signUp(formData.name, formData.email, formData.password, formData.phone);
+  if (!result.success) {
+    const fieldErrors: Record<string, string> = {};
+    result.error.errors.forEach((err) => {
+      if (err.path[0]) {
+        fieldErrors[err.path[0] as string] = err.message;
+      }
+    });
+    setErrors(fieldErrors);
+    return;
+  }
+
+  if (!termsAccepted) {
+    setErrors({ terms: 'Please accept the Terms of Use.' });
+    return;
+  }
+
+  if (!privacyAcknowledged) {
+    setErrors({ privacy: 'Please acknowledge the Privacy Policy.' });
+    return;
+  }
+
+  setLoading(true);
+       const signUpResult = await signUp(
+  formData.name,
+  formData.email,
+  formData.password,
+  formData.phone,
+  termsAccepted,
+  privacyAcknowledged
+);
 
         if (signUpResult.error) {
           const msg = signUpResult.error.message?.toLowerCase() || '';
@@ -102,6 +124,8 @@ export default function Auth() {
           toast.success('Account created! Please check your email to confirm, then sign in.');
           setIsSignUp(false);
           setFormData({ name: '', email: '', password: '', phone: '' });
+          setTermsAccepted(false);
+          setPrivacyAcknowledged(false);
         } else {
           toast.success('Account created successfully!');
         }
@@ -141,9 +165,13 @@ export default function Auth() {
     setErrors({});
     setEmailExists(false);
     setFormData({ name: '', email: '', password: '', phone: '' });
+    setTermsAccepted(false);
+setPrivacyAcknowledged(false);
   };
 
   const switchToLogin = () => {
+    setTermsAccepted(false);
+setPrivacyAcknowledged(false);
     setIsSignUp(false);
     setErrors({});
     setEmailExists(false);
@@ -334,6 +362,69 @@ export default function Auth() {
 
 
                   <motion.div variants={childFade}>
+                    {isSignUp && (
+  <motion.div variants={childFade} className="space-y-3">
+    <label className="flex items-start gap-3 text-sm cursor-pointer">
+      <input
+        type="checkbox"
+        checked={termsAccepted}
+        onChange={(e) => {
+          setTermsAccepted(e.target.checked);
+          setErrors((prev) => ({ ...prev, terms: '' }));
+        }}
+        className="mt-1 h-4 w-4 rounded border-border accent-primary"
+      />
+      <span className="text-muted-foreground">
+        I agree to the{' '}
+        <a
+          href="/terms-of-use.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline font-medium"
+        >
+          Terms of Use
+        </a>
+        .
+      </span>
+    </label>
+
+    {errors.terms && (
+      <motion.p {...fadeSlide} className="text-sm text-destructive">
+        {errors.terms}
+      </motion.p>
+    )}
+
+    <label className="flex items-start gap-3 text-sm cursor-pointer">
+      <input
+        type="checkbox"
+        checked={privacyAcknowledged}
+        onChange={(e) => {
+          setPrivacyAcknowledged(e.target.checked);
+          setErrors((prev) => ({ ...prev, privacy: '' }));
+        }}
+        className="mt-1 h-4 w-4 rounded border-border accent-primary"
+      />
+      <span className="text-muted-foreground">
+        I acknowledge the{' '}
+        <a
+          href="/privacy-policy.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline font-medium"
+        >
+          Privacy Policy
+        </a>
+        .
+      </span>
+    </label>
+
+    {errors.privacy && (
+      <motion.p {...fadeSlide} className="text-sm text-destructive">
+        {errors.privacy}
+      </motion.p>
+    )}
+  </motion.div>
+)}
                     <Button
                       type="submit"
                       className="w-full mt-6"
