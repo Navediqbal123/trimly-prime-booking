@@ -164,17 +164,17 @@ export default function BecomeBarber() {
         className="max-w-xl mx-auto pb-10 space-y-5"
       >
         {/* HERO */}
-        <section className="hero-dark relative isolate mt-2 mx-auto w-full max-w-[560px] h-[350px] sm:h-[380px] overflow-hidden rounded-[30px] shadow-[0_18px_50px_rgba(0,0,0,0.35)]">
+        <section className="hero-dark relative isolate mt-2 mx-auto w-full max-w-[560px] min-h-[320px] sm:min-h-[350px] overflow-hidden rounded-[30px] shadow-[0_18px_50px_rgba(0,0,0,0.35)]">
           <img
             src={barberHero}
             alt="Premium barbershop interior with leather barber chair"
-            className="absolute inset-0 w-full h-full object-cover object-right"
+            className="absolute inset-0 w-full h-full object-cover object-center sm:object-right"
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0B0705] via-[#0B0705]/85 to-[#0B0705]/25" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0B0705]/80 via-transparent to-[#0B0705]/30" />
 
-          <div className="relative z-10 h-full flex flex-col justify-center p-7 sm:p-8 max-w-[85%]">
+          <div className="relative z-10 min-h-[320px] sm:min-h-[350px] flex flex-col justify-center p-6 sm:p-8 max-w-[88%]">
             <div className="inline-flex self-start items-center gap-2 rounded-full border border-[#E3B85C]/50 bg-white/5 px-3 py-1.5 mb-5 backdrop-blur-sm">
               <Scissors className="w-3.5 h-3.5 text-[#E3B85C]" strokeWidth={1.8} />
               <span className="text-[10px] tracking-[0.2em] uppercase text-[#E3B85C]">Trimly Partners</span>

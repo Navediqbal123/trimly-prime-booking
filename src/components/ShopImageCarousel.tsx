@@ -6,12 +6,18 @@ interface Props {
   alt: string;
   interval?: number;
   className?: string;
+  onImageChange?: (image: string) => void;
 }
 
 /** Auto-sliding carousel with swipe/drag support. */
-export function ShopImageCarousel({ images, alt, interval = 3000, className }: Props) {
+export function ShopImageCarousel({ images, alt, interval = 3000, className, onImageChange }: Props) {
   const [index, setIndex] = useState(0);
   const paused = useRef(false);
+
+  useEffect(() => {
+    const image = images[index];
+    if (image) onImageChange?.(image);
+  }, [images, index, onImageChange]);
 
   useEffect(() => {
     if (images.length <= 1) return;
