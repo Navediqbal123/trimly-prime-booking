@@ -275,6 +275,18 @@ export interface ApprovedBarberData {
   id: string;
   shop_name: string;
   location: string;
+  address?: string;
+  locality?: string;
+  city?: string;
+  village?: string;
+  town?: string;
+  state?: string;
+  pincode?: string;
+  pin_code?: string;
+  postal_code?: string;
+  zip_code?: string;
+  description?: string;
+  phone?: string;
   user_id: string;
   status: string;
   user?: { email: string; name: string };

@@ -1,11 +1,12 @@
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MapPin, Star, Clock, Home as HomeIcon, Scissors, Loader2, AlertCircle, Check } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, Clock, Home as HomeIcon, Scissors, Loader2, AlertCircle, Check, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getApprovedBarbers, getBarberServices } from '@/lib/api';
 import { shopImage, shopRating, shopDescription } from '@/lib/shopMedia';
+import { listShopMedia } from '@/lib/shopMediaStore';
 import { useState, useEffect } from 'react';
 
 export default function BarberProfile() {
@@ -13,6 +14,7 @@ export default function BarberProfile() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselected = searchParams.get('service');
+  const selectedImage = searchParams.get('image');
   const [selectedIds, setSelectedIds] = useState<string[]>(
     preselected ? preselected.split(',').filter(Boolean) : [],
   );
@@ -35,6 +37,13 @@ export default function BarberProfile() {
       return res.success && res.data ? res.data : [];
     },
     enabled: !!shopId,
+  });
+
+  const { data: shopMedia = [] } = useQuery({
+    queryKey: ['shopMedia', shopId],
+    queryFn: () => listShopMedia(shopId ?? ''),
+    enabled: !!shopId && !selectedImage,
+    staleTime: 30_000,
   });
 
   useEffect(() => {
@@ -63,6 +72,16 @@ export default function BarberProfile() {
 
   const { rating, reviews } = shopRating(shop.id);
   const description = shopDescription(shop.id);
+  const heroImage = selectedImage || shopMedia[0] || shopImage(shop.id);
+  const fullAddress = [
+    shop.address || shop.location,
+    shop.locality,
+    shop.city || shop.village || shop.town,
+    shop.state,
+    shop.pincode || shop.pin_code || shop.postal_code || shop.zip_code,
+  ]
+    .filter(Boolean)
+    .join(', ');
   const chosen = services.filter((s) => selectedIds.includes(s.id));
   const total = chosen.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
 
@@ -76,7 +95,7 @@ export default function BarberProfile() {
 
 
   return (
-    <div className="animate-fade-in pt-2 lg:pt-0 pb-8">
+    <div className="animate-fade-in pt-2 lg:pt-0 pb-32">
       <Button
         variant="ghost"
         onClick={() => navigate(-1)}
@@ -93,17 +112,13 @@ export default function BarberProfile() {
         className="relative overflow-hidden rounded-3xl border border-gold/30 mb-6"
       >
         <img
-          src={shopImage(shop.id)}
+          src={heroImage}
           alt={shop.shop_name}
-          className="w-full h-56 sm:h-72 object-cover"
+          className="w-full aspect-[16/10] sm:aspect-[16/8] object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5">
           <h1 className="text-2xl sm:text-3xl font-display font-bold text-white mb-1">{shop.shop_name}</h1>
-          <div className="flex items-center gap-2 text-sm text-white/85">
-            <MapPin className="w-4 h-4 text-gold" />
-            <span className="truncate">{shop.location}</span>
-          </div>
           <div className="flex items-center gap-1.5 mt-2">
             {[1, 2, 3, 4, 5].map((i) => (
               <Star
@@ -116,6 +131,17 @@ export default function BarberProfile() {
           </div>
         </div>
       </motion.div>
+
+      {/* Full address */}
+      <section className="mb-6 rounded-2xl border border-gold/25 bg-black/30 p-4">
+        <div className="flex items-start gap-3">
+          <MapPin className="w-5 h-5 text-gold shrink-0 mt-0.5" />
+          <p className="min-w-0 flex-1 text-sm leading-relaxed text-white/85 break-words">
+            {fullAddress || 'Address not available'}
+          </p>
+          <ArrowRight className="w-4 h-4 text-gold shrink-0 mt-1" />
+        </div>
+      </section>
 
       {/* Description */}
       <section className="mb-6">
