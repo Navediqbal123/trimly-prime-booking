@@ -242,16 +242,13 @@ export function AppSidebar() {
               <span className="text-sm font-bold text-primary">{userInitials}</span>
             </div>
             <div className="flex-1 min-w-0 text-left">
-              <p className="font-medium text-sm truncate">{user?.full_name || 'User'}</p>
-              <p className="text-xs text-muted-foreground truncate capitalize">
-                {isBarber ? 'Barber' : isBarberPending ? 'Pending Barber' : user?.role?.replace('_', ' ') || 'User'}
-              </p>
+              <p className="font-semibold text-sm truncate">{user?.full_name || 'User'}</p>
             </div>
             <motion.div
-              animate={{ rotate: profileOpen ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
+              animate={{ rotate: profileOpen ? 90 : 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
             >
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </motion.div>
           </button>
 
