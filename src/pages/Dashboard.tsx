@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Scissors, Loader2, ArrowRight, Sparkles, MapPin, Star } from 'lucide-react';
@@ -18,6 +19,7 @@ interface Barber {
 export default function Dashboard() {
   const { user } = useProtectedUser();
   const navigate = useNavigate();
+  const displayedImages = useRef<Record<string, string>>({});
 
   const { data: shops, isLoading } = useQuery({
     queryKey: ['approvedBarbersHome'],
@@ -133,11 +135,11 @@ export default function Dashboard() {
                   transition={{ delay: i * 0.04, duration: 0.35, ease: 'easeOut' }}
                   role="button"
                   tabIndex={0}
-                  onClick={() => openShop(b.id, gallery[0])}
+                  onClick={() => openShop(b.id, displayedImages.current[b.id] || gallery[0])}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
-                      openShop(b.id, gallery[0]);
+                      openShop(b.id, displayedImages.current[b.id] || gallery[0]);
                     }
                   }}
                   className="bg-white rounded-2xl overflow-hidden text-left border border-black/10 hover:shadow-lg transition-all flex flex-col cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -147,6 +149,9 @@ export default function Dashboard() {
                       images={gallery}
                       alt={b.shop_name}
                       className="absolute inset-0 w-full h-full"
+                      onImageChange={(image) => {
+                        displayedImages.current[b.id] = image;
+                      }}
                     />
                     <div className="absolute top-2 right-2 inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full z-10">
                       <Star className="w-3 h-3 fill-gold text-gold" />
@@ -164,7 +169,7 @@ export default function Dashboard() {
                     <Button
                       onClick={(event) => {
                         event.stopPropagation();
-                        openShop(b.id, gallery[0]);
+                        openShop(b.id, displayedImages.current[b.id] || gallery[0]);
                       }}
                       className="mt-4 w-full h-11 bg-black text-white hover:bg-black/90 rounded-xl font-medium transition-colors"
                     >
