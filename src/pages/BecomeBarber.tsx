@@ -164,54 +164,33 @@ export default function BecomeBarber() {
         className="max-w-xl mx-auto pb-10 space-y-5"
       >
         {/* HERO */}
-        <section className="hero-dark relative isolate mt-2 mx-auto w-full max-w-[560px] min-h-[320px] sm:min-h-[350px] overflow-hidden rounded-[30px] shadow-[0_18px_50px_rgba(0,0,0,0.35)]">
+        <section className="hero-dark relative isolate mt-2 mx-auto w-full max-w-[560px] min-h-[240px] sm:min-h-[280px] overflow-hidden rounded-[28px] shadow-[0_14px_40px_rgba(0,0,0,0.30)]">
           <img
             src={barberHero}
             alt="Premium barbershop interior with leather barber chair"
-            className="absolute inset-0 w-full h-full object-cover object-center sm:object-right"
+            className="absolute inset-0 w-full h-full object-cover object-[75%_center]"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0705] via-[#0B0705]/85 to-[#0B0705]/25" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0705]/80 via-transparent to-[#0B0705]/30" />
+          {/* Left-weighted dark gradient keeps the chair visible on the right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0705]/95 via-[#0B0705]/70 to-[#0B0705]/15" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0705]/55 via-transparent to-transparent" />
 
-          <div className="relative z-10 min-h-[320px] sm:min-h-[350px] flex flex-col justify-center p-6 sm:p-8 max-w-[88%]">
-            <div className="inline-flex self-start items-center gap-2 rounded-full border border-[#E3B85C]/50 bg-white/5 px-3 py-1.5 mb-5 backdrop-blur-sm">
-              <Scissors className="w-3.5 h-3.5 text-[#E3B85C]" strokeWidth={1.8} />
-              <span className="text-[10px] tracking-[0.2em] uppercase text-[#E3B85C]">Trimly Partners</span>
+          <div className="relative z-10 min-h-[240px] sm:min-h-[280px] flex flex-col justify-center px-5 py-7 sm:px-8 sm:py-9 max-w-[80%]">
+            <div className="inline-flex self-start items-center gap-2 rounded-full border border-[#E9C46A]/70 bg-black/40 px-3 py-1.5 mb-4 backdrop-blur-sm">
+              <Scissors className="w-3.5 h-3.5 text-[#E9C46A]" strokeWidth={1.8} />
+              <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#F2D48A]">Trimly Partners</span>
             </div>
-            <h1 className="font-display font-bold leading-[1.1] text-[34px] sm:text-[40px] text-white">
+            <h1 className="font-display font-bold leading-[1.12] text-[30px] sm:text-[38px] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)]">
               Open Your
               <br />
-              <span className="text-[#E9C46A]">
-                Barber Shop
-              </span>
+              <span className="text-[#F0CC79]">Barber Shop</span>
             </h1>
-            <p className="mt-4 text-sm leading-relaxed text-white/75 max-w-[19rem]">
+            <p className="mt-3 text-[13px] sm:text-sm leading-relaxed text-white/90 max-w-[19rem] drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">
               Fill in the details below to get your shop approved on Trimly.
             </p>
           </div>
         </section>
 
-
-        {/* BENEFITS 2x2 */}
-        <section className="grid grid-cols-2 gap-3">
-          {[
-            { label: 'Reach more customers', Icon: Users },
-            { label: 'Manage bookings easily', Icon: CalendarCheck },
-            { label: 'Grow your business', Icon: TrendingUp },
-            { label: 'Get paid securely', Icon: ShieldCheck },
-          ].map(({ label, Icon }) => (
-            <div
-              key={label}
-              className="rounded-2xl border border-black/10 bg-white p-4 shadow-[0_2px_10px_rgba(16,10,40,0.05)] flex flex-col gap-2.5 min-h-[104px]"
-            >
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Icon className="w-5 h-5 text-primary" strokeWidth={1.8} />
-              </div>
-              <span className="text-[13px] font-medium leading-snug text-black">{label}</span>
-            </div>
-          ))}
-        </section>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* SHOP INFORMATION */}
