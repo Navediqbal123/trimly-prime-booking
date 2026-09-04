@@ -164,32 +164,33 @@ export default function BecomeBarber() {
         className="max-w-xl mx-auto pb-10 space-y-5"
       >
         {/* HERO */}
-        <section className="hero-dark relative isolate mt-2 mx-auto w-full max-w-[560px] min-h-[240px] sm:min-h-[280px] overflow-hidden rounded-[28px] shadow-[0_14px_40px_rgba(0,0,0,0.30)]">
-          <img
-            src={barberHero}
-            alt="Premium barbershop interior with leather barber chair"
-            className="absolute inset-0 w-full h-full object-cover object-[75%_center]"
-            loading="lazy"
-          />
-          {/* Left-weighted dark gradient keeps the chair visible on the right */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0705]/95 via-[#0B0705]/70 to-[#0B0705]/15" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0705]/55 via-transparent to-transparent" />
+        <section className="hero-dark relative isolate mt-2 mx-auto w-full max-w-[560px] overflow-hidden rounded-[28px] bg-[#0B0705] shadow-[0_14px_40px_rgba(0,0,0,0.30)]">
+          {/* Image + overlay layer (never above the text) */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src={barberHero}
+              alt="Premium barbershop interior with leather barber chair"
+              className="absolute inset-0 w-full h-full object-cover object-[78%_center]"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,6,4,0.94)_0%,rgba(9,6,4,0.82)_42%,rgba(9,6,4,0.35)_72%,rgba(9,6,4,0.12)_100%)]" />
+          </div>
 
-          <div className="relative z-10 min-h-[240px] sm:min-h-[280px] flex flex-col justify-center px-5 py-7 sm:px-8 sm:py-9 max-w-[80%]">
-            <div className="inline-flex self-start items-center gap-2 rounded-full border border-[#E9C46A]/70 bg-black/40 px-3 py-1.5 mb-4 backdrop-blur-sm">
+          <div className="relative z-10 flex min-h-[230px] sm:min-h-[268px] flex-col justify-center px-6 py-8 sm:px-9 sm:py-10 max-w-[76%]">
+            <div className="inline-flex self-start items-center gap-2 rounded-full border border-[#E9C46A]/80 bg-black/45 px-3 py-1.5 mb-4">
               <Scissors className="w-3.5 h-3.5 text-[#E9C46A]" strokeWidth={1.8} />
-              <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#F2D48A]">Trimly Partners</span>
+              <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#F5DA9A]">Trimly Partners</span>
             </div>
-            <h1 className="font-display font-bold leading-[1.12] text-[30px] sm:text-[38px] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)]">
+            <h1 className="font-display font-bold leading-[1.12] text-[30px] sm:text-[38px] text-white">
               Open Your
               <br />
-              <span className="text-[#F0CC79]">Barber Shop</span>
+              <span className="text-[#F2CE72]">Barber Shop</span>
             </h1>
-            <p className="mt-3 text-[13px] sm:text-sm leading-relaxed text-white/90 max-w-[19rem] drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">
+            <p className="mt-3 text-[13px] sm:text-sm leading-relaxed text-white/85 max-w-[19rem]">
               Fill in the details below to get your shop approved on Trimly.
             </p>
           </div>
         </section>
+
 
 
         <form onSubmit={handleSubmit} className="space-y-5">
