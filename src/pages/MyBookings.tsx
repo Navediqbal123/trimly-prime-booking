@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, CheckCircle, XCircle, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, XCircle, AlertCircle, Loader2, RefreshCw, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,7 @@ import { listAllShopMedia } from '@/lib/shopMediaStore';
 import { shopImage } from '@/lib/shopMedia';
 import { timeAgo, useTimeTick } from '@/lib/timeAgo';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 
 const statusConfig = {
   pending: { icon: AlertCircle, label: 'Pending', className: 'text-yellow-500 bg-yellow-500/10' },
@@ -26,9 +27,10 @@ export default function MyBookings() {
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState('upcoming');
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [selectedRating, setSelectedRating] = useState<Record<string, number>>({});
+
   // Keep "Just now / 2 min ago" labels live between refetches.
   useTimeTick(60000);
-
 
   const { data: bookings = [], isLoading: loading, isFetching, refetch } = useQuery({
     queryKey: ['myBookings'],
@@ -42,6 +44,27 @@ export default function MyBookings() {
     refetchInterval: 15000,
     refetchOnWindowFocus: true,
     staleTime: 0,
+  });
+
+  // Existing ratings for the user's bookings.
+  const { data: existingReviews = [] } = useQuery({
+    queryKey: ['myBookingReviews', bookings.map((b) => b.id).sort().join(',')],
+    queryFn: async () => {
+      const bookingIds = bookings.map((b) => b.id).filter(Boolean);
+
+      if (!bookingIds.length) return [];
+
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('booking_id, rating')
+        .in('booking_id', bookingIds);
+
+      if (error) throw error;
+
+      return data || [];
+    },
+    enabled: bookings.length > 0,
+    staleTime: 30_000,
   });
 
   // Resolve real shop names for every barber referenced by the bookings.
@@ -77,6 +100,7 @@ export default function MyBookings() {
     enabled: barberIds.length > 0,
     staleTime: 60_000,
   });
+
   // Shop photos uploaded by barbers (Barber Hub → My Shop).
   const { data: shopPhotos = {} } = useQuery({
     queryKey: ['bookingShopPhotos'],
@@ -84,36 +108,82 @@ export default function MyBookings() {
     staleTime: 60_000,
   });
 
-
-
   const handleCancelGroup = async (group: BookingData[]) => {
     setCancellingId(group[0].id);
     const results = await Promise.all(group.map((b) => cancelBooking(b.id)));
+
     if (results.every((r) => r.success)) {
       toast.success('Booking cancelled successfully');
     } else {
       toast.error(results.find((r) => !r.success)?.error || 'Failed to cancel booking');
     }
+
     qc.invalidateQueries({ queryKey: ['myBookings'] });
     qc.invalidateQueries({ queryKey: ['bookedSlots'] });
     setCancellingId(null);
   };
 
+  // Submit rating for a completed booking.
+  const handleRating = async (group: BookingData[]) => {
+    const booking = group[0];
+    const rating = selectedRating[booking.id];
+
+    if (!rating) {
+      toast.error('Please select a rating.');
+      return;
+    }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      toast.error('Please log in again.');
+      return;
+    }
+
+    const { error } = await supabase.from('reviews').insert({
+      booking_id: booking.id,
+      customer_id: user.id,
+      barber_id: booking.barber_id,
+      rating,
+    });
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    toast.success('Rating submitted successfully!');
+
+    setSelectedRating((prev) => {
+      const updated = { ...prev };
+      delete updated[booking.id];
+      return updated;
+    });
+
+    qc.invalidateQueries({ queryKey: ['myBookingReviews'] });
+  };
+
   // Group every booking with the same barber + date + time slot into ONE card.
   const groups = (() => {
     const map = new Map<string, BookingData[]>();
+
     for (const b of bookings) {
       const key = `${b.barber_id}|${b.date}|${b.time_slot}`;
       const list = map.get(key);
+
       if (list) list.push(b);
       else map.set(key, [b]);
     }
+
     return Array.from(map.values());
   })();
 
   const upcomingBookings = groups.filter((g) =>
     ['pending', 'confirmed', 'approved'].includes(g[0].status)
   );
+
   const pastBookings = groups.filter((g) =>
     ['completed', 'cancelled', 'rejected'].includes(g[0].status)
   );
@@ -134,6 +204,7 @@ export default function MyBookings() {
 
     return rawList.map((s, i) => {
       const cat = s.id ? serviceMap[s.id] : undefined;
+
       return {
         id: s.id || `${i}`,
         name: s.name || cat?.name || '',
@@ -150,22 +221,37 @@ export default function MyBookings() {
 
     // Merge all services from every booking in the group (dedup by id).
     const seen = new Set<string>();
+
     const services = group
       .flatMap(resolveServices)
       .filter((s) => {
         const key = s.id || s.name;
+
         if (!key || seen.has(key)) return false;
+
         seen.add(key);
         return true;
       });
 
     const shopName = booking.barber?.shop_name || shopMap[booking.barber_id] || '';
+
     const photo =
       (shopPhotos[booking.barber_id] && shopPhotos[booking.barber_id][0]) ||
       (booking.barber_id ? shopImage(booking.barber_id) : '');
+
     const serviceTitle = services.map((s) => s.name).filter(Boolean).join(' + ');
-    const total = services.reduce((sum, s) => sum + Number(s.price ?? 0), 0) ||
+
+    const total =
+      services.reduce((sum, s) => sum + Number(s.price ?? 0), 0) ||
       group.reduce((sum, b) => sum + Number(b.total_amount ?? 0), 0);
+
+    const isCompleted = booking.status === 'completed';
+
+    const hasRated = existingReviews.some(
+      (review) => review.booking_id === booking.id
+    );
+
+    const currentRating = selectedRating[booking.id] || 0;
 
     return (
       <motion.div
@@ -185,18 +271,28 @@ export default function MyBookings() {
                   className="w-14 h-14 rounded-xl object-cover border border-border shrink-0"
                 />
               )}
+
               <div className="min-w-0">
                 {shopName && <h3 className="font-semibold truncate">{shopName}</h3>}
                 {serviceTitle && <p className="text-sm text-primary">{serviceTitle}</p>}
               </div>
             </div>
+
             <div className="flex flex-col items-end gap-1 shrink-0">
-              <span className={cn('flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium', config.className)}>
+              <span
+                className={cn(
+                  'flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
+                  config.className
+                )}
+              >
                 <StatusIcon className="w-3 h-3" />
                 {config.label}
               </span>
+
               {booking.created_at && (
-                <span className="text-[11px] text-muted-foreground">{timeAgo(booking.created_at)}</span>
+                <span className="text-[11px] text-muted-foreground">
+                  {timeAgo(booking.created_at)}
+                </span>
               )}
             </div>
           </div>
@@ -204,30 +300,40 @@ export default function MyBookings() {
           {services.length > 1 && (
             <div className="mt-3 rounded-xl border border-border/70 divide-y divide-border/70 overflow-hidden">
               {services.filter((s) => s.name).map((s, i) => (
-                <div key={s.id || `${s.name}-${i}`} className="flex items-center justify-between px-3 py-2 text-sm">
+                <div
+                  key={s.id || `${s.name}-${i}`}
+                  className="flex items-center justify-between px-3 py-2 text-sm"
+                >
                   <span className="truncate">{s.name}</span>
-                  <span className="font-semibold shrink-0">₹{Number(s.price ?? 0)}</span>
+                  <span className="font-semibold shrink-0">
+                    ₹{Number(s.price ?? 0)}
+                  </span>
                 </div>
               ))}
             </div>
           )}
-
 
           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-3">
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
               <span>{new Date(booking.date).toLocaleDateString()}</span>
             </div>
+
             <div className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
               <span>{booking.time_slot}</span>
             </div>
+
             <div className="flex items-center gap-1">
-              <span className="font-medium text-foreground">Total ₹{total}</span>
+              <span className="font-medium text-foreground">
+                Total ₹{total}
+              </span>
             </div>
           </div>
 
-          {(booking.status === 'pending' || booking.status === 'confirmed' || booking.status === 'approved') && (
+          {(booking.status === 'pending' ||
+            booking.status === 'confirmed' ||
+            booking.status === 'approved') && (
             <div className="flex gap-2 mt-4">
               <Button
                 variant="outline"
@@ -237,18 +343,96 @@ export default function MyBookings() {
                 disabled={cancellingId === booking.id}
               >
                 {cancellingId === booking.id ? (
-                  <><Loader2 className="w-4 h-4 mr-1 animate-spin" />Cancelling...</>
+                  <>
+                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    Cancelling...
+                  </>
                 ) : (
-                  <><XCircle className="w-4 h-4 mr-1" />Cancel</>
+                  <>
+                    <XCircle className="w-4 h-4 mr-1" />
+                    Cancel
+                  </>
                 )}
               </Button>
+            </div>
+          )}
+
+          {isCompleted && (
+            <div className="mt-4 pt-4 border-t border-border">
+              {hasRated ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: 5 }).map((_, index) => {
+                      const review = existingReviews.find(
+                        (r) => r.booking_id === booking.id
+                      );
+
+                      return (
+                        <Star
+                          key={index}
+                          className={cn(
+                            'w-4 h-4',
+                            index < (review?.rating || 0)
+                              ? 'fill-yellow-400 text-yellow-400'
+                              : 'text-muted-foreground'
+                          )}
+                        />
+                      );
+                    })}
+                  </div>
+                  <span>Rated</span>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-sm font-medium mb-2">
+                    Rate this Barber
+                  </p>
+
+                  <div className="flex items-center gap-1 mb-3">
+                    {Array.from({ length: 5 }).map((_, index) => {
+                      const starNumber = index + 1;
+
+                      return (
+                        <button
+                          key={starNumber}
+                          type="button"
+                          onClick={() =>
+                            setSelectedRating((prev) => ({
+                              ...prev,
+                              [booking.id]: starNumber,
+                            }))
+                          }
+                          className="p-1 rounded-md transition-transform hover:scale-110"
+                          aria-label={`Rate ${starNumber} star${starNumber > 1 ? 's' : ''}`}
+                        >
+                          <Star
+                            className={cn(
+                              'w-6 h-6',
+                              starNumber <= currentRating
+                                ? 'fill-yellow-400 text-yellow-400'
+                                : 'text-muted-foreground'
+                            )}
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <Button
+                    size="sm"
+                    onClick={() => handleRating(group)}
+                    disabled={!currentRating}
+                  >
+                    Submit Rating
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>
       </motion.div>
     );
   };
-
 
   if (loading) {
     return (
@@ -266,35 +450,57 @@ export default function MyBookings() {
           <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
             My <span className="gradient-text">Bookings</span>
           </h1>
+
           <p className="text-muted-foreground">Manage your appointments</p>
         </div>
-        <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
-          <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+
+        <Button
+          variant="outline"
+          onClick={() => refetch()}
+          disabled={isFetching}
+        >
+          <RefreshCw
+            className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`}
+          />
           Refresh
         </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
-          <TabsTrigger value="upcoming">Upcoming ({upcomingBookings.length})</TabsTrigger>
-          <TabsTrigger value="past">Past ({pastBookings.length})</TabsTrigger>
+          <TabsTrigger value="upcoming">
+            Upcoming ({upcomingBookings.length})
+          </TabsTrigger>
+
+          <TabsTrigger value="past">
+            Past ({pastBookings.length})
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="upcoming" className="space-y-4">
           {upcomingBookings.length > 0 ? (
-            upcomingBookings.map((g) => <BookingCard key={g[0].id} group={g} />)
+            upcomingBookings.map((g) => (
+              <BookingCard key={g[0].id} group={g} />
+            ))
           ) : (
             <div className="text-center py-12 bg-card rounded-xl border border-border">
               <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">No upcoming bookings</p>
-              <Button className="mt-4" onClick={() => navigate('/discover')}>Book Now</Button>
+              <Button
+                className="mt-4"
+                onClick={() => navigate('/discover')}
+              >
+                Book Now
+              </Button>
             </div>
           )}
         </TabsContent>
 
         <TabsContent value="past" className="space-y-4">
           {pastBookings.length > 0 ? (
-            pastBookings.map((g) => <BookingCard key={g[0].id} group={g} />)
+            pastBookings.map((g) => (
+              <BookingCard key={g[0].id} group={g} />
+            ))
           ) : (
             <div className="text-center py-12 bg-card rounded-xl border border-border">
               <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
