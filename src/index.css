@@ -172,7 +172,16 @@
   .page-black .hero-dark p,
   .page-black .hero-dark span,
   .page-black .hero-dark div {
-    color: inherit;
+    color: #ffffff;
+  }
+  .page-black .hero-dark .hero-gold {
+    color: #f2ce72;
+  }
+  .page-black .hero-dark .hero-gold-soft {
+    color: #f5da9a;
+  }
+  .page-black .hero-dark .hero-sub {
+    color: rgba(255, 255, 255, 0.88);
   }
 
   .page-black .gradient-text {

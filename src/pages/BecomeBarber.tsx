@@ -164,28 +164,28 @@ export default function BecomeBarber() {
         className="max-w-xl mx-auto pb-10 space-y-5"
       >
         {/* HERO */}
-        <section className="hero-dark relative isolate mt-2 mx-auto w-full max-w-[560px] overflow-hidden rounded-[28px] bg-[#0B0705] shadow-[0_14px_40px_rgba(0,0,0,0.30)]">
+        <section className="hero-dark relative isolate mt-3 mb-2 mx-auto w-full max-w-[560px] overflow-hidden rounded-[28px] bg-[#0B0705] shadow-[0_14px_40px_rgba(0,0,0,0.30)]">
           {/* Image + overlay layer (never above the text) */}
           <div className="absolute inset-0 z-0">
             <img
               src={barberHero}
               alt="Premium barbershop interior with leather barber chair"
-              className="absolute inset-0 w-full h-full object-cover object-[78%_center]"
+              className="absolute inset-0 w-full h-full object-cover object-[74%_center]"
             />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,6,4,0.94)_0%,rgba(9,6,4,0.82)_42%,rgba(9,6,4,0.35)_72%,rgba(9,6,4,0.12)_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,6,4,0.88)_0%,rgba(9,6,4,0.72)_45%,rgba(9,6,4,0.28)_75%,rgba(9,6,4,0.08)_100%)]" />
           </div>
 
-          <div className="relative z-10 flex min-h-[230px] sm:min-h-[268px] flex-col justify-center px-6 py-8 sm:px-9 sm:py-10 max-w-[76%]">
+          <div className="relative z-10 flex min-h-[240px] sm:min-h-[280px] flex-col justify-center px-6 py-9 sm:px-9 sm:py-11 max-w-[78%]">
             <div className="inline-flex self-start items-center gap-2 rounded-full border border-[#E9C46A]/80 bg-black/45 px-3 py-1.5 mb-4">
-              <Scissors className="w-3.5 h-3.5 text-[#E9C46A]" strokeWidth={1.8} />
-              <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#F5DA9A]">Trimly Partners</span>
+              <Scissors className="w-3.5 h-3.5 hero-gold" strokeWidth={1.8} />
+              <span className="text-[10px] font-semibold tracking-[0.2em] uppercase hero-gold-soft">Trimly Partners</span>
             </div>
             <h1 className="font-display font-bold leading-[1.12] text-[30px] sm:text-[38px] text-white">
               Open Your
               <br />
-              <span className="text-[#F2CE72]">Barber Shop</span>
+              <span className="hero-gold">Barber Shop</span>
             </h1>
-            <p className="mt-3 text-[13px] sm:text-sm leading-relaxed text-white/85 max-w-[19rem]">
+            <p className="mt-3 text-[13px] sm:text-sm leading-relaxed hero-sub max-w-[19rem]">
               Fill in the details below to get your shop approved on Trimly.
             </p>
           </div>

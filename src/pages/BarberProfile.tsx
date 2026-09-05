@@ -133,10 +133,10 @@ export default function BarberProfile() {
       </motion.div>
 
       {/* Full address */}
-      <section className="mb-6 rounded-2xl border border-gold/25 bg-black/30 p-4">
+      <section className="mb-6 rounded-2xl border border-gray-200 bg-white p-4">
         <div className="flex items-start gap-3">
           <MapPin className="w-5 h-5 text-gold shrink-0 mt-0.5" />
-          <p className="min-w-0 flex-1 text-sm leading-relaxed text-white/85 break-words">
+          <p className="min-w-0 flex-1 text-sm leading-relaxed text-[#111111] break-words">
             {fullAddress || 'Address not available'}
           </p>
           <ArrowRight className="w-4 h-4 text-gold shrink-0 mt-1" />
