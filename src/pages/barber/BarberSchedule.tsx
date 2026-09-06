@@ -160,7 +160,7 @@ export default function BarberSchedule() {
 
       if (error) {
         console.error('Failed to save schedule:', error);
-        toast.error('Failed to save schedule');
+       toast.error(error.message || 'Failed to save schedule');
         return;
       }
 
@@ -173,7 +173,7 @@ export default function BarberSchedule() {
       toast.success('Schedule saved successfully');
     } catch (error) {
       console.error('Failed to save schedule:', error);
-      toast.error('Failed to save schedule');
+      toast.error(error instanceof Error ? error.message : 'Failed to save schedule');
     } finally {
       setSaving(false);
     }
