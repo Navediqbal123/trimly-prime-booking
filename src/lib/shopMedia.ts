@@ -30,10 +30,7 @@ export function shopImage(id: string): string {
 }
 
 export function shopRating(id: string): { rating: number; reviews: number } {
-  const h = hash(id);
-  const rating = 4.4 + ((h % 60) / 100); // 4.40 – 4.99
-  const reviews = 80 + (h % 480);
-  return { rating: Math.round(rating * 10) / 10, reviews };
+  return { rating: 0, reviews: 0 };
 }
 
 export function shopDescription(id: string): string {

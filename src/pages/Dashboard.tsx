@@ -6,7 +6,8 @@ import { Scissors, Loader2, ArrowRight, Sparkles, MapPin, Star } from 'lucide-re
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { getApprovedBarbers } from '@/lib/api';
-import { shopImage, shopRating } from '@/lib/shopMedia';
+import { shopImage } from '@/lib/shopMedia';
+import { supabase } from '@/lib/supabase';
 import { listAllShopMedia } from '@/lib/shopMediaStore';
 import { ShopImageCarousel } from '@/components/ShopImageCarousel';
 
@@ -40,6 +41,18 @@ export default function Dashboard() {
 
   const barbers = shops?.list ?? [];
   const loadError = shops?.error ?? null;
+  const { data: reviews = [] } = useQuery({
+  queryKey: ['barberRatings'],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('barber_id, rating');
+
+    if (error) throw error;
+    return data || [];
+  },
+  staleTime: 30_000,
+});
 
 
   const { data: mediaMap = {} } = useQuery({
@@ -124,7 +137,12 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {barbers.map((b, i) => {
-              const { rating, reviews } = shopRating(b.id);
+              const barberReviews = reviews.filter((review) => review.barber_id === b.id);
+const reviewCount = barberReviews.length;
+const rating =
+  reviewCount > 0
+    ? barberReviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+    : 0;
               const uploaded = mediaMap[b.id] || [];
               const gallery = uploaded.length > 0 ? uploaded : [shopImage(b.id)];
               return (
@@ -156,7 +174,7 @@ export default function Dashboard() {
                     <div className="absolute top-2 right-2 inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full z-10">
                       <Star className="w-3 h-3 fill-gold text-gold" />
                       <span className="text-[11px] font-semibold text-white">{rating.toFixed(1)}</span>
-                      <span className="text-[10px] text-white/70">({reviews})</span>
+                      <span className="text-[10px] text-white/70">({reviewCount})</span>
                     </div>
                   </div>
                   <div className="p-5 flex flex-col flex-1">
