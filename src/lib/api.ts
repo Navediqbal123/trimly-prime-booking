@@ -150,7 +150,7 @@ export async function addService(data: AddServiceData): Promise<ApiResponse> {
 
 export async function getMyServices(): Promise<ApiResponse<ServiceData[]>> {
   // Auth token is attached automatically by apiCall (barber-scoped list)
-  return fetchServiceList('/api/services');
+  return fetchServiceList('/api/barber/my-services');
 }
 
 
