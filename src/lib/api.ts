@@ -12,7 +12,7 @@ interface ApiResponse<T = unknown> {
 
 async function apiCall<T>(
   endpoint: string,
-  options: RequestInit = {},
+  options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   try {
     // Get Supabase session token
@@ -141,6 +141,7 @@ export async function addService(data: AddServiceData): Promise<ApiResponse> {
 
     data = { ...data, barber_id: profile.data.id };
   }
+
   return apiCall('/api/barber/add-service', {
     method: 'POST',
     body: JSON.stringify(data),
@@ -174,7 +175,7 @@ export interface CreateBookingData {
 export async function checkSlotAvailability(
   barber_id: string,
   date: string,
-  time_slot: string,
+  time_slot: string
 ): Promise<ApiResponse<{ available: boolean }>> {
   const qs = new URLSearchParams({ barber_id, date, time_slot }).toString();
   return apiCall<{ available: boolean }>(`/api/booking/check-slot?${qs}`, { method: 'GET' });
@@ -249,6 +250,7 @@ export async function getMyBookings(): Promise<ApiResponse<BookingData[]>> {
 export async function getAllBookings(): Promise<ApiResponse<BookingData[]>> {
   return apiCall<BookingData[]>('/api/booking/all', { method: 'GET' });
 }
+
 
 // ==========================================
 // BARBER FETCH ENDPOINTS
@@ -339,6 +341,7 @@ export async function getBarberServices(barberId: string): Promise<ApiResponse<S
   if (all.success && all.data) {
     return { success: true, data: all.data.filter((s) => s.barber_id === barberId) };
   }
+
   return primary;
 }
 
@@ -368,6 +371,7 @@ export async function getBarberDashboardStats(): Promise<ApiResponse<BarberDashb
     }
     return 0;
   };
+
   return {
     success: true,
     data: {
@@ -411,6 +415,12 @@ export async function updateMyShop(data: UpdateShopData): Promise<ApiResponse> {
   });
 }
 
+export async function deleteMyShop(): Promise<ApiResponse> {
+  return apiCall('/api/barber/my-shop', {
+    method: 'DELETE',
+  });
+}
+
 export async function cancelBooking(bookingId: string): Promise<ApiResponse> {
   return apiCall(`/api/booking/cancel/${bookingId}`, { method: 'PATCH' });
 }
@@ -432,6 +442,7 @@ export async function verifyBookingOtp(booking_id: string, otp: string): Promise
   });
 }
 
+
 // ==========================================
 // ADMIN ENDPOINTS
 // ==========================================
@@ -447,6 +458,7 @@ export interface UserData {
 export async function getAdminUsers(): Promise<ApiResponse<UserData[]>> {
   return apiCall<UserData[]>('/api/admin/users', { method: 'GET' });
 }
+
 
 // ==========================================
 // NOTIFICATIONS
@@ -472,4 +484,3 @@ export async function getNotifications(): Promise<ApiResponse<NotificationData[]
 export async function markNotificationsRead(): Promise<ApiResponse> {
   return apiCall('/api/booking/notifications/read', { method: 'PATCH' });
 }
-
