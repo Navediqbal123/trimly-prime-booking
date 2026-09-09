@@ -44,16 +44,17 @@ function StatCard({ title, value, prefix = '', icon: Icon, color, bgColor, index
       whileHover={{ scale: 1.02, y: -2 }}
       whileTap={{ scale: 0.98 }}
     >
-      <Card className="border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-default overflow-hidden relative group">
+      <Card className="relative overflow-hidden rounded-2xl border border-orange-100/80 bg-white/80 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-200/30 cursor-default group">
+      <div className="absolute -inset-6 bg-orange-200/20 blur-2xl opacity-70 pointer-events-none" />
         {/* Subtle gradient overlay on hover */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
-        <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
+       <CardHeader className="flex flex-row items-center justify-between pb-1.5 relative z-10">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             {title}
           </CardTitle>
           <motion.div 
-            className={`w-10 h-10 rounded-xl ${bgColor} flex items-center justify-center`}
+            className={`w-9 h-9 rounded-xl ${bgColor} flex items-center justify-center shadow-sm`}
             whileHover={{ rotate: [0, -10, 10, 0] }}
             transition={{ duration: 0.5 }}
           >
@@ -62,7 +63,7 @@ function StatCard({ title, value, prefix = '', icon: Icon, color, bgColor, index
         </CardHeader>
         <CardContent className="relative z-10">
           <motion.div 
-            className="text-3xl font-bold tracking-tight"
+            className="text-2xl sm:text-3xl font-bold tracking-tight"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: index * 0.1 + 0.2 }}
@@ -95,58 +96,58 @@ export function StatsCards({ services, bookings, stats: apiStats, isLoading }: S
 
 
   const stats = [
-    { 
-      title: 'Total Bookings', 
-      value: totalBookings, 
-      icon: Calendar,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10',
-    },
-    { 
-      title: 'Completed', 
-      value: completedBookings, 
-      icon: CheckCircle,
-      color: 'text-green-500',
-      bgColor: 'bg-green-500/10',
-    },
-    {
-      title: 'Approved',
-      value: approvedBookings,
-      icon: CheckCircle,
-      color: 'text-emerald-500',
-      bgColor: 'bg-emerald-500/10',
-    },
-    {
-      title: 'Cancelled',
-      value: cancelledBookings,
-      icon: XCircle,
-      color: 'text-red-500',
-      bgColor: 'bg-red-500/10',
-    },
-    { 
-      title: 'Pending', 
-      value: pendingBookings, 
-      icon: Clock,
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-500/10',
-    },
-    { 
-      title: 'Total Earnings', 
-      value: totalEarnings, 
-      prefix: '₹',
-      icon: IndianRupee,
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
-      formatAsCurrency: true,
-    },
-  ];
+  { 
+    title: 'Total Bookings', 
+    value: totalBookings, 
+    icon: Calendar,
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-500/10',
+  },
+  { 
+    title: 'Pending', 
+    value: pendingBookings, 
+    icon: Clock,
+    color: 'text-amber-500',
+    bgColor: 'bg-amber-500/10',
+  },
+  {
+    title: 'Approved',
+    value: approvedBookings,
+    icon: CheckCircle,
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-500/10',
+  },
+  { 
+    title: 'Completed', 
+    value: completedBookings, 
+    icon: CheckCircle,
+    color: 'text-green-500',
+    bgColor: 'bg-green-500/10',
+  },
+  {
+    title: 'Cancelled',
+    value: cancelledBookings,
+    icon: XCircle,
+    color: 'text-red-500',
+    bgColor: 'bg-red-500/10',
+  },
+  { 
+    title: 'Total Earnings', 
+    value: totalEarnings, 
+    prefix: '₹',
+    icon: IndianRupee,
+    color: 'text-primary',
+    bgColor: 'bg-primary/10',
+    formatAsCurrency: true,
+  },
+];
 
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4"
+      className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4"
     >
       {stats.map((stat, index) => (
         <StatCard

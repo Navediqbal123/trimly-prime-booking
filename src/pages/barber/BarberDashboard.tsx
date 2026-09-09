@@ -14,8 +14,7 @@ import {
 } from '@/lib/api';
 import { StatsCards } from '@/components/barber/StatsCards';
 import { EarningsChart } from '@/components/barber/EarningsChart';
-import { ServicesTable } from '@/components/barber/ServicesTable';
-import { BookingsTable } from '@/components/barber/BookingsTable';
+
 import { DashboardSkeleton } from '@/components/barber/DashboardSkeleton';
 
 const containerVariants = {
@@ -39,8 +38,6 @@ export default function BarberDashboard() {
   const [services, setServices] = useState<ServiceData[]>([]);
   const [stats, setStats] = useState<BarberDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [servicesLoading, setServicesLoading] = useState(false);
-  const [bookingsLoading, setBookingsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -93,27 +90,7 @@ export default function BarberDashboard() {
     if (showRefreshState) toast.success('Dashboard refreshed');
   };
 
-  const refreshBookings = async () => {
-    setBookingsLoading(true);
-    const response = await getBarberBookings();
-    if (response.success && response.data) {
-      setBookings(response.data);
-    } else {
-      toast.error(response.error || 'Failed to refresh bookings');
-    }
-    setBookingsLoading(false);
-  };
-
-  const refreshServices = async () => {
-    setServicesLoading(true);
-    const response = await getMyServices();
-    if (response.success && response.data) {
-      setServices(response.data);
-    } else {
-      toast.error(response.error || 'Failed to refresh services');
-    }
-    setServicesLoading(false);
-  };
+  
 
   useEffect(() => {
     fetchAllData();
@@ -170,15 +147,6 @@ export default function BarberDashboard() {
       <motion.div variants={itemVariants}>
         <EarningsChart bookings={bookings} services={services} />
       </motion.div>
-
-
-      <motion.div variants={itemVariants}>
-        <ServicesTable services={services} onRefresh={refreshServices} loading={servicesLoading} />
       </motion.div>
-
-      <motion.div variants={itemVariants}>
-        <BookingsTable bookings={bookings} onRefresh={refreshBookings} loading={bookingsLoading} />
-      </motion.div>
-    </motion.div>
   );
 }
