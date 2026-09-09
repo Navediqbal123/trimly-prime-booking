@@ -1,15 +1,28 @@
 import { motion } from 'framer-motion';
-import { Calendar, IndianRupee, CheckCircle, Clock, XCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ServiceData, BookingData, BarberDashboardStats } from '@/lib/api';
-import { bookingAmount, buildServiceMap } from '@/lib/bookingAmount';
+import {
+  Calendar,
+  IndianRupee,
+  CheckCircle,
+  Clock,
+  XCircle,
+  ChevronRight,
+} from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import {
+  ServiceData,
+  BookingData,
+  BarberDashboardStats,
+} from '@/lib/api';
+import {
+  bookingAmount,
+  buildServiceMap,
+} from '@/lib/bookingAmount';
 import { useCountUp } from '@/hooks/useCountUp';
-
 
 interface StatsCardsProps {
   services: ServiceData[];
   bookings: BookingData[];
-  /** Server-provided stats from GET /api/barber/dashboard (preferred when present) */
+  /** Server-provided stats from GET /api/barber/dashboard */
   stats?: BarberDashboardStats | null;
   isLoading?: boolean;
 }
@@ -19,135 +32,369 @@ interface StatCardProps {
   value: number;
   prefix?: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: string;
-  bgColor: string;
+  iconColor: string;
+  iconBg: string;
   index: number;
   formatAsCurrency?: boolean;
 }
 
-function StatCard({ title, value, prefix = '', icon: Icon, color, bgColor, index, formatAsCurrency }: StatCardProps) {
+function StatCard({
+  title,
+  value,
+  prefix = '',
+  icon: Icon,
+  iconColor,
+  iconBg,
+  index,
+  formatAsCurrency,
+}: StatCardProps) {
   const displayValue = useCountUp(value, {
     duration: 1200,
     delay: index * 100,
-    formatter: (v) => formatAsCurrency ? v.toLocaleString('en-IN') : v.toString(),
+    formatter: (v) =>
+      formatAsCurrency
+        ? v.toLocaleString('en-IN')
+        : v.toString(),
   });
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-    transition={{ 
-      delay: index * 0.1,
-      duration: 0.4,
-      ease: "easeOut",
-    }}
-      whileHover={{ scale: 1.02, y: -2 }}
-      whileTap={{ scale: 0.98 }}
+      initial={{
+        opacity: 0,
+        y: 16,
+        scale: 0.97,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        scale: 1,
+      }}
+      transition={{
+        delay: index * 0.07,
+        duration: 0.4,
+        ease: 'easeOut',
+      }}
+      whileHover={{
+        y: -2,
+        scale: 1.01,
+      }}
+      whileTap={{
+        scale: 0.98,
+      }}
+      className="h-full"
     >
-      <Card className="relative overflow-hidden rounded-2xl border border-orange-100/80 bg-white/80 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-200/30 cursor-default group">
-      <div className="absolute -inset-6 bg-orange-200/20 blur-2xl opacity-70 pointer-events-none" />
-        {/* Subtle gradient overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        
-       <CardHeader className="flex flex-row items-center justify-between pb-1.5 relative z-10">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            {title}
-          </CardTitle>
-          <motion.div 
-            className={`w-9 h-9 rounded-xl ${bgColor} flex items-center justify-center shadow-sm`}
-            whileHover={{ rotate: [0, -10, 10, 0] }}
-            transition={{ duration: 0.5 }}
-          >
-            <Icon className={`w-5 h-5 ${color}`} />
-          </motion.div>
-        </CardHeader>
-        <CardContent className="relative z-10">
-          <motion.div 
-            className="text-2xl sm:text-3xl font-bold tracking-tight"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: index * 0.1 + 0.2 }}
-          >
-            {prefix}{displayValue}
-          </motion.div>
-        </CardContent>
+      <Card
+        className="
+          group
+          relative
+          h-full
+          min-h-[108px]
+          overflow-hidden
+          rounded-2xl
+          border
+          border-orange-100/80
+          bg-white/70
+          shadow-[0_8px_24px_rgba(148,163,184,0.10)]
+          backdrop-blur-xl
+          transition-all
+          duration-300
+          hover:border-orange-200
+          hover:bg-white/80
+          hover:shadow-[0_12px_30px_rgba(251,146,60,0.16)]
+        "
+      >
+        {/* Main soft orange ambient glow */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            -right-10
+            -top-10
+            h-28
+            w-28
+            rounded-full
+            bg-orange-200/25
+            blur-3xl
+            opacity-80
+          "
+        />
+
+        {/* Secondary warm glow */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            -bottom-10
+            -left-10
+            h-24
+            w-28
+            rounded-full
+            bg-orange-100/25
+            blur-3xl
+          "
+        />
+
+        {/* Subtle glass highlight */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            inset-x-4
+            top-0
+            h-px
+            bg-white/90
+          "
+        />
+
+        <div
+          className="
+            relative
+            z-10
+            flex
+            min-h-[108px]
+            h-full
+            flex-col
+            justify-between
+            p-3.5
+            sm:p-4
+          "
+        >
+          {/* Top section */}
+          <div className="flex items-start justify-between gap-2">
+            <p
+              className="
+                max-w-[78px]
+                text-[12px]
+                font-medium
+                leading-[1.25]
+                text-slate-600
+                sm:max-w-[100px]
+                sm:text-[13px]
+              "
+            >
+              {title}
+            </p>
+
+            <motion.div
+              whileHover={{
+                scale: 1.06,
+                rotate: 3,
+              }}
+              transition={{
+                duration: 0.2,
+              }}
+              className={`
+                flex
+                h-9
+                w-9
+                shrink-0
+                items-center
+                justify-center
+                rounded-xl
+                ${iconBg}
+                shadow-sm
+              `}
+            >
+              <Icon
+                className={`
+                  h-[18px]
+                  w-[18px]
+                  ${iconColor}
+                `}
+              />
+            </motion.div>
+          </div>
+
+          {/* Bottom section */}
+          <div className="mt-3 flex items-end justify-between gap-2">
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 5,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                delay: index * 0.07 + 0.15,
+                duration: 0.3,
+              }}
+              className="
+                min-w-0
+                truncate
+                text-[24px]
+                font-bold
+                leading-none
+                tracking-tight
+                text-slate-950
+                sm:text-[27px]
+              "
+            >
+              {prefix}
+              {displayValue}
+            </motion.div>
+
+            {/* Reference-style arrow circle */}
+            <motion.div
+              whileHover={{
+                scale: 1.08,
+              }}
+              whileTap={{
+                scale: 0.92,
+              }}
+              className="
+                flex
+                h-7
+                w-7
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                bg-slate-900/[0.06]
+                text-slate-500
+                transition-all
+                duration-200
+                group-hover:bg-orange-500/10
+                group-hover:text-orange-500
+              "
+            >
+              <ChevronRight className="h-4 w-4" />
+            </motion.div>
+          </div>
+        </div>
       </Card>
     </motion.div>
   );
 }
 
-export function StatsCards({ services, bookings, stats: apiStats, isLoading }: StatsCardsProps) {
+export function StatsCards({
+  services,
+  bookings,
+  stats: apiStats,
+  isLoading,
+}: StatsCardsProps) {
   const serviceMap = buildServiceMap(services);
-  const statusOf = (b: BookingData) => String(b.status ?? '').toLowerCase().trim();
 
-  const completed = bookings.filter((b) => statusOf(b) === 'completed');
-  const totalBookings = apiStats?.total_bookings ?? bookings.length;
-  const completedBookings = apiStats?.completed ?? completed.length;
-  const pendingBookings = apiStats?.pending ?? bookings.filter((b) => statusOf(b) === 'pending').length;
+  const statusOf = (b: BookingData) =>
+    String(b.status ?? '')
+      .toLowerCase()
+      .trim();
+
+  const completed = bookings.filter(
+    (b) => statusOf(b) === 'completed'
+  );
+
+  const totalBookings =
+    apiStats?.total_bookings ?? bookings.length;
+
+  const completedBookings =
+    apiStats?.completed ?? completed.length;
+
+  const pendingBookings =
+    apiStats?.pending ??
+    bookings.filter(
+      (b) => statusOf(b) === 'pending'
+    ).length;
+
   const approvedBookings =
-    apiStats?.approved ?? bookings.filter((b) => statusOf(b) === 'approved').length;
+    apiStats?.approved ??
+    bookings.filter(
+      (b) => statusOf(b) === 'approved'
+    ).length;
+
   const cancelledBookings =
     apiStats?.cancelled ??
-    bookings.filter((b) => ['cancelled', 'canceled', 'rejected'].includes(statusOf(b))).length;
+    bookings.filter((b) =>
+      [
+        'cancelled',
+        'canceled',
+        'rejected',
+      ].includes(statusOf(b))
+    ).length;
 
-  // Earnings come from the API when available, else from completed bookings priced via services
+  /*
+   * Earnings:
+   * Prefer the server-provided total.
+   * Otherwise calculate from completed bookings.
+   */
   const totalEarnings =
-    apiStats?.total_earnings ?? completed.reduce((sum, b) => sum + bookingAmount(b, serviceMap), 0);
+    apiStats?.total_earnings ??
+    completed.reduce(
+      (sum, b) =>
+        sum + bookingAmount(b, serviceMap),
+      0
+    );
 
-
+  /*
+   * FINAL APPROVED ORDER
+   *
+   * 1. Total Bookings
+   * 2. Pending
+   * 3. Approved
+   * 4. Completed
+   * 5. Cancelled
+   * 6. Total Earnings
+   */
   const stats = [
-  { 
-    title: 'Total Bookings', 
-    value: totalBookings, 
-    icon: Calendar,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-500/10',
-  },
-  { 
-    title: 'Pending', 
-    value: pendingBookings, 
-    icon: Clock,
-    color: 'text-amber-500',
-    bgColor: 'bg-amber-500/10',
-  },
-  {
-    title: 'Approved',
-    value: approvedBookings,
-    icon: CheckCircle,
-    color: 'text-emerald-500',
-    bgColor: 'bg-emerald-500/10',
-  },
-  { 
-    title: 'Completed', 
-    value: completedBookings, 
-    icon: CheckCircle,
-    color: 'text-green-500',
-    bgColor: 'bg-green-500/10',
-  },
-  {
-    title: 'Cancelled',
-    value: cancelledBookings,
-    icon: XCircle,
-    color: 'text-red-500',
-    bgColor: 'bg-red-500/10',
-  },
-  { 
-    title: 'Total Earnings', 
-    value: totalEarnings, 
-    prefix: '₹',
-    icon: IndianRupee,
-    color: 'text-primary',
-    bgColor: 'bg-primary/10',
-    formatAsCurrency: true,
-  },
-];
-
+    {
+      title: 'Total Bookings',
+      value: totalBookings,
+      icon: Calendar,
+      iconColor: 'text-orange-600',
+      iconBg: 'bg-orange-100/80',
+    },
+    {
+      title: 'Pending',
+      value: pendingBookings,
+      icon: Clock,
+      iconColor: 'text-orange-500',
+      iconBg: 'bg-orange-100/80',
+    },
+    {
+      title: 'Approved',
+      value: approvedBookings,
+      icon: CheckCircle,
+      iconColor: 'text-green-600',
+      iconBg: 'bg-green-100/80',
+    },
+    {
+      title: 'Completed',
+      value: completedBookings,
+      icon: CheckCircle,
+      iconColor: 'text-green-600',
+      iconBg: 'bg-green-100/80',
+    },
+    {
+      title: 'Cancelled',
+      value: cancelledBookings,
+      icon: XCircle,
+      iconColor: 'text-red-500',
+      iconBg: 'bg-red-100/80',
+    },
+    {
+      title: 'Total Earnings',
+      value: totalEarnings,
+      prefix: '₹',
+      icon: IndianRupee,
+      iconColor: 'text-orange-600',
+      iconBg: 'bg-orange-100/80',
+      formatAsCurrency: true,
+    },
+  ];
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4"
+      className="
+        grid
+        grid-cols-2
+        gap-3
+        sm:gap-4
+        lg:grid-cols-3
+        xl:grid-cols-6
+      "
     >
       {stats.map((stat, index) => (
         <StatCard
@@ -156,8 +403,8 @@ export function StatsCards({ services, bookings, stats: apiStats, isLoading }: S
           value={stat.value}
           prefix={stat.prefix}
           icon={stat.icon}
-          color={stat.color}
-          bgColor={stat.bgColor}
+          iconColor={stat.iconColor}
+          iconBg={stat.iconBg}
           index={index}
           formatAsCurrency={stat.formatAsCurrency}
         />
