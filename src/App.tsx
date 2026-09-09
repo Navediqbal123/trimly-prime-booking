@@ -1,7 +1,7 @@
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { BarberHubLayout } from "@/components/layout/BarberHubLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -61,7 +61,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Navigate to="/auth?mode=signup" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/discover" element={<DiscoverBarbers />} />
         <Route path="/bookings" element={<MyBookings />} />
