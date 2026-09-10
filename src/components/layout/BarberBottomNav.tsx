@@ -20,20 +20,20 @@ export function BarberBottomNav() {
   const { pathname } = useLocation();
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 px-3 pb-3 pt-2">
+    <nav className="lg:hidden fixed inset-x-0 bottom-0 z-[100] px-2 pb-2 pt-1 pointer-events-none">
       <div
         className="
-          relative overflow-hidden
-          rounded-[24px]
+          pointer-events-auto
+          mx-auto w-full max-w-lg
+          overflow-hidden
+          rounded-[22px]
           border border-orange-200/70
-          bg-white/85
+          bg-white/90
           backdrop-blur-2xl
-          shadow-[0_12px_40px_rgba(249,115,22,0.14)]
+          shadow-[0_-4px_30px_rgba(249,115,22,0.12)]
         "
       >
-        <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-52 h-20 rounded-full bg-orange-200/20 blur-3xl" />
-
-        <div className="relative flex items-center justify-around px-2 py-2">
+        <div className="relative flex w-full items-stretch px-1 py-1.5">
           {items.map((item) => {
             const active = pathname === item.href;
             const Icon = item.icon;
@@ -43,15 +43,15 @@ export function BarberBottomNav() {
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  'relative flex min-w-[58px] flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 transition-all duration-300',
+                  'relative flex flex-1 min-w-0 flex-col items-center justify-center gap-1 rounded-[17px] px-1 py-2 transition-all duration-300',
                   active
-                    ? 'bg-orange-50 text-orange-500 shadow-[0_5px_18px_rgba(249,115,22,0.10)]'
+                    ? 'bg-orange-50 text-orange-500'
                     : 'text-slate-400 hover:text-slate-600'
                 )}
               >
                 <Icon
                   className={cn(
-                    'w-[21px] h-[21px] transition-all duration-300',
+                    'h-5 w-5 shrink-0 transition-all duration-300',
                     active &&
                       'stroke-[2.5] drop-shadow-[0_2px_6px_rgba(249,115,22,0.30)]'
                   )}
@@ -59,7 +59,7 @@ export function BarberBottomNav() {
 
                 <span
                   className={cn(
-                    'text-[11px] font-semibold leading-none',
+                    'truncate text-[10px] font-semibold leading-none',
                     active ? 'text-orange-500' : 'text-slate-400'
                   )}
                 >
@@ -67,7 +67,7 @@ export function BarberBottomNav() {
                 </span>
 
                 {active && (
-                  <span className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-orange-500" />
+                  <span className="absolute bottom-0.5 h-1 w-1 rounded-full bg-orange-500" />
                 )}
               </NavLink>
             );

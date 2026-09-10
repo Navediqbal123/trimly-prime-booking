@@ -3,19 +3,18 @@ import { motion } from 'framer-motion';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { 
-  getBarberBookings, 
-  getMyServices, 
+import {
+  getBarberBookings,
+  getMyServices,
   getMyBarberProfile,
   getBarberDashboardStats,
-  BookingData, 
+  BookingData,
   ServiceData,
   BarberDashboardStats,
 } from '@/lib/api';
 import { StatsCards } from '@/components/barber/StatsCards';
 import { EarningsChart } from '@/components/barber/EarningsChart';
 import { BarberBottomNav } from '@/components/layout/BarberBottomNav';
-
 import { DashboardSkeleton } from '@/components/barber/DashboardSkeleton';
 
 const containerVariants = {
@@ -28,9 +27,10 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, y: 0,
-    transition: { duration: 0.4, ease: "easeOut" as const },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: 'easeOut' as const },
   },
 };
 
@@ -48,18 +48,23 @@ export default function BarberDashboard() {
     } else {
       setLoading(true);
     }
+
     setError(null);
 
     // Resolve internal barber_id (never the auth user id) to scope bookings
     const profileResponse = await getMyBarberProfile();
-    const barberId = profileResponse.success ? profileResponse.data?.id : undefined;
+    const barberId = profileResponse.success
+      ? profileResponse.data?.id
+      : undefined;
 
     if (!profileResponse.success) {
-      // For any profile error, show dashboard with empty state instead of blocking
-      console.warn('Profile fetch failed, showing empty dashboard:', profileResponse.error);
+      console.warn(
+        'Profile fetch failed, showing empty dashboard:',
+        profileResponse.error
+      );
     }
 
-    // Fetch bookings and services in parallel (bookings table only — no profiles join)
+    // Fetch bookings and services in parallel
     const [bookingsRes, servicesRes, statsRes] = await Promise.all([
       getBarberBookings(),
       getMyServices(),
@@ -69,35 +74,51 @@ export default function BarberDashboard() {
     if (statsRes.success && statsRes.data) {
       setStats(statsRes.data);
     } else {
-      console.warn('Dashboard stats fetch failed, using booking-derived stats:', statsRes.error);
+      console.warn(
+        'Dashboard stats fetch failed, using booking-derived stats:',
+        statsRes.error
+      );
       setStats(null);
     }
 
     if (bookingsRes.success && bookingsRes.data) {
-      const list = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
-      setBookings(barberId ? list.filter((b) => !b.barber_id || b.barber_id === barberId) : list);
+      const list = Array.isArray(bookingsRes.data)
+        ? bookingsRes.data
+        : [];
+
+      setBookings(
+        barberId
+          ? list.filter(
+              (b) => !b.barber_id || b.barber_id === barberId
+            )
+          : list
+      );
     }
+
     if (servicesRes.success && servicesRes.data) {
       setServices(servicesRes.data);
     } else if (!servicesRes.success) {
       console.error('Services fetch failed:', servicesRes.error);
-      toast.error(servicesRes.error || 'Failed to load services');
+      toast.error(
+        servicesRes.error || 'Failed to load services'
+      );
     }
-
-
 
     setLoading(false);
     setIsRefreshing(false);
-    if (showRefreshState) toast.success('Dashboard refreshed');
-  };
 
-  
+    if (showRefreshState) {
+      toast.success('Dashboard refreshed');
+    }
+  };
 
   useEffect(() => {
     fetchAllData();
   }, []);
 
-  if (loading) return <DashboardSkeleton />;
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
 
   if (error) {
     return (
@@ -107,9 +128,20 @@ export default function BarberDashboard() {
         className="flex flex-col items-center justify-center py-16 text-center"
       >
         <AlertCircle className="w-16 h-16 text-destructive mb-4" />
-        <h3 className="text-xl font-semibold mb-2">Error Loading Dashboard</h3>
-        <p className="text-muted-foreground">{error}</p>
-        <Button variant="outline" className="mt-4" onClick={() => fetchAllData()}>
+
+        <h3 className="text-xl font-semibold mb-2">
+          Error Loading Dashboard
+        </h3>
+
+        <p className="text-muted-foreground">
+          {error}
+        </p>
+
+        <Button
+          variant="outline"
+          className="mt-4"
+          onClick={() => fetchAllData()}
+        >
           Try Again
         </Button>
       </motion.div>
@@ -117,38 +149,63 @@ export default function BarberDashboard() {
   }
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="page-black space-y-8"
-    >
-      <motion.div variants={itemVariants} className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
-            Barber <span className="gradient-text">Hub</span>
-          </h1>
-          <p className="text-muted-foreground">Manage your shop, services, and appointments</p>
-        </div>
-        <Button 
-          variant="outline" 
-          onClick={() => fetchAllData(true)} 
-          disabled={isRefreshing}
-          className="transition-all duration-200 hover:scale-105 active:scale-95"
+    <>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="page-black space-y-8 pb-28"
+      >
+        <motion.div
+          variants={itemVariants}
+          className="flex items-center justify-between"
         >
-          <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+          <div>
+            <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
+              Barber{' '}
+              <span className="gradient-text">
+                Hub
+              </span>
+            </h1>
+
+            <p className="text-muted-foreground">
+              Manage your shop, services, and appointments
+            </p>
+          </div>
+
+          <Button
+            variant="outline"
+            onClick={() => fetchAllData(true)}
+            disabled={isRefreshing}
+            className="transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            <RefreshCw
+              className={`w-4 h-4 mr-2 ${
+                isRefreshing ? 'animate-spin' : ''
+              }`}
+            />
+            Refresh
+          </Button>
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <StatsCards
+            services={services}
+            bookings={bookings}
+            stats={stats}
+          />
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <EarningsChart
+            bookings={bookings}
+            services={services}
+          />
+        </motion.div>
       </motion.div>
 
-      <motion.div variants={itemVariants}>
-        <StatsCards services={services} bookings={bookings} stats={stats} />
-      </motion.div>
-
-      <motion.div variants={itemVariants}>
-        <EarningsChart bookings={bookings} services={services} />
-      </motion.div>
-       <BarberBottomNav />
-      </motion.div>
+      {/* Fixed Barber Hub Bottom Navigation */}
+      <BarberBottomNav />
+    </>
   );
 }
