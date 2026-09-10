@@ -14,6 +14,7 @@ import {
 } from '@/lib/api';
 import { StatsCards } from '@/components/barber/StatsCards';
 import { EarningsChart } from '@/components/barber/EarningsChart';
+import { BarberBottomNav } from '@/components/layout/BarberBottomNav';
 
 import { DashboardSkeleton } from '@/components/barber/DashboardSkeleton';
 
@@ -147,6 +148,7 @@ export default function BarberDashboard() {
       <motion.div variants={itemVariants}>
         <EarningsChart bookings={bookings} services={services} />
       </motion.div>
+       <BarberBottomNav />
       </motion.div>
   );
 }
