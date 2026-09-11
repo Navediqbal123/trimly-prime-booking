@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scissors, Mail, Lock, Loader2, Eye, EyeOff, User, Phone } from 'lucide-react';
@@ -332,7 +332,7 @@ setPrivacyAcknowledged(false);
                         id="password"
                         name="password"
                         type={showPassword ? 'text' : 'password'}
-                        placeholder="••••••••"
+                        placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                         value={formData.password}
                         onChange={handleChange}
                         className="pl-10 pr-10"
@@ -492,7 +492,7 @@ setPrivacyAcknowledged(false);
       Terms of Use
     </a>
 
-    <span className="text-muted-foreground/40">•</span>
+    <span className="text-muted-foreground/40">â€¢</span>
 
     <a
       href="/privacy-policy.html"
@@ -503,7 +503,7 @@ setPrivacyAcknowledged(false);
       Privacy Policy
     </a>
 
-    <span className="text-muted-foreground/40">•</span>
+    <span className="text-muted-foreground/40">â€¢</span>
 
     <a
       href="/refund-policy.html"
@@ -514,7 +514,7 @@ setPrivacyAcknowledged(false);
       Refund Policy
     </a>
 
-    <span className="text-muted-foreground/40">•</span>
+    <span className="text-muted-foreground/40">â€¢</span>
 
     <a
       href="/contact-us.html"
@@ -524,10 +524,20 @@ setPrivacyAcknowledged(false);
     >
       Contact Us
     </a>
+    <span className="text-muted-foreground/40">•</span>
+
+    <a
+      href="/delete-account.html"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-muted-foreground hover:text-primary transition-colors"
+    >
+      Delete Account
+    </a>
   </div>
 
   <p className="mt-3 text-xs text-muted-foreground">
-    © 2026 Trimlyhub. All rights reserved.
+    Â© 2026 Trimlyhub. All rights reserved.
   </p>
 </footer>
       </div>
@@ -535,3 +545,4 @@ setPrivacyAcknowledged(false);
     </div>
   );
 }
+
