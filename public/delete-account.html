@@ -1,0 +1,1249 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Delete Account | Trimlyhub</title>
+
+    <meta
+        name="description"
+        content="Read the Trimlyhub Privacy Policy to understand how we collect, use, store, protect, and share information when you use our platform."
+    >
+
+    <meta
+        name="robots"
+        content="index, follow"
+    >
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        /* =========================
+           GLOBAL
+        ========================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            background: #fffaf3;
+            color: #1f2937;
+            line-height: 1.7;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font-family: inherit;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            background: rgba(255, 255, 255, 0.95);
+
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+
+            border-bottom:
+                1px solid rgba(245, 139, 0, 0.12);
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: auto;
+
+            padding: 14px 24px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+
+        /* =========================
+           TRIMLYHUB LOGO
+        ========================= */
+
+        .logo {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            font-size: 23px;
+            font-weight: 800;
+
+            white-space: nowrap;
+        }
+
+        .logo img {
+            width: 43px;
+            height: 43px;
+
+            object-fit: cover;
+
+            border-radius: 12px;
+
+            display: block;
+        }
+
+        .logo-text {
+            display: flex;
+            align-items: center;
+
+            gap: 0;
+        }
+
+        .logo-text .trimly {
+            color: #f28c00;
+        }
+
+        .logo-text .hub {
+            color: #171717;
+        }
+
+
+        /* =========================
+           NAVIGATION
+        ========================= */
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+
+            gap: 28px;
+        }
+
+        .nav-links a {
+            color: #4b5563;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            transition: 0.25s ease;
+        }
+
+        .nav-links a:hover {
+            color: #f28c00;
+        }
+
+        .nav-home {
+            padding: 10px 18px;
+
+            border-radius: 10px;
+
+            background: #fff1dc;
+
+            color: #e77d00 !important;
+        }
+
+        .nav-home:hover {
+            background: #ffe4bd;
+        }
+
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            position: relative;
+
+            overflow: hidden;
+
+            padding: 80px 20px 85px;
+
+            text-align: center;
+
+            background:
+                radial-gradient(
+                    circle at 10% 20%,
+                    rgba(255, 166, 0, 0.16),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 90% 30%,
+                    rgba(245, 139, 0, 0.14),
+                    transparent 28%
+                ),
+                linear-gradient(
+                    135deg,
+                    #fff4e2,
+                    #ffffff
+                );
+        }
+
+        .hero::before {
+            content: "";
+
+            position: absolute;
+
+            width: 260px;
+            height: 260px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(245, 139, 0, 0.08);
+
+            top: -130px;
+            left: -100px;
+        }
+
+        .hero::after {
+            content: "";
+
+            position: absolute;
+
+            width: 300px;
+            height: 300px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255, 174, 0, 0.07);
+
+            bottom: -170px;
+            right: -120px;
+        }
+
+        .hero-content {
+            position: relative;
+
+            z-index: 2;
+
+            max-width: 800px;
+
+            margin: auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 8px 16px;
+
+            border-radius: 50px;
+
+            background: #fff0d8;
+
+            color: #e57c00;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size:
+                clamp(38px, 6vw, 58px);
+
+            line-height: 1.1;
+
+            font-weight: 800;
+
+            letter-spacing: -1.5px;
+
+            margin-bottom: 18px;
+
+            color: #171717;
+        }
+
+        .hero h1 span {
+            color: #f28c00;
+        }
+
+        .hero p {
+            max-width: 690px;
+
+            margin: auto;
+
+            color: #667085;
+
+            font-size: 16px;
+        }
+
+
+        /* =========================
+           PAGE WRAPPER
+        ========================= */
+
+        .privacy-wrapper {
+            max-width: 1120px;
+
+            margin: -35px auto 0;
+
+            padding:
+                0 20px 90px;
+
+            position: relative;
+
+            z-index: 5;
+        }
+
+
+        /* =========================
+           LAST UPDATED
+        ========================= */
+
+        .policy-meta {
+            background: #ffffff;
+
+            border: 1px solid #f0e5d6;
+
+            border-radius: 18px;
+
+            padding: 18px 22px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 14px 35px rgba(
+                    85,
+                    53,
+                    10,
+                    0.06
+                );
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            flex-wrap: wrap;
+        }
+
+        .policy-meta strong {
+            color: #171717;
+
+            font-size: 13px;
+        }
+
+        .policy-meta span {
+            color: #e77d00;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================
+           POLICY LAYOUT
+        ========================= */
+
+        .policy-layout {
+            display: grid;
+
+            grid-template-columns:
+                250px 1fr;
+
+            gap: 28px;
+
+            align-items: start;
+        }
+
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .policy-sidebar {
+            position: sticky;
+
+            top: 90px;
+
+            background: #ffffff;
+
+            border:
+                1px solid #f0e5d6;
+
+            border-radius: 20px;
+
+            padding: 22px;
+
+            box-shadow:
+                0 15px 35px rgba(
+                    85,
+                    53,
+                    10,
+                    0.06
+                );
+        }
+
+        .policy-sidebar h3 {
+            font-size: 15px;
+
+            color: #171717;
+
+            margin-bottom: 14px;
+        }
+
+        .policy-sidebar a {
+            display: block;
+
+            padding: 8px 10px;
+
+            margin-bottom: 3px;
+
+            border-radius: 8px;
+
+            color: #667085;
+
+            font-size: 12px;
+
+            transition: 0.2s ease;
+        }
+
+        .policy-sidebar a:hover {
+            color: #e77d00;
+
+            background: #fff5e8;
+        }
+
+
+        /* =========================
+           POLICY CONTENT
+        ========================= */
+
+        .policy-content {
+            background: #ffffff;
+
+            border:
+                1px solid #f0e5d6;
+
+            border-radius: 24px;
+
+            padding:
+                42px 45px;
+
+            box-shadow:
+                0 18px 45px rgba(
+                    85,
+                    53,
+                    10,
+                    0.07
+                );
+        }
+
+        .policy-intro {
+            padding-bottom: 30px;
+
+            margin-bottom: 30px;
+
+            border-bottom:
+                1px solid #f0e5d6;
+        }
+
+        .policy-intro h2 {
+            font-size: 25px;
+
+            color: #171717;
+
+            margin-bottom: 12px;
+        }
+
+        .policy-intro p {
+            color: #667085;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           POLICY SECTIONS
+        ========================= */
+
+        .policy-section {
+            margin-bottom: 38px;
+
+            scroll-margin-top: 100px;
+        }
+
+        .policy-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .policy-section h2 {
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 12px;
+
+            font-size: 21px;
+
+            line-height: 1.4;
+
+            color: #171717;
+
+            margin-bottom: 13px;
+        }
+
+        .section-number {
+            flex: 0 0 auto;
+
+            width: 32px;
+            height: 32px;
+
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: #fff0d8;
+
+            color: #e77d00;
+
+            font-size: 12px;
+
+            font-weight: 800;
+        }
+
+        .policy-section p {
+            color: #596579;
+
+            font-size: 13.5px;
+
+            margin-bottom: 12px;
+        }
+
+        .policy-section ul {
+            margin:
+                10px 0 15px 20px;
+        }
+
+        .policy-section li {
+            color: #596579;
+
+            font-size: 13.5px;
+
+            margin-bottom: 8px;
+
+            padding-left: 4px;
+        }
+
+        .policy-section li::marker {
+            color: #f28c00;
+        }
+
+        .policy-section strong {
+            color: #303846;
+        }
+
+
+        /* =========================
+           HIGHLIGHT BOX
+        ========================= */
+
+        .highlight-box {
+            margin: 18px 0;
+
+            padding: 18px 20px;
+
+            border-radius: 13px;
+
+            background: #fff8ed;
+
+            border-left:
+                4px solid #f28c00;
+        }
+
+        .highlight-box p {
+            margin: 0;
+
+            color: #5b4a34;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           INFO BOX
+        ========================= */
+
+        .info-box {
+            margin-top: 18px;
+
+            padding: 18px 20px;
+
+            border-radius: 13px;
+
+            background: #fffaf3;
+
+            border:
+                1px solid #f2e3cf;
+        }
+
+        .info-box h4 {
+            color: #171717;
+
+            font-size: 14px;
+
+            margin-bottom: 6px;
+        }
+
+        .info-box p {
+            margin: 0;
+
+            font-size: 13px;
+        }
+
+        .info-box a {
+            color: #e77d00;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================
+           CONTACT BOX
+        ========================= */
+
+        .contact-policy-box {
+            margin-top: 18px;
+
+            padding: 22px;
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #fff4e2,
+                    #fffaf3
+                );
+
+            border:
+                1px solid #f1ddc0;
+        }
+
+        .contact-policy-box h3 {
+            color: #171717;
+
+            font-size: 16px;
+
+            margin-bottom: 8px;
+        }
+
+        .contact-policy-box p {
+            margin-bottom: 7px;
+        }
+
+        .contact-policy-box a {
+            color: #e77d00;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            background: #17130e;
+
+            color: white;
+
+            padding:
+                55px 20px 25px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+
+            margin: auto;
+        }
+
+        .footer-top {
+            display: grid;
+
+            grid-template-columns:
+                1.5fr 1fr 1fr;
+
+            gap: 45px;
+
+            padding-bottom: 40px;
+
+            border-bottom:
+                1px solid rgba(
+                    255,
+                    255,
+                    255,
+                    0.1
+                );
+        }
+
+        .footer-brand .logo {
+            margin-bottom: 15px;
+        }
+
+        .footer-brand .logo-text .trimly {
+            color: #f28c00;
+        }
+
+        .footer-brand .logo-text .hub {
+            color: white;
+        }
+
+        .footer-brand p {
+            max-width: 400px;
+
+            color: #a9a29a;
+
+            font-size: 13px;
+
+            line-height: 1.8;
+        }
+
+        .footer-column h4 {
+            font-size: 14px;
+
+            margin-bottom: 18px;
+        }
+
+        .footer-column a {
+            display: block;
+
+            color: #a9a29a;
+
+            font-size: 13px;
+
+            margin-bottom: 10px;
+
+            transition: 0.2s ease;
+        }
+
+        .footer-column a:hover {
+            color: #f28c00;
+        }
+
+        .footer-bottom {
+            padding-top: 22px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            color: #756e66;
+
+            font-size: 12px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            .policy-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .policy-sidebar {
+                position: static;
+            }
+
+            .policy-sidebar {
+                display: none;
+            }
+
+            .footer-top {
+                grid-template-columns:
+                    1fr 1fr;
+            }
+        }
+
+
+        @media (max-width: 650px) {
+
+            .navbar {
+                padding:
+                    13px 16px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .logo img {
+                width: 38px;
+                height: 38px;
+
+                border-radius: 10px;
+            }
+
+            .logo-text {
+                gap: 0;
+            }
+
+            .nav-links {
+                gap: 8px;
+            }
+
+            .nav-links a:not(.nav-home) {
+                display: none;
+            }
+
+            .nav-home {
+                padding:
+                    8px 13px;
+
+                font-size: 12px !important;
+            }
+
+
+            .hero {
+                padding:
+                    65px 18px 75px;
+            }
+
+            .hero h1 {
+                font-size: 40px;
+            }
+
+            .hero p {
+                font-size: 14px;
+            }
+
+
+            .privacy-wrapper {
+                padding:
+                    0 15px 70px;
+
+                margin-top: -30px;
+            }
+
+
+            .policy-meta {
+                padding:
+                    15px 17px;
+            }
+
+
+            .policy-content {
+                padding:
+                    28px 20px;
+
+                border-radius: 20px;
+            }
+
+
+            .policy-intro h2 {
+                font-size: 22px;
+            }
+
+
+            .policy-section h2 {
+                font-size: 18px;
+            }
+
+
+            .policy-section p,
+            .policy-section li {
+                font-size: 13px;
+            }
+
+
+            .section-number {
+                width: 29px;
+                height: 29px;
+            }
+
+
+            .footer-top {
+                grid-template-columns:
+                    1fr;
+
+                gap: 30px;
+            }
+
+
+            .footer-bottom {
+                flex-direction: column;
+
+                text-align: center;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header>
+
+        <nav class="navbar">
+
+
+            <a
+                href="/"
+                class="logo"
+            >
+
+                <img
+                    src="trimly-logo.png"
+                    alt="Trimlyhub Logo"
+                >
+
+                <span class="logo-text">
+
+                    <span class="trimly">
+                        Trimly
+                    </span><span class="hub">hub</span>
+
+                </span>
+
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="/">
+                    Home
+                </a>
+
+                <a href="terms-of-use.html">
+                    Terms
+                </a>
+
+                <a href="privacy-policy.html">
+                    Privacy
+                </a>
+
+                <a href="refund-policy.html">
+                    Refunds
+                </a>
+
+                <a
+                    href="contact-us.html"
+                    class="nav-home"
+                >
+                    Contact Us
+                </a>
+
+            </div>
+
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- =========================
+         HERO
+    ========================= -->
+
+    <section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Trimlyhub Account</div>
+    <h1>Delete <span>Account</span></h1>
+    <p>This page explains how Trimlyhub customers can request deletion of their account and associated personal information.</p>
+  </div>
+</section>
+
+
+
+    <!-- =========================
+         PRIVACY CONTENT
+    ========================= -->
+
+    <main class="privacy-wrapper">
+  <div class="policy-meta">
+    <div><strong>Account Deletion</strong></div>
+    <div><span>Last Updated: 11 September 2026</span></div>
+  </div>
+
+  <div class="policy-layout">
+    <aside class="policy-sidebar">
+      <div class="sidebar-title">On This Page</div>
+      <a href="#introduction">Introduction</a>
+      <a href="#request">How to Request Deletion</a>
+      <a href="#information">Information to Include</a>
+      <a href="#deleted">What We Delete</a>
+      <a href="#retained">Information We May Retain</a>
+      <a href="#processing">Processing</a>
+      <a href="#help">Need Help?</a>
+    </aside>
+
+    <article class="policy-content">
+
+      <section class="policy-intro" id="introduction">
+        <div class="section-number">01</div>
+        <div>
+          <h2>Account Deletion</h2>
+          <p>Trimlyhub respects your right to request deletion of your customer account and associated personal information.</p>
+          <p>Customer accounts can currently be deleted by sending a deletion request to our support email. The customer account does not currently include an in-app Delete Account button.</p>
+        </div>
+      </section>
+
+      <section class="policy-section" id="request">
+        <div class="section-number">02</div>
+        <div>
+          <h2>How to Request Deletion</h2>
+          <p>To request deletion of your Trimlyhub customer account:</p>
+          <ol>
+            <li>Send an email to <strong>trimlyhub@gmail.com</strong> from your registered email address.</li>
+            <li>Use the subject line <strong>Delete My Trimlyhub Account</strong>.</li>
+            <li>Clearly state that you want your Trimlyhub customer account deleted.</li>
+          </ol>
+
+          <div class="highlight-box">
+            <strong>Account Deletion Email</strong>
+            <p>
+              <a href="mailto:trimlyhub@gmail.com?subject=Delete%20My%20Trimlyhub%20Account">
+                trimlyhub@gmail.com
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="policy-section" id="information">
+        <div class="section-number">03</div>
+        <div>
+          <h2>Information to Include</h2>
+          <p>For faster processing, please include:</p>
+          <ul>
+            <li>Your name</li>
+            <li>Your registered email address</li>
+            <li>Your registered phone number, if applicable</li>
+          </ul>
+
+          <div class="info-box">
+            <strong>Security Notice</strong>
+            <p>Never send your password, OTP, PIN, CVV, or complete payment-card details by email.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="policy-section" id="deleted">
+        <div class="section-number">04</div>
+        <div>
+          <h2>What We Delete</h2>
+          <p>After verifying your request, Trimlyhub will take reasonable steps to delete or anonymize customer account information that is no longer required for providing our services, security, legal, or business obligations.</p>
+          <ul>
+            <li>Customer profile information</li>
+            <li>Account-related personal information</li>
+            <li>Saved account preferences where applicable</li>
+            <li>Other personal information that is eligible for deletion</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="policy-section" id="retained">
+        <div class="section-number">05</div>
+        <div>
+          <h2>Information We May Retain</h2>
+          <p>Some information may need to be retained for a limited period when required for legal compliance, financial records, refunds, disputes, fraud prevention, security, or other legitimate obligations.</p>
+          <p>Where retention is required, the information will be kept only for the period reasonably necessary for that purpose.</p>
+        </div>
+      </section>
+
+      <section class="policy-section" id="processing">
+        <div class="section-number">06</div>
+        <div>
+          <h2>Processing of Your Request</h2>
+          <p>We may verify your identity or account ownership before processing a deletion request. This helps protect accounts from unauthorized deletion requests.</p>
+          <p>After verification, we will process the request within a reasonable period. Information stored in backups may remain temporarily until those backups are securely overwritten or deleted.</p>
+        </div>
+      </section>
+
+      <section class="policy-section" id="help">
+        <div class="section-number">07</div>
+        <div>
+          <h2>Need Help?</h2>
+          <p>If you have questions about account deletion or your personal information, contact us:</p>
+
+          <div class="contact-policy-box">
+            <h3>Trimlyhub Support</h3>
+            <p><strong>Email:</strong> <a href="mailto:trimlyhub@gmail.com">trimlyhub@gmail.com</a></p>
+            <p><strong>Support:</strong> 23 Hours Daily</p>
+          </div>
+
+          <p>We will help you with the account deletion process and any related questions.</p>
+        </div>
+      </section>
+
+    </article>
+  </div>
+</main>
+
+
+
+    <!-- =========================
+         FOOTER
+    ========================= -->
+
+    <footer>
+
+        <div class="footer-container">
+
+
+            <div class="footer-top">
+
+
+                <!-- BRAND -->
+
+                <div class="footer-brand">
+
+                    <a
+                        href="/"
+                        class="logo"
+                    >
+
+                        <img
+                            src="trimly-logo.png"
+                            alt="Trimlyhub Logo"
+                        >
+
+                        <span class="logo-text">
+
+                            <span class="trimly">
+                                Trimly
+                            </span><span class="hub">hub</span>
+
+                        </span>
+
+                    </a>
+
+
+                    <p>
+                        Trimlyhub connects customers with barbers
+                        and salons, making it easier to discover,
+                        compare, and book grooming services.
+                    </p>
+
+                </div>
+
+
+
+                <!-- QUICK LINKS -->
+
+                <div class="footer-column">
+
+                    <h4>
+                        Quick Links
+                    </h4>
+
+
+                    <a href="/">
+                        Home
+                    </a>
+
+
+                    <a href="contact-us.html">
+                        Contact Us
+                    </a>
+
+                </div>
+
+
+
+                <!-- LEGAL -->
+
+                <div class="footer-column">
+
+                    <h4>
+                        Legal
+                    </h4>
+
+
+                    <a href="terms-of-use.html">
+                        Terms of Use
+                    </a>
+
+
+                    <a href="privacy-policy.html">
+                        Privacy Policy
+                    </a>
+
+
+                    <a href="refund-policy.html">
+                        Cancellation & Refund Policy
+                    </a>
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="footer-bottom">
+
+                <div>
+                    Â© 2026 Trimlyhub.
+                    All rights reserved.
+                </div>
+
+
+                <div>
+                    Made for better grooming experiences.
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </footer>
+
+
+</body>
+</html>
