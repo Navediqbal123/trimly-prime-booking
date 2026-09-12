@@ -16,8 +16,6 @@ import { StatsCards } from '@/components/barber/StatsCards';
 import { EarningsChart } from '@/components/barber/EarningsChart';
 
 import { DashboardSkeleton } from '@/components/barber/DashboardSkeleton';
-
-import { BarberBottomNav } from '@/components/layout/BarberBottomNav';
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -204,8 +202,7 @@ export default function BarberDashboard() {
           />
         </motion.div>
       </motion.div>
-      {/* Fixed Barber Hub Bottom Navigation */}
-<BarberBottomNav />
+     
     
     </>
   );

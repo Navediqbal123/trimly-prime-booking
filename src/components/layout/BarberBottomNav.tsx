@@ -5,16 +5,16 @@ import {
   CalendarDays,
   LayoutGrid,
   Wallet,
-  User,
+  Store,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const items = [
   { title: 'Home', href: '/barber-hub', icon: Home },
-  { title: 'Bookings', href: '/barber-hub/bookings', icon: CalendarDays },
+  { title: 'appointments', href: '/barber-hub/appointments', icon: CalendarDays },
   { title: 'Services', href: '/barber-hub/services', icon: LayoutGrid },
   { title: 'Earnings', href: '/barber-hub/earnings', icon: Wallet },
-  { title: 'Profile', href: '/profile', icon: User },
+ { title: 'My Shop', href: '/barber-hub/shop', icon: Store },
 ];
 
 export function BarberBottomNav() {
