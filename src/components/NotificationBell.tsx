@@ -20,7 +20,8 @@ export function NotificationBell({ className }: { className?: string }) {
   const isUnread = (notification: NotificationData) => {
     if (typeof notification.read === 'boolean') return !notification.read;
     if (typeof notification.is_read === 'boolean') return !notification.is_read;
-    return !notification.read_at;
+    if ('read_at' in notification) return !notification.read_at;
+    return false;
   };
   const unread = items.filter(isUnread).length;
 
