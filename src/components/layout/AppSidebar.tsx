@@ -51,7 +51,7 @@ export function AppSidebar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending } = useProtectedUser();
   const location = useLocation();
-  const headerVisible = useHideOnScroll(1);
+  const headerVisible = useHideOnScroll(0);
 
   const isBarberApproved = isBarber;
   const isPending = isBarberPending;

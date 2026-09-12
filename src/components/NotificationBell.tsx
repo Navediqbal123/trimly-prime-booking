@@ -17,7 +17,11 @@ export function NotificationBell({ className }: { className?: string }) {
   // Re-render periodically so relative timestamps stay live.
   useTimeTick(60000);
 
-  const isUnread = (notification: NotificationData) => notification.read === false;
+  const isUnread = (notification: NotificationData) => {
+    if (typeof notification.read === 'boolean') return !notification.read;
+    if (typeof notification.is_read === 'boolean') return !notification.is_read;
+    return !notification.read_at;
+  };
   const unread = items.filter(isUnread).length;
 
   const loadProfiles = async (list: NotificationData[]) => {

@@ -467,7 +467,9 @@ export async function getAdminUsers(): Promise<ApiResponse<UserData[]>> {
 export interface NotificationData {
   id: string;
   message: string;
-  read: boolean;
+  read?: boolean;
+  is_read?: boolean;
+  read_at?: string | null;
   created_at: string;
   user_id?: string;
   actor_id?: string;
@@ -478,7 +480,9 @@ export interface NotificationData {
 }
 
 export async function getNotifications(): Promise<ApiResponse<NotificationData[]>> {
-  return apiCall<NotificationData[]>('/api/booking/notifications', { method: 'GET' });
+  const res = await apiCall<unknown>('/api/booking/notifications', { method: 'GET' });
+  if (!res.success) return { success: false, error: res.error };
+  return { success: true, data: asList<NotificationData>(res.data) };
 }
 
 export async function markNotificationsRead(): Promise<ApiResponse> {
