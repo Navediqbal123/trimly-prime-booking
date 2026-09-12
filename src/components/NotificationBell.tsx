@@ -17,7 +17,13 @@ export function NotificationBell({ className }: { className?: string }) {
   // Re-render periodically so relative timestamps stay live.
   useTimeTick(60000);
 
-  const unread = items.filter((n) => !n.read).length;
+  const isUnread = (notification: NotificationData) => {
+    if (typeof notification.read === 'boolean') return !notification.read;
+    if (typeof notification.is_read === 'boolean') return !notification.is_read;
+    if ('read_at' in notification) return !notification.read_at;
+    return false;
+  };
+  const unread = items.filter(isUnread).length;
 
   const loadProfiles = async (list: NotificationData[]) => {
     const ids = Array.from(
@@ -41,14 +47,17 @@ export function NotificationBell({ className }: { className?: string }) {
     }
   };
 
-  const load = async (silent = false) => {
+  const load = async (silent = false): Promise<NotificationData[]> => {
     if (!silent) setLoading(true);
     const res = await getNotifications();
     if (res.success && Array.isArray(res.data)) {
       setItems(res.data);
       loadProfiles(res.data);
+      if (!silent) setLoading(false);
+      return res.data;
     }
     if (!silent) setLoading(false);
+    return [];
   };
 
 
@@ -71,10 +80,10 @@ export function NotificationBell({ className }: { className?: string }) {
 
   const openPanel = async () => {
     setOpen(true);
-    await load();
-    if (unread > 0) {
-      await markNotificationsRead();
+    const latestItems = await load();
+    if (latestItems.some(isUnread)) {
       setItems((prev) => prev.map((n) => ({ ...n, read: true })));
+      await markNotificationsRead();
     }
   };
 
@@ -91,7 +100,7 @@ export function NotificationBell({ className }: { className?: string }) {
         <Bell className="w-6 h-6 text-foreground" />
         {unread > 0 && (
           <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-background">
-            {unread > 9 ? '9+' : unread}
+            {unread}
           </span>
         )}
       </button>
@@ -175,7 +184,7 @@ export function NotificationBell({ className }: { className?: string }) {
                         transition={{ delay: i * 0.03, duration: 0.25 }}
                         className={cn(
                           'rounded-2xl p-4 border transition-colors bg-white',
-                          !n.read ? 'border-primary/40 shadow-sm' : 'border-black/10',
+                          isUnread(n) ? 'border-primary/40 shadow-sm' : 'border-black/10',
                         )}
                       >
                         <div className="flex items-start gap-3">
@@ -189,7 +198,7 @@ export function NotificationBell({ className }: { className?: string }) {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <p className="text-sm font-bold text-black truncate">{name}</p>
-                              {!n.read && (
+                              {isUnread(n) && (
                                 <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
                               )}
                             </div>

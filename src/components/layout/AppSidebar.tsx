@@ -21,6 +21,7 @@ import {
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/NotificationBell';
+import { useHideOnScroll } from '@/hooks/useHideOnScroll';
 
 import { cn } from '@/lib/utils';
 
@@ -50,6 +51,7 @@ export function AppSidebar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending } = useProtectedUser();
   const location = useLocation();
+  const headerVisible = useHideOnScroll(0);
 
   const isBarberApproved = isBarber;
   const isPending = isBarberPending;
@@ -92,8 +94,11 @@ export function AppSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Button + Brand (fixed at top, always visible) */}
-      <div
+      {/* Mobile header keeps its reserved page space while sliding out of view. */}
+      <motion.div
+        initial={false}
+        animate={{ y: headerVisible || isOpen ? 0 : '-100%' }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
         className="lg:hidden"
         style={{
           position: 'fixed',
@@ -102,6 +107,7 @@ export function AppSidebar() {
           width: '100%',
           zIndex: 1000,
           backgroundColor: '#ffffff',
+          willChange: 'transform',
         }}
       >
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
@@ -120,7 +126,7 @@ export function AppSidebar() {
           </div>
           <NotificationBell />
         </div>
-      </div>
+      </motion.div>
 
 
       {/* Mobile Overlay */}
