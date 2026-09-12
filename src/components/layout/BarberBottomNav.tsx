@@ -11,10 +11,10 @@ import { cn } from '@/lib/utils';
 
 const items = [
   { title: 'Home', href: '/barber-hub', icon: Home },
-  { title: 'Appointments', href: '/barber-hub/Appointments', icon: CalendarDays },
+  { title: 'Appointments', href: '/barber-hub/bookings', icon: CalendarDays },
   { title: 'Services', href: '/barber-hub/services', icon: LayoutGrid },
   { title: 'Earnings', href: '/barber-hub/earnings', icon: Wallet },
- { title: 'My Shop', href: '/barber-hub/shop', icon: Store },
+  { title: 'My Shop', href: '/barber-hub/shop', icon: Store },
 ];
 
 export function BarberBottomNav() {
