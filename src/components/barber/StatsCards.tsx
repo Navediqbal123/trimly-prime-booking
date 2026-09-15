@@ -61,8 +61,8 @@ function StatCard({
     <motion.div
       initial={{
         opacity: 0,
-        y: 16,
-        scale: 0.97,
+        y: 14,
+        scale: 0.98,
       }}
       animate={{
         opacity: 1,
@@ -76,10 +76,10 @@ function StatCard({
       }}
       whileHover={{
         y: -2,
-        scale: 1.01,
+        scale: 1.008,
       }}
       whileTap={{
-        scale: 0.98,
+        scale: 0.985,
       }}
       className="h-full"
     >
@@ -88,125 +88,80 @@ function StatCard({
           group
           relative
           h-full
-          min-h-[108px]
+          min-h-[118px]
           overflow-hidden
-          rounded-2xl
-          border
-          border-orange-100/80
-          bg-white/70
-          shadow-[0_8px_24px_rgba(148,163,184,0.10)]
-          backdrop-blur-xl
+          rounded-[30px]
+          border-0
+          bg-white
+          p-0
+          shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]
           transition-all
           duration-300
-          hover:border-orange-200
-          hover:bg-white/80
-          hover:shadow-[0_12px_30px_rgba(251,146,60,0.16)]
+          hover:shadow-[9px_10px_20px_rgba(0,0,0,0.12),-7px_-7px_17px_rgba(255,255,255,1)]
         "
       >
-        {/* Main soft orange ambient glow */}
-        <div
-          className="
-            pointer-events-none
-            absolute
-            -right-10
-            -top-10
-            h-28
-            w-28
-            rounded-full
-            bg-orange-200/25
-            blur-3xl
-            opacity-80
-          "
-        />
-
-        {/* Secondary warm glow */}
-        <div
-          className="
-            pointer-events-none
-            absolute
-            -bottom-10
-            -left-10
-            h-24
-            w-28
-            rounded-full
-            bg-orange-100/25
-            blur-3xl
-          "
-        />
-
-        {/* Subtle glass highlight */}
-        <div
-          className="
-            pointer-events-none
-            absolute
-            inset-x-4
-            top-0
-            h-px
-            bg-white/90
-          "
-        />
-
         <div
           className="
             relative
-            z-10
-            flex
-            min-h-[108px]
+            flex    
             h-full
-            flex-col
-            justify-between
-            p-3.5
-            sm:p-4
+            min-h-[118px]
+            items-center
+            gap-4
+            px-5
+            py-4
+            sm:px-6
           "
         >
-          {/* Top section */}
-          <div className="flex items-start justify-between gap-2">
+          {/* Icon */}
+          <motion.div
+            whileHover={{
+              scale: 1.05,
+              rotate: 2,
+            }}
+            transition={{
+              duration: 0.2,
+            }}
+            className={`
+              flex
+              h-[68px]
+              w-[68px]
+              shrink-0
+              items-center
+              justify-center
+              rounded-full
+              ${iconBg}
+              ${iconColor}
+              shadow-[inset_3px_3px_7px_rgba(255,255,255,0.95),inset_-4px_-4px_8px_rgba(0,0,0,0.06),5px_6px_12px_rgba(0,0,0,0.08)]
+              sm:h-[72px]
+              sm:w-[72px]
+            `}
+          >
+            <Icon
+              className="
+                h-8
+                w-8
+                stroke-[2.2]
+                drop-shadow-[0_1px_1px_rgba(255,255,255,0.7)]
+              "
+            />
+          </motion.div>
+
+          {/* Content */}
+          <div className="min-w-0 flex-1">
             <p
               className="
-                max-w-[78px]
-                text-[12px]
+                mb-2
+                truncate
+                text-[14px]
                 font-medium
-                leading-[1.25]
+                leading-tight
                 text-slate-600
-                sm:max-w-[100px]
-                sm:text-[13px]
+                sm:text-[16px]
               "
             >
               {title}
             </p>
-
-            <motion.div
-              whileHover={{
-                scale: 1.06,
-                rotate: 3,
-              }}
-              transition={{
-                duration: 0.2,
-              }}
-              className={`
-                flex
-                h-9
-                w-9
-                shrink-0
-                items-center
-                justify-center
-                rounded-xl
-                ${iconBg}
-                shadow-sm
-              `}
-            >
-              <Icon
-                className={`
-                  h-[18px]
-                  w-[18px]
-                  ${iconColor}
-                `}
-              />
-            </motion.div>
-          </div>
-
-          {/* Bottom section */}
-          <div className="mt-3 flex items-end justify-between gap-2">
             <motion.div
               initial={{
                 opacity: 0,
@@ -217,51 +172,59 @@ function StatCard({
                 y: 0,
               }}
               transition={{
-                delay: index * 0.07 + 0.15,
+                delay: index * 0.07 + 0.15,   
                 duration: 0.3,
               }}
               className="
-                min-w-0
                 truncate
-                text-[24px]
+                text-[28px]
                 font-bold
                 leading-none
                 tracking-tight
                 text-slate-950
-                sm:text-[27px]
+                sm:text-[34px]
               "
             >
               {prefix}
               {displayValue}
             </motion.div>
-
-            {/* Reference-style arrow circle */}
-            <motion.div
-              whileHover={{
-                scale: 1.08,
-              }}
-              whileTap={{
-                scale: 0.92,
-              }}
-              className="
-                flex
-                h-7
-                w-7
-                shrink-0
-                items-center
-                justify-center
-                rounded-full
-                bg-slate-900/[0.06]
-                text-slate-500
-                transition-all
-                duration-200
-                group-hover:bg-orange-500/10
-                group-hover:text-orange-500
-              "
-            >
-              <ChevronRight className="h-4 w-4" />
-            </motion.div>
           </div>
+
+          {/* 3D Arrow */}
+          <motion.div
+            whileHover={{
+              scale: 1.08,
+              x: 1,
+            }}
+            whileTap={{
+              scale: 0.92,
+            }}
+            className="
+              flex
+              h-11
+              w-11
+              shrink-0
+              items-center
+              justify-center
+              rounded-full
+              bg-white
+              text-slate-800
+              shadow-[4px_5px_10px_rgba(0,0,0,0.09),-3px_-3px_8px_rgba(255,255,255,0.95)]
+              transition-all
+              duration-200
+              group-hover:text-orange-500
+              sm:h-12
+              sm:w-12
+            "
+          >
+            <ChevronRight
+              className="
+                h-6
+                w-6
+                stroke-[2.4]
+              "
+            />
+          </motion.div>
         </div>
       </Card>
     </motion.div>
@@ -282,7 +245,7 @@ export function StatsCards({
       .trim();
 
   const completed = bookings.filter(
-    (b) => statusOf(b) === 'completed'
+    (b) => statusOf(b) === 'completed',
   );
 
   const totalBookings =
@@ -294,13 +257,13 @@ export function StatsCards({
   const pendingBookings =
     apiStats?.pending ??
     bookings.filter(
-      (b) => statusOf(b) === 'pending'
+      (b) => statusOf(b) === 'pending',
     ).length;
 
   const approvedBookings =
     apiStats?.approved ??
     bookings.filter(
-      (b) => statusOf(b) === 'approved'
+      (b) => statusOf(b) === 'approved',
     ).length;
 
   const cancelledBookings =
@@ -310,7 +273,7 @@ export function StatsCards({
         'cancelled',
         'canceled',
         'rejected',
-      ].includes(statusOf(b))
+      ].includes(statusOf(b)),
     ).length;
 
   /*
@@ -323,7 +286,7 @@ export function StatsCards({
     completed.reduce(
       (sum, b) =>
         sum + bookingAmount(b, serviceMap),
-      0
+      0,
     );
 
   /*
@@ -342,46 +305,48 @@ export function StatsCards({
       value: totalBookings,
       icon: Calendar,
       iconColor: 'text-orange-600',
-      iconBg: 'bg-orange-100/80',
+      iconBg: 'bg-[#fff0e5]',
     },
     {
       title: 'Pending',
       value: pendingBookings,
       icon: Clock,
-      iconColor: 'text-orange-500',
-      iconBg: 'bg-orange-100/80',
+      iconColor: 'text-[#e58b00]',
+      iconBg: 'bg-[#fff5dc]',
     },
     {
       title: 'Approved',
       value: approvedBookings,
       icon: CheckCircle,
-      iconColor: 'text-green-600',
-      iconBg: 'bg-green-100/80',
+      iconColor: 'text-[#0dbb69]',
+      iconBg: 'bg-[#eafff4]',
     },
     {
       title: 'Completed',
       value: completedBookings,
       icon: CheckCircle,
-      iconColor: 'text-green-600',
-      iconBg: 'bg-green-100/80',
+      iconColor: 'text-[#1976ed]',
+      iconBg: 'bg-[#e8f4ff]',
     },
     {
       title: 'Cancelled',
       value: cancelledBookings,
       icon: XCircle,
-      iconColor: 'text-red-500',
-      iconBg: 'bg-red-100/80',
+      iconColor: 'text-[#ed3159]',
+      iconBg: 'bg-[#ffe9ee]',
     },
     {
       title: 'Total Earnings',
       value: totalEarnings,
       prefix: '₹',
       icon: IndianRupee,
-      iconColor: 'text-orange-600',
-      iconBg: 'bg-orange-100/80',
+      iconColor: 'text-[#7448e8]',
+      iconBg: 'bg-[#f2edff]',
       formatAsCurrency: true,
     },
   ];
+
+  void isLoading;
 
   return (
     <motion.div
@@ -391,9 +356,7 @@ export function StatsCards({
         grid
         grid-cols-2
         gap-3
-        sm:gap-4
-        lg:grid-cols-3
-        xl:grid-cols-6
+        sm:gap-5
       "
     >
       {stats.map((stat, index) => (
