@@ -217,7 +217,7 @@ function BookingCard({
               <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
                 Date
               </p>
-              <p className="truncate text-sm font-bold text-black sm:text-base">
+              <p className="whitespace-nowrap text-sm font-bold text-black sm:text-base">
                 {new Date(booking.date).toLocaleDateString('en-IN')}
               </p>
             </div>
@@ -234,7 +234,7 @@ function BookingCard({
               <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
                 Time
               </p>
-              <p className="truncate text-sm font-bold text-black sm:text-base">
+              <p className="whitespace-nowrap text-sm font-bold text-black sm:text-base">
                 {booking.time_slot}
               </p>
             </div>
