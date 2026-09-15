@@ -17,7 +17,7 @@ export function BarberHubLayout() {
         onOpenChange={setSidebarOpen}
       />
 
-      <main className="flex-1 overflow-x-hidden">
+      <main className="min-w-0 w-full flex-1 overflow-x-hidden">
 
         {/* Mobile sticky header — hides on scroll down, reappears on scroll up */}
         <HideOnScroll className="lg:hidden sticky top-0 z-40 bg-background/85 backdrop-blur-md">
@@ -38,7 +38,7 @@ export function BarberHubLayout() {
         </HideOnScroll>
 
         {/* Barber Hub Page Content */}
-        <div className="p-4 lg:p-8 pb-28">
+        <div className="mx-auto w-full min-w-0 p-4 pb-28 lg:p-8">
           <PageTransition>
             <Outlet />
           </PageTransition>
