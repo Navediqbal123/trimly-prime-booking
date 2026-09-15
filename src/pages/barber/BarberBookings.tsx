@@ -207,34 +207,34 @@ function BookingCard({
 
       {/* Date + Time */}
       <div className="mt-4 grid w-full min-w-0 grid-cols-2 gap-3">
-        <div className="min-w-0 rounded-[22px] bg-[#f3f6ff] p-3.5 shadow-[4px_5px_11px_rgba(70,100,180,0.10),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-white shadow-[3px_4px_8px_rgba(0,0,0,0.08)]">
-              <Calendar className="h-5 w-5 text-black" />
+        <div className="min-w-0 rounded-[22px] bg-[#f3f6ff] p-3 shadow-[4px_5px_11px_rgba(70,100,180,0.10),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-[#a6b6dc] shadow-[3px_4px_8px_rgba(70,100,180,0.18)]">
+              <Calendar className="h-4 w-4 text-black" />
             </div>
 
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
+            <div className="min-w-0 flex-1">
+              <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
                 Date
               </p>
-              <p className="whitespace-nowrap text-sm font-bold text-black sm:text-base">
+              <p className="whitespace-nowrap text-xs font-bold tracking-tight text-black sm:text-base">
                 {new Date(booking.date).toLocaleDateString('en-IN')}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="min-w-0 rounded-[22px] bg-[#fff4e7] p-3.5 shadow-[4px_5px_11px_rgba(255,116,23,0.10),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-white shadow-[3px_4px_8px_rgba(0,0,0,0.08)]">
-              <Clock className="h-5 w-5 text-black" />
+        <div className="min-w-0 rounded-[22px] bg-[#fff4e7] p-3 shadow-[4px_5px_11px_rgba(255,116,23,0.10),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-[#d6aa77] shadow-[3px_4px_8px_rgba(255,116,23,0.18)]">
+              <Clock className="h-4 w-4 text-black" />
             </div>
 
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
+            <div className="min-w-0 flex-1">
+              <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
                 Time
               </p>
-              <p className="whitespace-nowrap text-sm font-bold text-black sm:text-base">
+              <p className="whitespace-nowrap text-xs font-bold tracking-tight text-black sm:text-base">
                 {booking.time_slot}
               </p>
             </div>
