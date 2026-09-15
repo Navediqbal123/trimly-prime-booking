@@ -210,26 +210,38 @@ export function EarningsChart({
               </div>
             </div>
 
-            {/* 3D period button */}
-            <div
+            {/* Clay 3D period button */}
+            <motion.div
+              whileHover={{
+                y: -1,
+                scale: 1.02,
+              }}
+              whileTap={{
+                y: 2,
+                scale: 0.97,
+              }}
               className="
                 shrink-0
-                rounded-[24px]
+                rounded-[20px]
                 border-0
-                bg-white
-                px-3
+                bg-[#ff7417]
+                px-4
                 py-2.5
                 text-xs
-                font-semibold
-                text-slate-800
-                shadow-[5px_6px_12px_rgba(0,0,0,0.09),-4px_-4px_10px_rgba(255,255,255,0.95)]
+                font-bold
+                text-white
+                shadow-[5px_6px_12px_rgba(255,116,23,0.28),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-3px_-3px_5px_rgba(190,70,0,0.22)]
+                transition-all
+                duration-200
+                sm:rounded-[22px]
                 sm:px-5
-                sm:py-3.5
+                sm:py-3
                 sm:text-sm
+                sm:shadow-[6px_7px_14px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.28),inset_-3px_-3px_6px_rgba(190,70,0,0.22)]
               "
             >
               This Week⌄
-            </div>
+            </motion.div>
           </div>
 
           {chartData.length > 0 ? (
