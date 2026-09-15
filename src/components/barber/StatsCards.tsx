@@ -1,3 +1,4 @@
+import { type ComponentType } from 'react';
 import { motion } from 'framer-motion';
 import {
   Calendar,
@@ -31,7 +32,7 @@ interface StatCardProps {
   title: string;
   value: number;
   prefix?: string;
-  icon: React.ComponentType<{ className?: string }>;
+ icon: ComponentType<{ className?: string }>;
   iconColor: string;
   iconBg: string;
   index: number;
@@ -88,29 +89,35 @@ function StatCard({
           group
           relative
           h-full
-          min-h-[118px]
+          min-h-[96px]
           overflow-hidden
-          rounded-[30px]
+          rounded-[24px]
           border-0
           bg-white
           p-0
-          shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]
+          shadow-[6px_7px_15px_rgba(0,0,0,0.09),-5px_-5px_13px_rgba(255,255,255,0.95)]
           transition-all
           duration-300
-          hover:shadow-[9px_10px_20px_rgba(0,0,0,0.12),-7px_-7px_17px_rgba(255,255,255,1)]
+          hover:shadow-[8px_9px_18px_rgba(0,0,0,0.11),-6px_-6px_15px_rgba(255,255,255,1)]
+          sm:min-h-[118px]
+          sm:rounded-[30px]
+          sm:shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]
         "
       >
         <div
           className="
             relative
-            flex    
+            flex
             h-full
-            min-h-[118px]
+            min-h-[96px]
             items-center
-            gap-4
-            px-5
-            py-4
+            gap-2
+            px-3
+            py-3
+            sm:min-h-[118px]
+            sm:gap-4
             sm:px-6
+            sm:py-4
           "
         >
           {/* Icon */}
@@ -124,25 +131,28 @@ function StatCard({
             }}
             className={`
               flex
-              h-[68px]
-              w-[68px]
+              h-11
+              w-11
               shrink-0
               items-center
               justify-center
               rounded-full
               ${iconBg}
               ${iconColor}
-              shadow-[inset_3px_3px_7px_rgba(255,255,255,0.95),inset_-4px_-4px_8px_rgba(0,0,0,0.06),5px_6px_12px_rgba(0,0,0,0.08)]
+              shadow-[inset_2px_2px_5px_rgba(255,255,255,0.95),inset_-3px_-3px_6px_rgba(0,0,0,0.05),4px_5px_10px_rgba(0,0,0,0.07)]
               sm:h-[72px]
               sm:w-[72px]
+              sm:shadow-[inset_3px_3px_7px_rgba(255,255,255,0.95),inset_-4px_-4px_8px_rgba(0,0,0,0.06),5px_6px_12px_rgba(0,0,0,0.08)]
             `}
           >
             <Icon
               className="
-                h-8
-                w-8
+                h-5
+                w-5
                 stroke-[2.2]
                 drop-shadow-[0_1px_1px_rgba(255,255,255,0.7)]
+                sm:h-8
+                sm:w-8
               "
             />
           </motion.div>
@@ -151,17 +161,20 @@ function StatCard({
           <div className="min-w-0 flex-1">
             <p
               className="
-                mb-2
+                mb-1
                 truncate
-                text-[14px]
-                font-medium
+                text-[11px]
+                font-semibold
                 leading-tight
                 text-slate-600
+                sm:mb-2
                 sm:text-[16px]
+                sm:font-medium
               "
             >
               {title}
             </p>
+
             <motion.div
               initial={{
                 opacity: 0,
@@ -172,12 +185,12 @@ function StatCard({
                 y: 0,
               }}
               transition={{
-                delay: index * 0.07 + 0.15,   
+                delay: index * 0.07 + 0.15,
                 duration: 0.3,
               }}
               className="
                 truncate
-                text-[28px]
+                text-[21px]
                 font-bold
                 leading-none
                 tracking-tight
@@ -201,27 +214,30 @@ function StatCard({
             }}
             className="
               flex
-              h-11
-              w-11
+              h-8
+              w-8
               shrink-0
               items-center
               justify-center
               rounded-full
               bg-white
               text-slate-800
-              shadow-[4px_5px_10px_rgba(0,0,0,0.09),-3px_-3px_8px_rgba(255,255,255,0.95)]
+              shadow-[3px_4px_8px_rgba(0,0,0,0.08),-2px_-2px_7px_rgba(255,255,255,0.95)]
               transition-all
               duration-200
               group-hover:text-orange-500
               sm:h-12
               sm:w-12
+              sm:shadow-[4px_5px_10px_rgba(0,0,0,0.09),-3px_-3px_8px_rgba(255,255,255,0.95)]
             "
           >
             <ChevronRight
               className="
-                h-6
-                w-6
+                h-4
+                w-4
                 stroke-[2.4]
+                sm:h-6
+                sm:w-6
               "
             />
           </motion.div>
@@ -276,11 +292,6 @@ export function StatsCards({
       ].includes(statusOf(b)),
     ).length;
 
-  /*
-   * Earnings:
-   * Prefer the server-provided total.
-   * Otherwise calculate from completed bookings.
-   */
   const totalEarnings =
     apiStats?.total_earnings ??
     completed.reduce(
@@ -289,16 +300,6 @@ export function StatsCards({
       0,
     );
 
-  /*
-   * FINAL APPROVED ORDER
-   *
-   * 1. Total Bookings
-   * 2. Pending
-   * 3. Approved
-   * 4. Completed
-   * 5. Cancelled
-   * 6. Total Earnings
-   */
   const stats = [
     {
       title: 'Total Bookings',

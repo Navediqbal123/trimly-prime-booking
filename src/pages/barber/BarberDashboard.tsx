@@ -20,8 +20,7 @@ import {
 import { StatsCards } from '@/components/barber/StatsCards';
 import { EarningsChart } from '@/components/barber/EarningsChart';
 import { DashboardSkeleton } from '@/components/barber/DashboardSkeleton';
-import { ServicesTable } from '@/components/barber/ServicesTable';
-import { BookingsTable } from '@/components/barber/BookingsTable';
+
 
 const containerVariants = {
   hidden: { opacity: 0 },
