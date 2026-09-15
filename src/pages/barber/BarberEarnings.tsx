@@ -7,44 +7,47 @@ import {
   Loader2,
   RefreshCw,
   ChevronRight,
+  ChevronDown,
 } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+
 import {
   getBarberBookings,
   getMyServices,
   BookingData,
   ServiceData,
 } from '@/lib/api';
+
 import {
   bookingAmount,
   bookingServiceNames,
   buildServiceMap,
 } from '@/lib/bookingAmount';
+
 import {
   format,
   subDays,
   isAfter,
   parseISO,
 } from 'date-fns';
+
 import {
   BarChart,
   Bar,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-  ComposedChart,
-  Scatter,
 } from 'recharts';
+
+const clayCard =
+  'shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]';
+
+const orangeClay =
+  'bg-[#ff7417] text-white shadow-[6px_7px_14px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(190,70,0,0.25)]';
 
 export default function BarberEarnings() {
   const [bookings, setBookings] = useState<BookingData[]>([]);
@@ -62,7 +65,9 @@ export default function BarberEarnings() {
     if (bRes.success && bRes.data) {
       setBookings(bRes.data);
     } else {
-      toast.error(bRes.error || 'Failed to load earnings data');
+      toast.error(
+        bRes.error || 'Failed to load earnings data'
+      );
     }
 
     if (sRes.success && sRes.data) {
@@ -160,9 +165,10 @@ export default function BarberEarnings() {
 
   if (loading) {
     return (
-      <div className="min-h-full bg-[#fffaf5] flex flex-col items-center justify-center py-16">
-        <Loader2 className="w-8 h-8 animate-spin text-orange-500 mb-4" />
-        <p className="text-slate-500">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center bg-white">
+        <Loader2 className="h-9 w-9 animate-spin text-orange-500" />
+
+        <p className="mt-4 text-sm font-medium text-slate-500">
           Loading earnings...
         </p>
       </div>
@@ -171,155 +177,215 @@ export default function BarberEarnings() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative min-h-full bg-[#fffaf5] overflow-hidden px-1 sm:px-2 pb-10"
+      className="min-h-full overflow-hidden bg-white px-4 py-5 pb-10 sm:px-6 lg:px-8"
     >
-      {/* Ambient background glow */}
-      <div className="pointer-events-none fixed -top-32 -right-28 w-80 h-80 rounded-full bg-orange-200/30 blur-3xl" />
-      <div className="pointer-events-none fixed top-[35%] -left-32 w-72 h-72 rounded-full bg-purple-200/20 blur-3xl" />
-      <div className="pointer-events-none fixed bottom-0 right-0 w-72 h-72 rounded-full bg-orange-100/30 blur-3xl" />
+      <div className="mx-auto max-w-7xl">
 
-      <div className="relative space-y-6">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-slate-900 mb-2">
-              My <span className="text-orange-500">Earnings</span>
-            </h1>
+        <div className="mb-5">
+          <h1 className="whitespace-nowrap text-[32px] font-black leading-none tracking-[-0.045em] text-slate-950 sm:text-5xl lg:text-6xl">
+            My{' '}
+            <span className="text-[#ff7417] drop-shadow-[2px_3px_1px_rgba(255,116,23,0.22)]">
+              Earnings
+            </span>
+          </h1>
 
-            <p className="text-sm sm:text-base text-slate-500 max-w-[230px] leading-relaxed">
-              Track your revenue from completed bookings
-            </p>
-          </div>
+          <p className="mt-2 whitespace-nowrap text-sm font-semibold text-slate-500 sm:text-lg">
+            Track your revenue from completed bookings
+          </p>
 
-          <Button
-            variant="outline"
-            onClick={fetchData}
-            disabled={loading}
-            className="shrink-0 h-11 rounded-2xl border-orange-100 bg-white/75 backdrop-blur-xl text-slate-800 shadow-[0_8px_25px_rgba(249,115,22,0.08)] hover:bg-white hover:border-orange-200"
+          {/* Full Width Refresh */}
+          <motion.div
+            whileHover={{
+              y: -1,
+              scale: 1.01,
+            }}
+            whileTap={{
+              y: 2,
+              scale: 0.985,
+            }}
+            onClick={() => {
+              if (!loading) {
+                void fetchData();
+              }
+            }}
+            className={`mt-5 flex h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-[22px] text-base font-extrabold transition-all duration-200 sm:h-16 sm:text-xl ${orangeClay}`}
           >
             <RefreshCw
-              className={`w-4 h-4 mr-2 ${
+              className={`h-6 w-6 sm:h-7 sm:w-7 ${
                 loading ? 'animate-spin' : ''
               }`}
             />
-            Refresh
-          </Button>
+
+            {loading ? 'Refreshing...' : 'Refresh'}
+          </motion.div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Earnings Summary Cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+
           {/* Total Earnings */}
-          <Card className="relative overflow-hidden rounded-[22px] border border-orange-200/70 bg-white/70 backdrop-blur-xl shadow-[0_12px_35px_rgba(249,115,22,0.10)]">
-            <div className="pointer-events-none absolute -right-10 -top-10 w-28 h-28 rounded-full bg-orange-200/25 blur-2xl" />
+          <motion.div
+            whileHover={{ y: -2 }}
+            className={`rounded-[28px] border border-slate-100 bg-white p-5 ${clayCard}`}
+          >
+            <div className="flex items-center gap-4">
 
-            <CardContent className="relative p-5">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
-                  <IndianRupee className="w-5 h-5 text-emerald-500" />
-                </div>
-
-                <div>
-                  <p className="text-sm text-slate-500">
-                    Total Earnings
-                  </p>
-                  <p className="text-2xl font-bold text-slate-900">
-                    ₹{totalEarnings.toLocaleString()}
-                  </p>
-                </div>
+              <div
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] border border-emerald-100 bg-[#e7fbf2]"
+                style={{
+                  boxShadow:
+                    '5px 6px 12px rgba(0,0,0,0.08),-4px -4px 10px rgba(255,255,255,0.95),inset 2px 2px 4px rgba(255,255,255,0.70)',
+                }}
+              >
+                <IndianRupee className="h-7 w-7 text-emerald-500" />
               </div>
-            </CardContent>
-          </Card>
+
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-500 sm:text-base">
+                  Total Earnings
+                </p>
+
+                <p className="mt-0.5 whitespace-nowrap text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+                  ₹{totalEarnings.toLocaleString()}
+                </p>
+              </div>
+
+            </div>
+          </motion.div>
 
           {/* This Week */}
-          <Card className="relative overflow-hidden rounded-[22px] border border-purple-200/60 bg-white/70 backdrop-blur-xl shadow-[0_12px_35px_rgba(139,92,246,0.10)]">
-            <div className="pointer-events-none absolute -right-10 -top-10 w-28 h-28 rounded-full bg-purple-200/25 blur-2xl" />
+          <motion.div
+            whileHover={{ y: -2 }}
+            className={`rounded-[28px] border border-slate-100 bg-white p-5 ${clayCard}`}
+          >
+            <div className="flex items-center gap-4">
 
-            <CardContent className="relative p-5">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center shrink-0">
-                  <TrendingUp className="w-5 h-5 text-purple-500" />
-                </div>
-
-                <div>
-                  <p className="text-sm text-slate-500">
-                    This Week
-                  </p>
-                  <p className="text-2xl font-bold text-slate-900">
-                    ₹{weeklyEarnings.toLocaleString()}
-                  </p>
-                </div>
+              <div
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] border border-purple-100 bg-[#f2eaff]"
+                style={{
+                  boxShadow:
+                    '5px 6px 12px rgba(0,0,0,0.08),-4px -4px 10px rgba(255,255,255,0.95),inset 2px 2px 4px rgba(255,255,255,0.70)',
+                }}
+              >
+                <TrendingUp className="h-7 w-7 text-purple-500" />
               </div>
-            </CardContent>
-          </Card>
+
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-500 sm:text-base">
+                  This Week
+                </p>
+
+                <p className="mt-0.5 whitespace-nowrap text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+                  ₹{weeklyEarnings.toLocaleString()}
+                </p>
+              </div>
+
+            </div>
+          </motion.div>
 
           {/* Completed Jobs */}
-          <Card className="relative overflow-hidden rounded-[22px] border border-orange-200/60 bg-white/70 backdrop-blur-xl shadow-[0_12px_35px_rgba(249,115,22,0.08)]">
-            <div className="pointer-events-none absolute -right-10 -top-10 w-28 h-28 rounded-full bg-orange-100/30 blur-2xl" />
+          <motion.div
+            whileHover={{ y: -2 }}
+            className={`rounded-[28px] border border-slate-100 bg-white p-5 ${clayCard}`}
+          >
+            <div className="flex items-center gap-4">
 
-            <CardContent className="relative p-5">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
-                  <Calendar className="w-5 h-5 text-blue-500" />
-                </div>
-
-                <div>
-                  <p className="text-sm text-slate-500">
-                    Completed Jobs
-                  </p>
-                  <p className="text-2xl font-bold text-slate-900">
-                    {completedBookings.length}
-                  </p>
-                </div>
+              <div
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] border border-blue-100 bg-[#eaf4ff]"
+                style={{
+                  boxShadow:
+                    '5px 6px 12px rgba(0,0,0,0.08),-4px -4px 10px rgba(255,255,255,0.95),inset 2px 2px 4px rgba(255,255,255,0.70)',
+                }}
+              >
+                <Calendar className="h-7 w-7 text-blue-500" />
               </div>
-            </CardContent>
-          </Card>
+
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-500 sm:text-base">
+                  Completed Jobs
+                </p>
+
+                <p className="mt-0.5 whitespace-nowrap text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+                  {completedBookings.length}
+                </p>
+              </div>
+
+            </div>
+          </motion.div>
+
         </div>
 
-        {/* Revenue Chart */}
-        <Card className="relative overflow-hidden rounded-[26px] border border-orange-200/70 bg-white/75 backdrop-blur-xl shadow-[0_15px_45px_rgba(249,115,22,0.10)]">
-          <div className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 rounded-full bg-orange-200/20 blur-3xl" />
-          <div className="pointer-events-none absolute bottom-0 -left-24 w-64 h-64 rounded-full bg-purple-100/15 blur-3xl" />
+        {/* Earnings Overview */}
+        <div
+          className={`mt-5 overflow-hidden rounded-[30px] border border-slate-100 bg-white p-4 sm:p-6 ${clayCard}`}
+        >
 
-          <CardHeader className="relative flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
-              Last 7 Days Revenue
-            </CardTitle>
+          {/* Chart Header */}
+          <div className="mb-4 flex items-start justify-between gap-3">
 
-            <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl border border-orange-100 bg-white/80 text-sm font-medium text-slate-700">
-              This Week
+            <div className="min-w-0">
+              <h2 className="font-display text-[25px] font-bold tracking-tight text-slate-950 sm:text-3xl">
+                Earnings Overview
+              </h2>
+
+              <p className="mt-1 text-sm font-medium text-slate-500 sm:text-base">
+                Your recent completed earnings
+              </p>
             </div>
-          </CardHeader>
 
-          <CardContent className="relative pt-3">
-            {chartData.some(
-              (d) => d.amount > 0
-            ) ? (
+            {/* This Week */}
+            <motion.div
+              whileHover={{
+                y: -1,
+                scale: 1.02,
+              }}
+              whileTap={{
+                y: 2,
+                scale: 0.97,
+              }}
+              className="flex shrink-0 items-center gap-2 rounded-[20px] bg-[#fff0df] px-4 py-3 text-xs font-extrabold text-slate-950 shadow-[5px_6px_13px_rgba(255,116,23,0.18),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-3px_-3px_5px_rgba(255,116,23,0.10)] sm:px-5 sm:text-sm"
+            >
+              This Week
+              <ChevronDown className="h-4 w-4" />
+            </motion.div>
+
+          </div>
+
+          {/* Chart */}
+          {chartData.some(
+            (d) => d.amount > 0
+          ) ? (
+            <div className="h-[270px] w-full sm:h-[330px]">
+
               <ResponsiveContainer
                 width="100%"
-                height={310}
+                height="100%"
               >
-                <ComposedChart
+                <BarChart
                   data={chartData}
                   margin={{
-                    top: 20,
-                    right: 12,
-                    left: -8,
+                    top: 12,
+                    right: 4,
+                    left: -12,
                     bottom: 4,
                   }}
+                  barCategoryGap="28%"
                 >
+
                   <CartesianGrid
                     strokeDasharray="4 5"
-                    stroke="rgba(148,163,184,0.22)"
-                    vertical
+                    stroke="rgba(148,163,184,0.20)"
+                    vertical={true}
                   />
 
                   <XAxis
                     dataKey="date"
                     tick={{
                       fill: '#64748b',
-                      fontSize: 12,
+                      fontSize: 11,
                     }}
                     axisLine={{
                       stroke: '#cbd5e1',
@@ -330,142 +396,180 @@ export default function BarberEarnings() {
                   <YAxis
                     tick={{
                       fill: '#64748b',
-                      fontSize: 12,
+                      fontSize: 11,
                     }}
                     axisLine={{
                       stroke: '#cbd5e1',
                     }}
                     tickLine={false}
                     width={42}
+                    tickFormatter={(value) =>
+                      `₹${value}`
+                    }
                   />
 
                   <Tooltip
                     cursor={{
-                      fill: 'rgba(249,115,22,0.05)',
+                      fill: 'rgba(255,116,23,0.05)',
                     }}
                     contentStyle={{
-                      background: 'rgba(255,255,255,0.94)',
-                      border: '1px solid rgba(249,115,22,0.25)',
-                      borderRadius: '16px',
+                      background: '#ffffff',
+                      border:
+                        '1px solid rgba(255,116,23,0.18)',
+                      borderRadius: '18px',
                       boxShadow:
-                        '0 15px 35px rgba(249,115,22,0.14)',
-                      padding: '12px 16px',
+                        '6px 8px 18px rgba(0,0,0,0.10)',
+                      padding: '10px 14px',
                     }}
                     labelStyle={{
                       color: '#0f172a',
-                      fontWeight: 600,
+                      fontWeight: 700,
                       marginBottom: 4,
                     }}
                     formatter={(value: number) => [
                       `₹${value.toLocaleString()}`,
-                      'Revenue',
+                      'Earnings',
                     ]}
                   />
 
                   <Bar
                     dataKey="amount"
-                    fill="#fb923c"
-                    fillOpacity={0.78}
-                    radius={[9, 9, 3, 3]}
+                    fill="#ffad63"
+                    radius={[
+                      14,
+                      14,
+                      5,
+                      5,
+                    ]}
                     barSize={30}
                   />
 
-                  <Line
-                    type="monotone"
-                    dataKey="amount"
-                    stroke="#f97316"
-                    strokeWidth={3}
-                    dot={{
-                      r: 5,
-                      fill: '#f97316',
-                      stroke: '#ffffff',
-                      strokeWidth: 2,
-                    }}
-                    activeDot={{
-                      r: 7,
-                      fill: '#f97316',
-                      stroke: '#ffffff',
-                      strokeWidth: 3,
-                    }}
-                    connectNulls
-                  />
-
-                  <Scatter
-                    dataKey="amount"
-                    fill="#f97316"
-                  />
-                </ComposedChart>
+                </BarChart>
               </ResponsiveContainer>
-            ) : (
-              <div className="text-center py-14 text-slate-400">
-                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-orange-50 flex items-center justify-center">
-                  <IndianRupee className="w-7 h-7 text-orange-400" />
-                </div>
 
-                <p className="font-medium text-slate-600">
-                  No completed bookings in the last 7 days
-                </p>
+            </div>
+          ) : (
+            <div className="flex h-[270px] flex-col items-center justify-center text-center sm:h-[330px]">
 
-                <p className="text-sm mt-1">
-                  Revenue will appear here once bookings are completed
-                </p>
+              <div
+                className="mb-4 flex h-14 w-14 items-center justify-center rounded-[20px] bg-[#fff0e5]"
+                style={{
+                  boxShadow:
+                    '5px 6px 12px rgba(0,0,0,0.08),-4px -4px 10px rgba(255,255,255,0.95)',
+                }}
+              >
+                <IndianRupee className="h-7 w-7 text-orange-400" />
               </div>
-            )}
-          </CardContent>
-        </Card>
+
+              <p className="font-bold text-slate-700">
+                No completed bookings in the last 7 days
+              </p>
+
+              <p className="mt-1 text-sm text-slate-400">
+                Revenue will appear here once bookings are completed
+              </p>
+
+            </div>
+          )}
+
+          {/* Total Earnings Footer */}
+          <div
+            className="mt-3 flex items-center justify-between rounded-[26px] border border-slate-100 bg-white px-5 py-4 sm:px-6 sm:py-5"
+            style={{
+              boxShadow:
+                '5px 6px 13px rgba(0,0,0,0.08),-4px -4px 10px rgba(255,255,255,0.95)',
+            }}
+          >
+
+            <div>
+              <p className="text-sm font-bold text-slate-700 sm:text-base">
+                Total Earnings
+              </p>
+
+              <p className="mt-1 whitespace-nowrap text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+                ₹{totalEarnings.toLocaleString()}
+              </p>
+            </div>
+
+            <div
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#fff0df] text-slate-950 sm:h-14 sm:w-14"
+              style={{
+                boxShadow:
+                  '5px 6px 12px rgba(255,116,23,0.15),-3px -3px 8px rgba(255,255,255,0.95)',
+              }}
+            >
+              <TrendingUp className="h-6 w-6 sm:h-7 sm:w-7" />
+            </div>
+
+          </div>
+
+        </div>
 
         {/* Recent Completed Bookings */}
-        <Card className="relative overflow-hidden rounded-[26px] border border-orange-200/70 bg-white/75 backdrop-blur-xl shadow-[0_15px_45px_rgba(249,115,22,0.09)]">
-          <div className="pointer-events-none absolute -right-24 -top-24 w-64 h-64 rounded-full bg-orange-200/15 blur-3xl" />
+        <div
+          className={`mt-5 overflow-hidden rounded-[30px] border border-slate-100 bg-white ${clayCard}`}
+        >
 
-          <CardHeader className="relative pb-3">
-            <CardTitle className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
+          <div className="border-b border-slate-100 px-5 py-4 sm:px-6">
+            <h2 className="font-display text-xl font-bold text-slate-950 sm:text-2xl">
               Recent Completed Bookings
-            </CardTitle>
-          </CardHeader>
+            </h2>
+          </div>
 
-          <CardContent className="relative">
-            {completedBookings.length > 0 ? (
-              <div className="space-y-0">
-                {completedBookings
-                  .slice(0, 10)
-                  .map((b) => (
-                    <div
-                      key={b.id}
-                      className="group flex items-center justify-between gap-4 py-4 border-b border-slate-200/70 last:border-0"
-                    >
-                      <div className="min-w-0">
-                        <p className="font-semibold text-slate-900 truncate">
-                          {bookingServiceNames(
-                            b,
-                            serviceMap
-                          ).join(', ') || 'Service'}
-                        </p>
+          {completedBookings.length > 0 ? (
+            <div className="px-5 sm:px-6">
 
-                        <p className="text-sm text-slate-500 mt-1">
-                          {b.date} • {b.time_slot}
-                        </p>
-                      </div>
+              {completedBookings
+                .slice(0, 10)
+                .map((b) => (
+                  <div
+                    key={b.id}
+                    className="flex items-center justify-between gap-3 border-b border-slate-100 py-4 last:border-0"
+                  >
 
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="font-bold text-slate-900">
-                          ₹{amountOf(b)}
-                        </span>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold text-slate-950 sm:text-base">
+                        {bookingServiceNames(
+                          b,
+                          serviceMap
+                        ).join(', ') || 'Service'}
+                      </p>
 
-                        <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center">
-                          <ChevronRight className="w-4 h-4 text-orange-400" />
-                        </div>
-                      </div>
+                      <p className="mt-1 text-xs font-medium text-slate-500 sm:text-sm">
+                        {b.date} • {b.time_slot}
+                      </p>
                     </div>
-                  ))}
-              </div>
-            ) : (
-              <p className="text-center py-8 text-slate-400">
-                No completed bookings yet
-              </p>
-            )}
-          </CardContent>
-        </Card>
+
+                    <div className="flex shrink-0 items-center gap-2">
+
+                      <span className="text-sm font-black text-slate-950 sm:text-base">
+                        ₹{amountOf(b)}
+                      </span>
+
+                      <div
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-[#fff0e5]"
+                        style={{
+                          boxShadow:
+                            '3px 4px 8px rgba(0,0,0,0.07),-2px -2px 6px rgba(255,255,255,0.95)',
+                        }}
+                      >
+                        <ChevronRight className="h-4 w-4 text-orange-500" />
+                      </div>
+
+                    </div>
+
+                  </div>
+                ))}
+
+            </div>
+          ) : (
+            <p className="py-10 text-center text-sm text-slate-400">
+              No completed bookings yet
+            </p>
+          )}
+
+        </div>
+
       </div>
     </motion.div>
   );

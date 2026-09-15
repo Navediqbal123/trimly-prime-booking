@@ -36,6 +36,12 @@ import {
   ServiceData,
 } from '@/lib/api';
 
+const clayCard =
+  'shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]';
+
+const orangeClay =
+  'bg-[#ff7417] text-white shadow-[6px_7px_14px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(190,70,0,0.25)]';
+
 export default function Services() {
   const queryClient = useQueryClient();
 
@@ -75,7 +81,9 @@ export default function Services() {
     queryClient.invalidateQueries({ queryKey: ['approvedBarbers'] });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, value } = e.target;
 
     setFormData((prev) => ({
@@ -84,10 +92,16 @@ export default function Services() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.duration || !formData.price) {
+    if (
+      !formData.name ||
+      !formData.duration ||
+      !formData.price
+    ) {
       toast.error('Please fill in all fields');
       return;
     }
@@ -95,12 +109,15 @@ export default function Services() {
     setSubmitting(true);
 
     if (editingService) {
-      const response = await updateService(editingService.id, {
-        name: formData.name,
-        duration: parseInt(formData.duration),
-        price: parseFloat(formData.price),
-        home_service: formData.home_service,
-      });
+      const response = await updateService(
+        editingService.id,
+        {
+          name: formData.name,
+          duration: parseInt(formData.duration),
+          price: parseFloat(formData.price),
+          home_service: formData.home_service,
+        }
+      );
 
       if (response.success) {
         toast.success('Service updated successfully');
@@ -117,7 +134,9 @@ export default function Services() {
 
         invalidateAll();
       } else {
-        toast.error(response.error || 'Failed to update service');
+        toast.error(
+          response.error || 'Failed to update service'
+        );
       }
     } else {
       const response = await addService({
@@ -141,7 +160,9 @@ export default function Services() {
 
         invalidateAll();
       } else {
-        toast.error(response.error || 'Failed to add service');
+        toast.error(
+          response.error || 'Failed to add service'
+        );
       }
     }
 
@@ -165,7 +186,9 @@ export default function Services() {
     queryClient.setQueryData(
       ['myServices'],
       (old: ServiceData[] | undefined) =>
-        old ? old.filter((s) => s.id !== id) : []
+        old
+          ? old.filter((s) => s.id !== id)
+          : []
     );
 
     toast.success('Service removed locally');
@@ -184,11 +207,8 @@ export default function Services() {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center">
-        <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-orange-200/40 blur-xl" />
-          <Loader2 className="relative w-9 h-9 animate-spin text-orange-500" />
-        </div>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center bg-white">
+        <Loader2 className="h-9 w-9 animate-spin text-orange-500" />
 
         <p className="mt-4 text-sm font-medium text-slate-500">
           Loading services...
@@ -198,57 +218,58 @@ export default function Services() {
   }
 
   return (
-    <div className="relative min-h-full overflow-hidden bg-[#fffdfa] px-4 py-5 sm:px-6 lg:px-8">
-      {/* Ambient background glow */}
-      <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
-      <div className="pointer-events-none absolute top-72 -left-32 h-64 w-64 rounded-full bg-orange-100/35 blur-3xl" />
+    <div className="min-h-full overflow-hidden bg-white px-4 py-5 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
 
-      <div className="relative mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="mb-1 flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/80 shadow-[0_8px_25px_rgba(249,115,22,0.12)] ring-1 ring-orange-100 backdrop-blur-xl">
-                <Scissors className="h-4 w-4 text-orange-500" />
-              </div>
+        <div className="mb-6">
+          <h1 className="whitespace-nowrap text-[32px] font-black leading-none tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-6xl">
+            My{' '}
+            <span className="text-[#ff7417] drop-shadow-[2px_3px_1px_rgba(255,116,23,0.22)]">
+              Services
+            </span>
+          </h1>
 
-              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-500">
-                Barber Hub
-              </span>
-            </div>
+          <p className="mt-2 whitespace-nowrap text-sm font-semibold text-slate-500 sm:text-lg">
+            Manage your service offerings
+          </p>
 
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-              My{' '}
-              <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
-                Services
-              </span>
-            </h1>
+          {/* Full Width Buttons */}
+          <div className="mt-5 flex w-full flex-col gap-3">
 
-            <p className="mt-1 text-sm text-slate-500">
-              Manage your service offerings
-            </p>
-          </div>
-
-          <div className="flex w-full gap-2 sm:w-auto">
             {/* Refresh */}
-            <Button
-              variant="outline"
-              onClick={() => refetch()}
-              disabled={isRefetching}
-              className="h-10 flex-1 rounded-xl border-orange-100 bg-white/70 text-slate-700 shadow-sm backdrop-blur-xl hover:bg-orange-50 hover:text-orange-600 sm:flex-none"
+            <motion.div
+              whileHover={{
+                y: -1,
+                scale: 1.01,
+              }}
+              whileTap={{
+                y: 2,
+                scale: 0.985,
+              }}
+              onClick={() => {
+                if (!isRefetching) {
+                  void refetch();
+                }
+              }}
+              className={`flex h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-[22px] text-base font-extrabold transition-all duration-200 sm:h-16 sm:text-xl ${orangeClay} ${
+                isRefetching
+                  ? 'cursor-not-allowed opacity-80'
+                  : ''
+              }`}
             >
               <RefreshCw
-                className={`mr-2 h-4 w-4 ${
-                  isRefetching ? 'animate-spin' : ''
+                className={`h-6 w-6 sm:h-7 sm:w-7 ${
+                  isRefetching
+                    ? 'animate-spin'
+                    : ''
                 }`}
               />
 
-              <span className="hidden sm:inline">
-                {isRefetching ? 'Refreshing...' : 'Refresh'}
-              </span>
-
-              <span className="sm:hidden">Refresh</span>
-            </Button>
+              {isRefetching
+                ? 'Refreshing...'
+                : 'Refresh'}
+            </motion.div>
 
             {/* Add Service */}
             <Dialog
@@ -262,15 +283,25 @@ export default function Services() {
               }}
             >
               <DialogTrigger asChild>
-                <Button className="h-10 flex-1 rounded-xl border-0 bg-gradient-to-r from-orange-500 to-amber-500 px-4 font-semibold text-white shadow-[0_8px_24px_rgba(249,115,22,0.25)] hover:from-orange-600 hover:to-amber-600 sm:flex-none">
-                  <Plus className="mr-2 h-4 w-4" />
+                <motion.div
+                  whileHover={{
+                    y: -1,
+                    scale: 1.01,
+                  }}
+                  whileTap={{
+                    y: 2,
+                    scale: 0.985,
+                  }}
+                  className={`flex h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-[22px] text-base font-extrabold transition-all duration-200 sm:h-16 sm:text-xl ${orangeClay}`}
+                >
+                  <Plus className="h-6 w-6 sm:h-7 sm:w-7" />
                   Add Service
-                </Button>
+                </motion.div>
               </DialogTrigger>
 
-              <DialogContent className="w-[calc(100%-24px)] max-w-md rounded-3xl border border-orange-100/70 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl sm:p-6">
+              <DialogContent className="w-[calc(100%-24px)] max-w-md rounded-[28px] border border-slate-100 bg-white p-5 shadow-[12px_14px_28px_rgba(0,0,0,0.12),-8px_-8px_20px_rgba(255,255,255,0.95)] sm:p-6">
                 <DialogHeader>
-                  <DialogTitle className="text-xl font-bold text-slate-900">
+                  <DialogTitle className="text-xl font-black text-slate-900">
                     {editingService
                       ? 'Edit Service'
                       : 'Add New Service'}
@@ -285,7 +316,7 @@ export default function Services() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="name"
-                      className="text-sm font-semibold text-slate-700"
+                      className="text-sm font-bold text-slate-700"
                     >
                       Service Name
                     </Label>
@@ -296,7 +327,7 @@ export default function Services() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="e.g., Classic Haircut"
-                      className="h-11 rounded-xl border-orange-100 bg-orange-50/30 focus-visible:ring-orange-400"
+                      className="h-11 rounded-[18px] border-slate-200 bg-white shadow-[inset_2px_2px_5px_rgba(0,0,0,0.05),inset_-2px_-2px_5px_rgba(255,255,255,0.95)] focus-visible:ring-orange-400"
                     />
                   </div>
 
@@ -304,7 +335,7 @@ export default function Services() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="duration"
-                      className="text-sm font-semibold text-slate-700"
+                      className="text-sm font-bold text-slate-700"
                     >
                       Duration (minutes)
                     </Label>
@@ -316,7 +347,7 @@ export default function Services() {
                       value={formData.duration}
                       onChange={handleChange}
                       placeholder="30"
-                      className="h-11 rounded-xl border-orange-100 bg-orange-50/30 focus-visible:ring-orange-400"
+                      className="h-11 rounded-[18px] border-slate-200 bg-white shadow-[inset_2px_2px_5px_rgba(0,0,0,0.05),inset_-2px_-2px_5px_rgba(255,255,255,0.95)] focus-visible:ring-orange-400"
                     />
                   </div>
 
@@ -324,7 +355,7 @@ export default function Services() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="price"
-                      className="text-sm font-semibold text-slate-700"
+                      className="text-sm font-bold text-slate-700"
                     >
                       Price (₹)
                     </Label>
@@ -337,21 +368,33 @@ export default function Services() {
                       value={formData.price}
                       onChange={handleChange}
                       placeholder="250"
-                      className="h-11 rounded-xl border-orange-100 bg-orange-50/30 focus-visible:ring-orange-400"
+                      className="h-11 rounded-[18px] border-slate-200 bg-white shadow-[inset_2px_2px_5px_rgba(0,0,0,0.05),inset_-2px_-2px_5px_rgba(255,255,255,0.95)] focus-visible:ring-orange-400"
                     />
                   </div>
 
                   {/* Home Service */}
-                  <div className="flex items-center justify-between rounded-2xl border border-orange-100 bg-orange-50/40 p-4">
+                  <div
+                    className="flex items-center justify-between rounded-[22px] border border-slate-100 bg-[#fffaf5] p-4"
+                    style={{
+                      boxShadow:
+                        '5px 6px 13px rgba(0,0,0,0.07), -3px -3px 9px rgba(255,255,255,0.95)',
+                    }}
+                  >
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm">
-                        <Home className="h-4 w-4 text-orange-500" />
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#fff0e5]"
+                        style={{
+                          boxShadow:
+                            '3px 4px 8px rgba(0,0,0,0.07), -2px -2px 6px rgba(255,255,255,0.95)',
+                        }}
+                      >
+                        <Home className="h-5 w-5 text-orange-500" />
                       </div>
 
                       <div>
                         <Label
                           htmlFor="home_service"
-                          className="cursor-pointer text-sm font-semibold text-slate-800"
+                          className="cursor-pointer text-sm font-bold text-slate-800"
                         >
                           Home Service Available
                         </Label>
@@ -376,7 +419,7 @@ export default function Services() {
 
                   <Button
                     type="submit"
-                    className="h-11 w-full rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 font-semibold text-white shadow-[0_8px_22px_rgba(249,115,22,0.22)] hover:from-orange-600 hover:to-amber-600"
+                    className={`h-12 w-full rounded-[20px] font-extrabold transition-all duration-200 active:translate-y-[2px] active:scale-[0.97] ${orangeClay}`}
                     disabled={submitting}
                   >
                     {submitting ? (
@@ -398,18 +441,22 @@ export default function Services() {
 
         {/* Service Count */}
         {services.length > 0 && (
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-orange-500" />
+          <div className="mb-4 flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-orange-500" />
 
-              <span className="text-sm font-semibold text-slate-700">
-                Your Services
-              </span>
+            <span className="text-lg font-black text-slate-900 sm:text-xl">
+              Your Services
+            </span>
 
-              <span className="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-bold text-orange-600 ring-1 ring-orange-100">
-                {services.length}
-              </span>
-            </div>
+            <span
+              className="rounded-full bg-[#fff0e5] px-3 py-1.5 text-sm font-extrabold text-slate-900"
+              style={{
+                boxShadow:
+                  '3px 4px 8px rgba(0,0,0,0.07), -2px -2px 6px rgba(255,255,255,0.95)',
+              }}
+            >
+              {services.length}
+            </span>
           </div>
         )}
 
@@ -423,88 +470,115 @@ export default function Services() {
             {services.map((service, index) => (
               <motion.div
                 key={service.id}
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{
+                  opacity: 0,
+                  y: 18,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
                 transition={{
                   duration: 0.35,
                   delay: index * 0.04,
                 }}
-                className="group relative overflow-hidden rounded-3xl border border-orange-100/80 bg-white/75 p-4 shadow-[0_10px_35px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(249,115,22,0.12)]"
+                className={`rounded-[30px] border border-slate-100 bg-white p-5 transition-all duration-200 ${clayCard}`}
               >
-                {/* Card glow */}
-                <div className="pointer-events-none absolute -right-12 -top-12 h-28 w-28 rounded-full bg-orange-200/25 blur-2xl transition-all duration-300 group-hover:bg-orange-300/35" />
-
-                <div className="relative">
-                  {/* Top */}
-                  <div className="mb-4 flex items-start justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50 shadow-sm">
-                      <Scissors className="h-5 w-5 text-orange-500" />
-                    </div>
-
-                    <div className="flex gap-1.5">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => handleEdit(service)}
-                        className="h-9 w-9 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-orange-600"
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => handleDelete(service.id)}
-                        className="h-9 w-9 rounded-xl text-slate-400 hover:bg-red-50 hover:text-red-500"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                {/* Top */}
+                <div className="mb-5 flex items-start justify-between">
+                  {/* Scissors Icon */}
+                  <div
+                    className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-orange-100 bg-[#fff3e8]"
+                    style={{
+                      boxShadow:
+                        '5px 6px 12px rgba(0,0,0,0.08), -4px -4px 10px rgba(255,255,255,0.95), inset 2px 2px 4px rgba(255,255,255,0.60)',
+                    }}
+                  >
+                    <Scissors className="h-7 w-7 text-orange-500" />
                   </div>
 
-                  {/* Service name */}
-                  <div className="mb-4 flex min-h-[32px] items-center gap-2">
-                    <h3 className="truncate text-lg font-bold text-slate-900">
-                      {service.name}
-                    </h3>
+                  {/* Edit / Delete */}
+                  <div className="flex gap-2">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() =>
+                        handleEdit(service)
+                      }
+                      className="h-11 w-11 rounded-[17px] bg-[#f2f6ff] text-slate-600 shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95)] hover:bg-[#e9f0ff] hover:text-slate-700"
+                    >
+                      <Edit2 className="h-5 w-5" />
+                    </Button>
 
-                    {service.home_service && (
-                      <span className="flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600 ring-1 ring-emerald-100">
-                        <Home className="h-3 w-3" />
-                        HOME
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() =>
+                        handleDelete(service.id)
+                      }
+                      className="h-11 w-11 rounded-[17px] bg-[#fff0f2] text-red-500 shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95)] hover:bg-[#ffe6e9] hover:text-red-600"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Service Name */}
+                <div className="mb-5 flex min-h-[38px] items-center gap-2">
+                  <h3 className="truncate text-2xl font-black tracking-tight text-slate-950">
+                    {service.name}
+                  </h3>
+
+                  {service.home_service && (
+                    <span className="flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1.5 text-[10px] font-extrabold text-emerald-600 shadow-[2px_3px_7px_rgba(0,0,0,0.06)]">
+                      <Home className="h-3 w-3" />
+                      HOME
+                    </span>
+                  )}
+                </div>
+
+                {/* Details */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Duration */}
+                  <div
+                    className="rounded-[22px] border border-blue-100 bg-[#f6f9ff] p-4"
+                    style={{
+                      boxShadow:
+                        '5px 6px 12px rgba(0,0,0,0.07), -3px -3px 9px rgba(255,255,255,0.95), inset 2px 2px 4px rgba(255,255,255,0.65)',
+                    }}
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <Clock className="h-5 w-5 text-orange-500" />
+
+                      <span className="text-xs font-bold text-slate-500 sm:text-sm">
+                        Duration
                       </span>
-                    )}
+                    </div>
+
+                    <p className="text-xl font-black text-slate-950 sm:text-2xl">
+                      {service.duration} min
+                    </p>
                   </div>
 
-                  {/* Details */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
-                      <div className="mb-1 flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-orange-500" />
+                  {/* Price */}
+                  <div
+                    className="rounded-[22px] border border-orange-100 bg-[#fff9f2] p-4"
+                    style={{
+                      boxShadow:
+                        '5px 6px 12px rgba(0,0,0,0.07), -3px -3px 9px rgba(255,255,255,0.95), inset 2px 2px 4px rgba(255,255,255,0.65)',
+                    }}
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <IndianRupee className="h-5 w-5 text-orange-500" />
 
-                        <span className="text-[11px] font-medium text-slate-400">
-                          Duration
-                        </span>
-                      </div>
-
-                      <p className="text-sm font-bold text-slate-800">
-                        {service.duration} min
-                      </p>
+                      <span className="text-xs font-bold text-slate-500 sm:text-sm">
+                        Price
+                      </span>
                     </div>
 
-                    <div className="rounded-2xl border border-orange-100/80 bg-orange-50/45 p-3">
-                      <div className="mb-1 flex items-center gap-1.5">
-                        <IndianRupee className="h-3.5 w-3.5 text-orange-500" />
-
-                        <span className="text-[11px] font-medium text-slate-400">
-                          Price
-                        </span>
-                      </div>
-
-                      <p className="text-sm font-bold text-orange-600">
-                        ₹{service.price}
-                      </p>
-                    </div>
+                    <p className="text-xl font-black text-slate-950 sm:text-2xl">
+                      ₹{service.price}
+                    </p>
                   </div>
                 </div>
               </motion.div>
@@ -513,161 +587,177 @@ export default function Services() {
         ) : (
           /* Empty State */
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-3xl border border-orange-100/80 bg-white/70 px-5 py-14 text-center shadow-[0_12px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl"
+            initial={{
+              opacity: 0,
+              y: 10,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            className={`rounded-[30px] border border-slate-100 bg-white px-5 py-14 text-center ${clayCard}`}
           >
-            <div className="pointer-events-none absolute left-1/2 top-1/2 h-52 w-52 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-200/25 blur-3xl" />
+            <div
+              className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#fff3e8]"
+              style={{
+                boxShadow:
+                  '5px 6px 12px rgba(0,0,0,0.08), -4px -4px 10px rgba(255,255,255,0.95)',
+              }}
+            >
+              <AlertCircle className="h-7 w-7 text-orange-400" />
+            </div>
 
-            <div className="relative">
-              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50 shadow-sm">
-                <AlertCircle className="h-7 w-7 text-orange-400" />
-              </div>
+            <h3 className="mb-2 text-xl font-black text-slate-900">
+              No Services Yet
+            </h3>
 
-              <h3 className="mb-2 text-xl font-bold text-slate-900">
-                No Services Yet
-              </h3>
+            <p className="mx-auto mb-6 max-w-md text-sm leading-6 text-slate-500">
+              Add your first service to start accepting bookings.
+              Click the "Add Service" button above.
+            </p>
 
-              <p className="mx-auto mb-6 max-w-md text-sm leading-6 text-slate-500">
-                Add your first service to start accepting bookings.
-                Click the "Add Service" button above.
-              </p>
+            <Dialog
+              open={isOpen}
+              onOpenChange={(open) => {
+                setIsOpen(open);
 
-              <Dialog
-                open={isOpen}
-                onOpenChange={(open) => {
-                  setIsOpen(open);
+                if (!open) {
+                  resetForm();
+                }
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button
+                  className={`h-12 rounded-[20px] px-6 font-extrabold ${orangeClay}`}
+                >
+                  <Plus className="mr-2 h-5 w-5" />
+                  Add Your First Service
+                </Button>
+              </DialogTrigger>
 
-                  if (!open) {
-                    resetForm();
-                  }
-                }}
-              >
-                <DialogTrigger asChild>
-                  <Button className="rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-5 font-semibold text-white shadow-[0_8px_22px_rgba(249,115,22,0.22)] hover:from-orange-600 hover:to-amber-600">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Your First Service
-                  </Button>
-                </DialogTrigger>
+              <DialogContent className="w-[calc(100%-24px)] max-w-md rounded-[28px] border border-slate-100 bg-white p-5 shadow-[12px_14px_28px_rgba(0,0,0,0.12),-8px_-8px_20px_rgba(255,255,255,0.95)] sm:p-6">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-black text-slate-900">
+                    Add New Service
+                  </DialogTitle>
+                </DialogHeader>
 
-                <DialogContent className="w-[calc(100%-24px)] max-w-md rounded-3xl border border-orange-100/70 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl sm:p-6">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-bold text-slate-900">
-                      Add New Service
-                    </DialogTitle>
-                  </DialogHeader>
+                <form
+                  onSubmit={handleSubmit}
+                  className="mt-4 space-y-4"
+                >
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="name-empty"
+                      className="text-sm font-bold text-slate-700"
+                    >
+                      Service Name
+                    </Label>
 
-                  <form
-                    onSubmit={handleSubmit}
-                    className="mt-4 space-y-4"
+                    <Input
+                      id="name-empty"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="e.g., Classic Haircut"
+                      className="h-11 rounded-[18px] border-slate-200 bg-white shadow-[inset_2px_2px_5px_rgba(0,0,0,0.05),inset_-2px_-2px_5px_rgba(255,255,255,0.95)] focus-visible:ring-orange-400"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="duration-empty"
+                      className="text-sm font-bold text-slate-700"
+                    >
+                      Duration (minutes)
+                    </Label>
+
+                    <Input
+                      id="duration-empty"
+                      name="duration"
+                      type="number"
+                      value={formData.duration}
+                      onChange={handleChange}
+                      placeholder="30"
+                      className="h-11 rounded-[18px] border-slate-200 bg-white shadow-[inset_2px_2px_5px_rgba(0,0,0,0.05),inset_-2px_-2px_5px_rgba(255,255,255,0.95)] focus-visible:ring-orange-400"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="price-empty"
+                      className="text-sm font-bold text-slate-700"
+                    >
+                      Price (₹)
+                    </Label>
+
+                    <Input
+                      id="price-empty"
+                      name="price"
+                      type="number"
+                      step="0.01"
+                      value={formData.price}
+                      onChange={handleChange}
+                      placeholder="250"
+                      className="h-11 rounded-[18px] border-slate-200 bg-white shadow-[inset_2px_2px_5px_rgba(0,0,0,0.05),inset_-2px_-2px_5px_rgba(255,255,255,0.95)] focus-visible:ring-orange-400"
+                    />
+                  </div>
+
+                  <div
+                    className="flex items-center justify-between rounded-[22px] border border-slate-100 bg-[#fffaf5] p-4"
+                    style={{
+                      boxShadow:
+                        '5px 6px 13px rgba(0,0,0,0.07), -3px -3px 9px rgba(255,255,255,0.95)',
+                    }}
                   >
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="name-empty"
-                        className="text-sm font-semibold text-slate-700"
-                      >
-                        Service Name
-                      </Label>
-
-                      <Input
-                        id="name-empty"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="e.g., Classic Haircut"
-                        className="h-11 rounded-xl border-orange-100 bg-orange-50/30 focus-visible:ring-orange-400"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="duration-empty"
-                        className="text-sm font-semibold text-slate-700"
-                      >
-                        Duration (minutes)
-                      </Label>
-
-                      <Input
-                        id="duration-empty"
-                        name="duration"
-                        type="number"
-                        value={formData.duration}
-                        onChange={handleChange}
-                        placeholder="30"
-                        className="h-11 rounded-xl border-orange-100 bg-orange-50/30 focus-visible:ring-orange-400"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="price-empty"
-                        className="text-sm font-semibold text-slate-700"
-                      >
-                        Price (₹)
-                      </Label>
-
-                      <Input
-                        id="price-empty"
-                        name="price"
-                        type="number"
-                        step="0.01"
-                        value={formData.price}
-                        onChange={handleChange}
-                        placeholder="250"
-                        className="h-11 rounded-xl border-orange-100 bg-orange-50/30 focus-visible:ring-orange-400"
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between rounded-2xl border border-orange-100 bg-orange-50/40 p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm">
-                          <Home className="h-4 w-4 text-orange-500" />
-                        </div>
-
-                        <div>
-                          <Label
-                            htmlFor="home_service-empty"
-                            className="cursor-pointer text-sm font-semibold text-slate-800"
-                          >
-                            Home Service Available
-                          </Label>
-
-                          <p className="mt-0.5 text-xs text-slate-500">
-                            Offer this service at customer's location
-                          </p>
-                        </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#fff0e5]">
+                        <Home className="h-5 w-5 text-orange-500" />
                       </div>
 
-                      <Switch
-                        id="home_service-empty"
-                        checked={formData.home_service}
-                        onCheckedChange={(checked) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            home_service: checked,
-                          }))
-                        }
-                      />
+                      <div>
+                        <Label
+                          htmlFor="home_service-empty"
+                          className="cursor-pointer text-sm font-bold text-slate-800"
+                        >
+                          Home Service Available
+                        </Label>
+
+                        <p className="mt-0.5 text-xs text-slate-500">
+                          Offer this service at customer's location
+                        </p>
+                      </div>
                     </div>
 
-                    <Button
-                      type="submit"
-                      className="h-11 w-full rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 font-semibold text-white shadow-[0_8px_22px_rgba(249,115,22,0.22)] hover:from-orange-600 hover:to-amber-600"
-                      disabled={submitting}
-                    >
-                      {submitting ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        'Add Service'
-                      )}
-                    </Button>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </div>
+                    <Switch
+                      id="home_service-empty"
+                      checked={formData.home_service}
+                      onCheckedChange={(checked) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          home_service: checked,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className={`h-12 w-full rounded-[20px] font-extrabold ${orangeClay}`}
+                    disabled={submitting}
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      'Add Service'
+                    )}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
           </motion.div>
         )}
       </div>
