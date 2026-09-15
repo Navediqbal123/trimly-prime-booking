@@ -21,7 +21,6 @@ import { StatsCards } from '@/components/barber/StatsCards';
 import { EarningsChart } from '@/components/barber/EarningsChart';
 import { DashboardSkeleton } from '@/components/barber/DashboardSkeleton';
 
-
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -50,6 +49,9 @@ const itemVariants = {
 
 const clayButton =
   'border-0 bg-white text-slate-700 shadow-[5px_6px_12px_rgba(0,0,0,0.09),-4px_-4px_10px_rgba(255,255,255,0.95)] hover:bg-white hover:text-orange-500';
+
+const refreshButton =
+  'border-0 bg-[#ff7417] text-white shadow-[5px_6px_12px_rgba(255,116,23,0.28),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-3px_-3px_5px_rgba(190,70,0,0.22)] hover:bg-[#f66d12] hover:text-white hover:shadow-[7px_8px_15px_rgba(255,116,23,0.30),inset_2px_2px_4px_rgba(255,255,255,0.30),inset_-3px_-3px_5px_rgba(190,70,0,0.25)]';
 
 export default function BarberDashboard() {
   const [bookings, setBookings] = useState<BookingData[]>([]);
@@ -282,15 +284,18 @@ export default function BarberDashboard() {
           onClick={() => fetchAllData(true)}
           disabled={isRefreshing}
           className={`
-            ${clayButton}
+            ${refreshButton}
             h-11
             w-full
             rounded-[18px]
             px-5
+            font-semibold
             transition-all
             duration-200
-            hover:scale-105
-            active:scale-95
+            hover:-translate-y-0.5
+            hover:scale-[1.02]
+            active:translate-y-[2px]
+            active:scale-[0.97]
             sm:w-auto
           `}
         >
@@ -299,6 +304,8 @@ export default function BarberDashboard() {
               mr-2
               h-4
               w-4
+              stroke-[2.8]
+              drop-shadow-[0_1px_1px_rgba(0,0,0,0.15)]
               ${isRefreshing ? 'animate-spin' : ''}
             `}
           />
