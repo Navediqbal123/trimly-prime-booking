@@ -324,24 +324,6 @@ export default function BarberDashboard() {
         />
       </motion.div>
 
-      {/* Services */}
-      <motion.div variants={itemVariants}>
-        <ServicesTable
-          services={services}
-          onRefresh={() => fetchAllData(true)}
-          loading={isRefreshing}
-        />
-      </motion.div>
-
-      {/* Customer Bookings */}
-      <motion.div variants={itemVariants}>
-        <BookingsTable
-          bookings={bookings}
-          onRefresh={() => fetchAllData(true)}
-          loading={isRefreshing}
-        />
-      </motion.div>
-
       {/* Small Dashboard Footer Accent */}
       <motion.div
         variants={itemVariants}
