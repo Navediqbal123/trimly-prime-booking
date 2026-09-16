@@ -80,20 +80,40 @@
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
 
   html {
     @apply dark;
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', sans-serif;
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
     background: var(--gradient-bg);
     background-attachment: fixed;
-    min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  #root {
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
   }
 
   html {
@@ -140,18 +160,16 @@
   }
 
   .page-black {
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
     background: #ffffff;
     color: #000000;
-    margin: -1rem;
-    padding: 1rem;
-    min-height: 100vh;
+    overflow-x: hidden;
   }
-  @media (min-width: 1024px) {
-    .page-black {
-      margin: -2rem;
-      padding: 2rem;
-    }
-  }
+
   .page-black,
   .page-black h1,
   .page-black h2,
@@ -167,6 +185,7 @@
   .page-black div {
     color: #000000;
   }
+
   .page-black .hero-dark,
   .page-black .hero-dark h1,
   .page-black .hero-dark p,
@@ -174,12 +193,15 @@
   .page-black .hero-dark div {
     color: #ffffff;
   }
+
   .page-black .hero-dark .hero-gold {
     color: #f2ce72;
   }
+
   .page-black .hero-dark .hero-gold-soft {
     color: #f5da9a;
   }
+
   .page-black .hero-dark .hero-sub {
     color: rgba(255, 255, 255, 0.88);
   }
@@ -188,6 +210,7 @@
     -webkit-text-fill-color: initial;
     color: inherit;
   }
+
   .page-black .glass-card,
   .page-black .bg-card,
   .page-black [class*="bg-card"] {
@@ -195,12 +218,14 @@
     border-color: rgba(0, 0, 0, 0.12) !important;
     color: #000000 !important;
   }
+
   .page-black .text-muted-foreground,
   .page-black .text-foreground\/70,
   .page-black .text-foreground\/80,
   .page-black .text-foreground\/60 {
     color: rgba(0, 0, 0, 0.75) !important;
   }
+
   .page-black input,
   .page-black textarea,
   .page-black select {
@@ -208,6 +233,7 @@
     color: #000000 !important;
     border-color: rgba(0, 0, 0, 0.2) !important;
   }
+
   .page-black input::placeholder,
   .page-black textarea::placeholder {
     color: rgba(0, 0, 0, 0.5) !important;
@@ -241,12 +267,8 @@
   }
 
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   @keyframes slideUp {
