@@ -515,7 +515,7 @@ export default function Dashboard() {
                     flex
                     w-full
                     cursor-pointer
-                    items-center
+                    items-start
                     gap-2.5
                     overflow-hidden
                     rounded-[25px]
@@ -540,7 +540,8 @@ export default function Dashboard() {
                       relative
                       aspect-video
                       h-auto
-                      w-[44%]
+                      w-[47%]
+                      mt-7
                       min-w-0
                       shrink-0
                       overflow-hidden
@@ -558,19 +559,19 @@ export default function Dashboard() {
                       }}
                     />
 
-                    {/* Rating */}
+                    {/* Rating - reserved space above the image */}
                     <div
                       className="
                         absolute
-                        right-1.5
-                        top-1.5
-                        z-10
+                        left-[35%]
+                        top-2
+                        z-20
                         inline-flex
                         items-center
                         gap-1
                         rounded-full
-                        bg-black/75
-                        px-2
+                        bg-black/80
+                        px-2.5
                         py-1
                         shadow-[2px_3px_6px_rgba(0,0,0,0.18)]
                         backdrop-blur-sm
