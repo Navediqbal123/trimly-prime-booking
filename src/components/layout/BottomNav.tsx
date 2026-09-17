@@ -13,25 +13,70 @@ export function BottomNav() {
   const { pathname } = useLocation();
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-3 pt-2">
-      <div className="bg-sidebar rounded-2xl flex items-center justify-around px-2 py-3 shadow-2xl border border-primary/30">
-        {items.map((item) => {
-          const active = pathname === item.href;
-          const Icon = item.icon;
-          return (
-            <NavLink
-              key={item.href}
-              to={item.href}
-              className={cn(
-                'flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-all duration-200',
-                active ? 'text-gold bg-gold/10' : 'text-foreground/70 hover:text-foreground',
-              )}
-            >
-              <Icon className={cn('w-7 h-7', active && 'drop-shadow-[0_0_6px_hsl(var(--gold))]')} />
-              <span className="text-xs font-semibold">{item.title}</span>
-            </NavLink>
-          );
-        })}
+    <nav
+      className="
+        lg:hidden
+        fixed
+        left-0
+        right-0
+        bottom-0
+        z-[9999]
+        w-full
+        px-2
+        pb-[calc(8px+env(safe-area-inset-bottom))]
+        pt-2
+      "
+    >
+      <div
+        className="
+          w-full
+          rounded-[22px]
+          border border-orange-200/70
+          bg-white/95
+          backdrop-blur-2xl
+          shadow-[0_-6px_30px_rgba(249,115,22,0.15)]
+        "
+      >
+        <div className="flex w-full items-stretch px-1.5 py-1.5">
+          {items.map((item) => {
+            const active = pathname === item.href;
+            const Icon = item.icon;
+
+            return (
+              <NavLink
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-[17px] px-1 py-2.5 transition-all duration-200',
+                  active
+                    ? 'bg-orange-50 text-orange-500'
+                    : 'text-slate-400'
+                )}
+              >
+                <Icon
+                  className={cn(
+                    'h-5 w-5 shrink-0',
+                    active &&
+                      'stroke-[2.5] drop-shadow-[0_2px_6px_rgba(249,115,22,0.3)]'
+                  )}
+                />
+
+                <span
+                  className={cn(
+                    'w-full truncate text-center text-[10px] font-semibold leading-none',
+                    active ? 'text-orange-500' : 'text-slate-400'
+                  )}
+                >
+                  {item.title}
+                </span>
+
+                {active && (
+                  <span className="absolute bottom-0.5 h-1 w-1 rounded-full bg-orange-500" />
+                )}
+              </NavLink>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
