@@ -46,9 +46,9 @@ const adBanners = [
     title: 'Look Sharp',
     highlight: 'Feel Better',
     description: 'Discover premium grooming near you',
-    button: 'Book Now',
+    button: 'visit Now',
     background:
-      'linear-gradient(135deg, #fff7ed 0%, #ffe7d0 52%, #ffd5b5 100%)',
+      'linear-gradient(135deg, #a6c96c 0%, #e4d898 52%, #ffd5b5 100%)',
   },
   {
     id: 3,
@@ -312,7 +312,7 @@ export default function Dashboard() {
 
             <h2
               className="
-                mt-2
+                mt-0
                 font-display
                 text-[25px]
                 font-bold
@@ -399,7 +399,7 @@ export default function Dashboard() {
               Barber Shops
             </h2>
 
-            <p className="mt-2 text-xs font-medium text-slate-500 sm:text-sm">
+            <p className="mt-0 text-xs font-medium text-slate-500 sm:text-sm">
               {searchQuery
                 ? `${filteredBarbers.length} shop${
                     filteredBarbers.length === 1 ? '' : 's'
@@ -450,7 +450,7 @@ export default function Dashboard() {
             </p>
 
             {loadError && (
-              <p className="mt-2 break-words text-xs text-red-500">
+              <p className="mt-0 break-words text-xs text-red-500">
                 {loadError}
               </p>
             )}
@@ -558,35 +558,6 @@ export default function Dashboard() {
                         displayedImages.current[b.id] = image;
                       }}
                     />
-
-                    {/* Rating - reserved space above the image */}
-                    <div
-                      className="
-                        absolute
-                        left-[35%]
-                        top-2
-                        z-20
-                        inline-flex
-                        items-center
-                        gap-1
-                        rounded-full
-                        bg-black/80
-                        px-2.5
-                        py-1
-                        shadow-[2px_3px_6px_rgba(0,0,0,0.18)]
-                        backdrop-blur-sm
-                      "
-                    >
-                      <Star className="h-3 w-3 fill-[#ffc107] text-[#ffc107]" />
-
-                      <span className="text-[10px] font-bold text-white">
-                        {rating.toFixed(1)}
-                      </span>
-
-                      <span className="text-[9px] text-white/70">
-                        ({reviewCount})
-                      </span>
-                    </div>
                   </div>
 
                   {/* =================================================
@@ -594,15 +565,37 @@ export default function Dashboard() {
                   ================================================= */}
                   <div className="flex min-w-0 flex-1 flex-col py-1 pr-1">
 
-                    {/* Shop name + Like */}
-                    <div className="flex min-w-0 items-start justify-between gap-2">
+                    {/* Rating + Shop name + Like */}
+                    <div className="flex min-w-0 items-center gap-1.5">
+                      <div
+                        className="
+                          inline-flex
+                          shrink-0
+                          items-center
+                          gap-1
+                          rounded-full
+                          bg-black/85
+                          px-2
+                          py-1
+                          shadow-[2px_3px_7px_rgba(0,0,0,0.16)]
+                        "
+                      >
+                        <Star className="h-3 w-3 fill-[#ffc107] text-[#ffc107]" />
+                        <span className="text-[9px] font-bold text-white">
+                          {rating.toFixed(1)}
+                        </span>
+                        <span className="text-[8px] text-white/70">
+                          ({reviewCount})
+                        </span>
+                      </div>
+
                       <h3
                         className="
                           min-w-0
                           flex-1
-                          line-clamp-2
+                          truncate
                           font-display
-                          text-[14px]
+                          text-[13px]
                           font-bold
                           leading-tight
                           tracking-[-0.2px]
