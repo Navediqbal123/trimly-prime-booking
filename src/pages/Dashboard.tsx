@@ -156,82 +156,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full bg-white animate-fade-in pb-4">
-      {/* =========================================================
-          TOP HEADER
-      ========================================================= */}
-      <div className="flex items-center justify-between px-1 pt-1 pb-4">
-        <button
-          type="button"
-          className="
-            flex h-12 w-12 items-center justify-center
-            rounded-[17px]
-            bg-white
-            text-black
-            shadow-[5px_6px_12px_rgba(0,0,0,0.10),-4px_-4px_10px_rgba(255,255,255,0.95)]
-            transition-transform
-            active:scale-95
-          "
-          aria-label="Open menu"
-        >
-          <span className="flex flex-col gap-1.5">
-            <span className="h-[3px] w-7 rounded-full bg-black" />
-            <span className="h-[3px] w-7 rounded-full bg-black" />
-            <span className="h-[3px] w-7 rounded-full bg-black" />
-          </span>
-        </button>
-
-        <h1
-          className="
-            font-display
-            text-[38px]
-            font-bold
-            leading-none
-            tracking-[-1.5px]
-            text-black
-          "
-        >
-          Trimly
-        </h1>
-
-        <button
-          type="button"
-          onClick={() => navigate('/notifications')}
-          className="
-            relative
-            flex h-12 w-12 items-center justify-center
-            rounded-[17px]
-            bg-white
-            text-black
-            shadow-[5px_6px_12px_rgba(0,0,0,0.10),-4px_-4px_10px_rgba(255,255,255,0.95)]
-            transition-transform
-            active:scale-95
-          "
-          aria-label="Notifications"
-        >
-          <div className="relative">
-            <svg
-              viewBox="0 0 24 24"
-              className="h-7 w-7"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10 21h4"
-              />
-            </svg>
-
-            <span className="absolute -right-1 -top-1 h-3.5 w-3.5 rounded-full bg-[#ff7417] shadow-[2px_2px_5px_rgba(255,116,23,0.35)]" />
-          </div>
-        </button>
-      </div>
 
       {/* =========================================================
           SEARCH BAR
@@ -239,24 +163,27 @@ export default function Dashboard() {
       <div className="mb-4">
         <div
           className="
-            flex min-h-[64px] w-full items-center
-            rounded-[25px]
+            flex h-[54px] w-full items-center
+            rounded-[22px]
             border border-orange-100
             bg-white
-            px-3
-            shadow-[6px_7px_16px_rgba(0,0,0,0.10),-5px_-5px_14px_rgba(255,255,255,0.95)]
+            px-2.5
+            shadow-[5px_6px_14px_rgba(0,0,0,0.09),-4px_-4px_11px_rgba(255,255,255,0.95)]
           "
         >
           <div
             className="
-              flex h-11 w-11 shrink-0 items-center justify-center
-              rounded-[17px]
+              flex h-9 w-9 shrink-0 items-center justify-center
+              rounded-[14px]
               bg-[#fff3e8]
               text-[#ff7417]
-              shadow-[3px_4px_8px_rgba(255,116,23,0.14),inset_2px_2px_4px_rgba(255,255,255,0.9)]
+              shadow-[3px_4px_7px_rgba(255,116,23,0.12),inset_2px_2px_4px_rgba(255,255,255,0.9)]
             "
           >
-            <Search className="h-6 w-6" strokeWidth={2.5} />
+            <Search
+              className="h-5 w-5"
+              strokeWidth={2.5}
+            />
           </div>
 
           <input
@@ -265,34 +192,37 @@ export default function Dashboard() {
             onChange={(event) => setSearchQuery(event.target.value)}
             placeholder="Search for barber shops..."
             className="
-              min-w-0 flex-1
+              min-w-0
+              flex-1
               bg-transparent
-              px-3
+              px-2.5
               text-sm
               font-medium
               text-black
               outline-none
               placeholder:text-slate-400
-              sm:text-base
             "
           />
 
-          <div className="mx-1 h-9 w-px bg-slate-200" />
+          <div className="mx-1 h-7 w-px bg-slate-200" />
 
           <button
             type="button"
             className="
-              flex h-11 w-11 shrink-0 items-center justify-center
-              rounded-[17px]
+              flex h-9 w-9 shrink-0 items-center justify-center
+              rounded-[14px]
               bg-white
               text-slate-600
-              shadow-[3px_4px_8px_rgba(0,0,0,0.08)]
+              shadow-[3px_4px_7px_rgba(0,0,0,0.07)]
               transition-transform
               active:scale-95
             "
             aria-label="Search filters"
           >
-            <SlidersHorizontal className="h-5 w-5" strokeWidth={2.5} />
+            <SlidersHorizontal
+              className="h-[18px] w-[18px]"
+              strokeWidth={2.5}
+            />
           </button>
         </div>
       </div>
@@ -308,82 +238,104 @@ export default function Dashboard() {
         className="
           relative
           mb-7
-          min-h-[205px]
+          h-[165px]
           w-full
           overflow-hidden
-          rounded-[27px]
+          rounded-[25px]
           border border-orange-100
-          shadow-[8px_10px_20px_rgba(0,0,0,0.12),-6px_-6px_16px_rgba(255,255,255,0.95)]
+          shadow-[7px_8px_17px_rgba(0,0,0,0.11),-5px_-5px_14px_rgba(255,255,255,0.95)]
         "
         style={{ background: currentBanner.background }}
       >
         {/* Decorative circles */}
-        <div className="absolute -right-10 -top-14 h-36 w-36 rounded-full bg-white/30" />
-        <div className="absolute -right-3 bottom-[-50px] h-40 w-40 rounded-full bg-[#ff7417]/10" />
-        <div className="absolute left-[48%] top-[-25px] h-24 w-24 rounded-full bg-[#ffb56f]/15" />
+        <div className="absolute -right-10 -top-14 h-32 w-32 rounded-full bg-white/30" />
+        <div className="absolute -right-3 bottom-[-45px] h-36 w-36 rounded-full bg-[#ff7417]/10" />
+        <div className="absolute left-[48%] top-[-25px] h-20 w-20 rounded-full bg-[#ffb56f]/15" />
 
-        {/* Barber-style decorative silhouette */}
-        <div className="absolute right-[-8px] bottom-[-25px] hidden h-44 w-44 sm:block">
-          <div className="absolute bottom-0 right-6 h-32 w-24 rounded-t-[55px] rounded-b-[20px] bg-black/85 shadow-[inset_5px_5px_8px_rgba(255,255,255,0.10)]" />
-          <div className="absolute right-10 top-5 h-20 w-20 rounded-full bg-[#c58b65] shadow-[inset_5px_5px_8px_rgba(255,255,255,0.25)]" />
-          <div className="absolute right-5 top-1 h-12 w-24 rotate-[-8deg] rounded-[50%] bg-[#3b2418]" />
+        {/* Barber decorative shape */}
+        <div className="absolute right-[-5px] bottom-[-25px] hidden h-40 w-40 sm:block">
+          <div className="absolute bottom-0 right-5 h-28 w-20 rounded-t-[50px] rounded-b-[18px] bg-black/85" />
+
+          <div className="absolute right-9 top-5 h-[72px] w-[72px] rounded-full bg-[#c58b65]" />
+
+          <div className="absolute right-4 top-1 h-11 w-24 rotate-[-8deg] rounded-[50%] bg-[#3b2418]" />
         </div>
 
-        <div className="relative z-10 flex min-h-[205px] flex-col justify-between p-5 sm:p-6">
+        <div className="relative z-10 flex h-full flex-col justify-between p-4 sm:p-5">
+
           <div>
             <div
               className="
-                inline-flex items-center gap-1.5
+                inline-flex
+                items-center
+                gap-1.5
                 rounded-full
-                bg-white/65
-                px-3 py-1
-                shadow-[2px_3px_6px_rgba(0,0,0,0.06)]
+                bg-white/70
+                px-2.5
+                py-1
+                shadow-[2px_3px_6px_rgba(0,0,0,0.05)]
               "
             >
-              <Sparkles className="h-3.5 w-3.5 text-[#ff7417]" />
-              <span className="text-[10px] font-bold tracking-wide text-[#a76a3d]">
+              <Sparkles className="h-3 w-3 text-[#ff7417]" />
+
+              <span className="text-[9px] font-bold tracking-wide text-[#a76a3d]">
                 {currentBanner.tag}
               </span>
             </div>
 
-            <h2 className="mt-3 font-display text-[29px] font-bold leading-[0.98] tracking-[-0.8px] text-black sm:text-4xl">
+            <h2
+              className="
+                mt-2
+                font-display
+                text-[25px]
+                font-bold
+                leading-[0.95]
+                tracking-[-0.7px]
+                text-black
+                sm:text-3xl
+              "
+            >
               {currentBanner.title}
               <br />
+
               <span className="text-[#ff7417]">
                 {currentBanner.highlight}
               </span>
             </h2>
 
-            <p className="mt-2 max-w-[250px] text-xs font-medium text-slate-600 sm:text-sm">
+            <p className="mt-1.5 max-w-[240px] text-[11px] font-medium text-slate-600 sm:text-xs">
               {currentBanner.description}
             </p>
           </div>
 
+          {/* Smaller left-positioned button */}
           <Button
             onClick={handleBookNow}
             className="
-              mt-3
-              h-10
+              mt-1
+              h-8
               w-fit
+              self-start
               rounded-full
               border-0
               bg-[#ff7417]
-              px-5
-              text-sm
+              px-4
+              text-[11px]
               font-bold
               text-white
-              shadow-[5px_6px_12px_rgba(255,116,23,0.30),inset_2px_2px_5px_rgba(255,255,255,0.28),inset_-3px_-3px_6px_rgba(190,70,0,0.22)]
+              shadow-[4px_5px_10px_rgba(255,116,23,0.28),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.22)]
               hover:bg-[#ff7417]
               active:scale-95
             "
           >
             {currentBanner.button}
-            <ArrowRight className="ml-2 h-4 w-4" />
+
+            <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
           </Button>
         </div>
 
         {/* Banner dots */}
-        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2">
+        <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
           {adBanners.map((banner, index) => (
             <button
               key={banner.id}
@@ -433,13 +385,18 @@ export default function Dashboard() {
             type="button"
             onClick={() => navigate('/discover')}
             className="
-              flex shrink-0 items-center gap-1
-              text-sm font-bold
+              flex
+              shrink-0
+              items-center
+              gap-1
+              text-sm
+              font-bold
               text-[#ff7417]
               sm:text-base
             "
           >
             See All
+
             <ArrowRight className="h-4 w-4" />
           </button>
         </div>
@@ -490,8 +447,11 @@ export default function Dashboard() {
                   : 0;
 
               const uploaded = mediaMap[b.id] || [];
+
               const gallery =
-                uploaded.length > 0 ? uploaded : [shopImage(b.id)];
+                uploaded.length > 0
+                  ? uploaded
+                  : [shopImage(b.id)];
 
               return (
                 <motion.div
@@ -522,7 +482,8 @@ export default function Dashboard() {
                     }
                   }}
                   className="
-                    flex cursor-pointer
+                    flex
+                    cursor-pointer
                     flex-col
                     overflow-hidden
                     rounded-[25px]
@@ -550,14 +511,19 @@ export default function Dashboard() {
 
                     <div
                       className="
-                        absolute right-3 top-3
-                        inline-flex items-center gap-1
+                        absolute
+                        right-3
+                        top-3
+                        z-10
+                        inline-flex
+                        items-center
+                        gap-1
                         rounded-full
                         bg-black/75
-                        px-2.5 py-1.5
-                        backdrop-blur-sm
+                        px-2.5
+                        py-1.5
                         shadow-[2px_3px_6px_rgba(0,0,0,0.18)]
-                        z-10
+                        backdrop-blur-sm
                       "
                     >
                       <Star className="h-3.5 w-3.5 fill-[#ffc107] text-[#ffc107]" />
