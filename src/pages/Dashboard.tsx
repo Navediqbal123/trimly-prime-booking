@@ -209,7 +209,7 @@ export default function Dashboard() {
             "
           >
             <Search
-              className="h-[18px] w-[18px]"
+              className="h-4 w-4"
               strokeWidth={2.5}
             />
           </div>
@@ -456,7 +456,7 @@ export default function Dashboard() {
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {filteredBarbers.map((b, i) => {
               const barberReviews = reviews.filter(
                 (review) => review.barber_id === b.id
@@ -515,7 +515,7 @@ export default function Dashboard() {
                     flex
                     w-full
                     cursor-pointer
-                    items-stretch
+                    items-center
                     gap-2.5
                     overflow-hidden
                     rounded-[25px]
@@ -538,8 +538,9 @@ export default function Dashboard() {
                   <div
                     className="
                       relative
-                      h-[150px]
-                      w-[43%]
+                      aspect-video
+                      h-auto
+                      w-[44%]
                       min-w-0
                       shrink-0
                       overflow-hidden
@@ -600,7 +601,7 @@ export default function Dashboard() {
                           flex-1
                           line-clamp-2
                           font-display
-                          text-[15px]
+                          text-[14px]
                           font-bold
                           leading-tight
                           tracking-[-0.2px]
@@ -621,8 +622,8 @@ export default function Dashboard() {
                         }
                         className={`
                           flex
-                          h-8
-                          w-8
+                          h-7
+                          w-7
                           shrink-0
                           items-center
                           justify-center
@@ -645,8 +646,8 @@ export default function Dashboard() {
                     </div>
 
                     {/* Location */}
-                    <p className="mt-1 flex min-w-0 items-start gap-1.5 text-[11px] font-medium leading-tight text-slate-500">
-                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#ff7417]" />
+                    <p className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px] font-medium leading-tight text-slate-500">
+                      <MapPin className="h-3.5 w-3.5 shrink-0 text-[#ff7417]" />
 
                       <span className="line-clamp-2">
                         {b.location}
@@ -665,13 +666,13 @@ export default function Dashboard() {
                         );
                       }}
                       className="
-                        mt-1
+                        mt-0.5
                         flex
                         min-w-0
                         items-center
                         gap-1.5
                         text-left
-                        text-[11px]
+                        text-[10px]
                         font-medium
                         leading-tight
                         text-slate-500
@@ -700,17 +701,17 @@ export default function Dashboard() {
                       }}
                       className="
                         mt-auto
-                        h-8
+                        h-7
                         w-full
-                        rounded-[15px]
+                        rounded-full
                         border-0
-                        bg-[#ff7417]
-                        px-3
-                        text-[11px]
+                        bg-[#f66b0a]
+                        px-2.5
+                        text-[10px]
                         font-bold
                         text-white
-                        shadow-[4px_5px_10px_rgba(255,116,23,0.25),inset_2px_2px_5px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.20)]
-                        hover:bg-[#ff7417]
+                        shadow-[4px_5px_9px_rgba(205,75,0,0.28),inset_2px_2px_4px_rgba(255,255,255,0.30),inset_-2px_-2px_5px_rgba(165,55,0,0.28)]
+                        hover:bg-[#f66b0a]
                         active:scale-[0.98]
                       "
                     >
