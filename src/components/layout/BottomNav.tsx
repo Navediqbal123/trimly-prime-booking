@@ -23,7 +23,7 @@ export function BottomNav() {
         z-[9999]
         w-full
         px-2
-        pb-[calc(8px+env(safe-area-inset-bottom))]
+        pb-0
         pt-2
       "
     >
