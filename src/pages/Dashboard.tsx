@@ -38,7 +38,7 @@ const adBanners = [
     description: 'Book top-rated barbers near you',
     button: 'Book Now',
     background:
-      'linear-gradient(135deg, #fff4e7 0%, #ffe1c4 52%, #ffd0a4 100%)',
+      'linear-gradient(135deg, #dc96dd 0%, #ffe1c4 52%, #ffd0a4 100%)',
   },
   {
     id: 2,
@@ -48,7 +48,7 @@ const adBanners = [
     description: 'Discover premium grooming near you',
     button: 'visit Now',
     background:
-      'linear-gradient(135deg, #a6c96c 0%, #e4d898 52%, #ffd5b5 100%)',
+      'linear-gradient(135deg, #a6c96c 0%, #e4d898 52%, #305570 100%)',
   },
   {
     id: 3,
@@ -66,9 +66,8 @@ const adBanners = [
     title: 'CUSTOM STYLR',
     highlight: 'NEW LOOK',
     description: 'Find your experienced barber in seconds',
-    button: 'Discover Now',
     background:
-      'linear-gradient(135deg, #ec2727 0%, #ffe0c5 50%, #3dc3d4 100%)',
+      'linear-gradient(135deg, #e25353 0%, #ffe0c5 50%, #3dc3d4 100%)',
   },
 ];
 
@@ -599,7 +598,7 @@ export default function Dashboard() {
                   {/* =================================================
                       SHOP DETAILS
                   ================================================= */}
-                  <div className="flex min-w-0 flex-1 flex-col py-1 pr-1">
+                  <div className="flex min-w-0 flex-1 self-stretch flex-col pt-7 pr-1 pb-0">
 
                     {/* Shop name + Like */}
                     <div className="flex min-w-0 items-center gap-1.5">
@@ -657,7 +656,7 @@ export default function Dashboard() {
                     <p className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px] font-medium leading-tight text-slate-500">
                       <MapPin className="h-3.5 w-3.5 shrink-0 text-[#ff7417]" />
 
-                      <span className="line-clamp-2">
+                      <span className="line-clamp-1 truncate">
                         {b.location}
                       </span>
                     </p>
