@@ -209,7 +209,7 @@ export default function Dashboard() {
             "
           >
             <Search
-              className="h-5 w-5"
+              className="h-[18px] w-[18px]"
               strokeWidth={2.5}
             />
           </div>
@@ -516,12 +516,12 @@ export default function Dashboard() {
                     w-full
                     cursor-pointer
                     items-stretch
-                    gap-3
+                    gap-2.5
                     overflow-hidden
                     rounded-[25px]
                     border border-orange-100
                     bg-white
-                    p-2.5
+                    p-2
                     text-left
                     shadow-[6px_7px_16px_rgba(0,0,0,0.09),-5px_-5px_13px_rgba(255,255,255,0.95)]
                     transition-all
@@ -600,7 +600,7 @@ export default function Dashboard() {
                           flex-1
                           line-clamp-2
                           font-display
-                          text-[17px]
+                          text-[15px]
                           font-bold
                           leading-tight
                           tracking-[-0.2px]
@@ -621,8 +621,8 @@ export default function Dashboard() {
                         }
                         className={`
                           flex
-                          h-9
-                          w-9
+                          h-8
+                          w-8
                           shrink-0
                           items-center
                           justify-center
@@ -637,7 +637,7 @@ export default function Dashboard() {
                         `}
                       >
                         <Heart
-                          className="h-5 w-5"
+                          className="h-[18px] w-[18px]"
                           fill={isLiked ? 'currentColor' : 'none'}
                           strokeWidth={2.2}
                         />
@@ -645,7 +645,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Location */}
-                    <p className="mt-1 flex min-w-0 items-start gap-1.5 text-xs font-medium leading-tight text-slate-500">
+                    <p className="mt-1 flex min-w-0 items-start gap-1.5 text-[11px] font-medium leading-tight text-slate-500">
                       <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#ff7417]" />
 
                       <span className="line-clamp-2">
@@ -665,13 +665,13 @@ export default function Dashboard() {
                         );
                       }}
                       className="
-                        mt-1.5
+                        mt-1
                         flex
                         min-w-0
-                        items-start
+                        items-center
                         gap-1.5
                         text-left
-                        text-xs
+                        text-[11px]
                         font-medium
                         leading-tight
                         text-slate-500
@@ -679,7 +679,7 @@ export default function Dashboard() {
                         hover:text-[#ff7417]
                       "
                     >
-                      <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <MessageCircle className="h-3 w-3 shrink-0 text-slate-400" />
 
                       <span className="line-clamp-1">
                         {b.description?.trim()
@@ -700,13 +700,13 @@ export default function Dashboard() {
                       }}
                       className="
                         mt-auto
-                        h-9
+                        h-8
                         w-full
                         rounded-[15px]
                         border-0
                         bg-[#ff7417]
                         px-3
-                        text-xs
+                        text-[11px]
                         font-bold
                         text-white
                         shadow-[4px_5px_10px_rgba(255,116,23,0.25),inset_2px_2px_5px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.20)]
@@ -715,7 +715,7 @@ export default function Dashboard() {
                       "
                     >
                       Visit
-                      <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                      <ArrowRight className="ml-1 h-3 w-3" />
                     </Button>
                   </div>
                 </motion.div>
