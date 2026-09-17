@@ -237,8 +237,8 @@ export default function Dashboard() {
         transition={{ duration: 0.35 }}
         className="
           relative
-          mb-7
-          h-[165px]
+          mb-4
+          h-[160px]
           w-full
           overflow-hidden
           rounded-[25px]
@@ -261,7 +261,7 @@ export default function Dashboard() {
           <div className="absolute right-4 top-1 h-11 w-24 rotate-[-8deg] rounded-[50%] bg-[#3b2418]" />
         </div>
 
-        <div className="relative z-10 flex h-full flex-col justify-between p-4 sm:p-5">
+        <div className="relative z-10 flex h-full flex-col justify-start p-4 pb-8 sm:p-5 sm:pb-8">
 
           <div>
             <div
@@ -312,15 +312,15 @@ export default function Dashboard() {
           <Button
             onClick={handleBookNow}
             className="
-              mt-1
-              h-8
+              mt-2
+              h-7
               w-fit
               self-start
               rounded-full
               border-0
               bg-[#ff7417]
-              px-4
-              text-[11px]
+              px-3.5
+              text-[10px]
               font-bold
               text-white
               shadow-[4px_5px_10px_rgba(255,116,23,0.28),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.22)]
@@ -330,7 +330,7 @@ export default function Dashboard() {
           >
             {currentBanner.button}
 
-            <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+            <ArrowRight className="ml-1 h-3 w-3" />
           </Button>
         </div>
 
@@ -361,7 +361,7 @@ export default function Dashboard() {
             <h2
               className="
                 font-display
-                text-[32px]
+                text-[29px]
                 font-bold
                 leading-none
                 tracking-[-1px]
