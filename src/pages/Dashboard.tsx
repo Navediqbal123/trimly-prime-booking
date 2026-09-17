@@ -11,6 +11,8 @@ import {
   MapPin,
   Star,
   Sparkles,
+  Heart,
+  MessageCircle,
 } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
@@ -24,6 +26,7 @@ interface Barber {
   id: string;
   shop_name: string;
   location: string;
+  description?: string | null;
 }
 
 const adBanners = [
@@ -67,6 +70,7 @@ export default function Dashboard() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeBanner, setActiveBanner] = useState(0);
+  const [likedShops, setLikedShops] = useState<Set<string>>(new Set());
 
   const { data: shops, isLoading } = useQuery({
     queryKey: ['approvedBarbersHome'],
@@ -88,6 +92,10 @@ export default function Dashboard() {
           id: b.id,
           shop_name: b.shop_name,
           location: b.location,
+          description:
+            'description' in b
+              ? (b as Barber).description
+              : null,
         })),
         error: null,
       };
@@ -138,7 +146,8 @@ export default function Dashboard() {
     return barbers.filter((barber) => {
       return (
         barber.shop_name.toLowerCase().includes(query) ||
-        barber.location.toLowerCase().includes(query)
+        barber.location.toLowerCase().includes(query) ||
+        barber.description?.toLowerCase().includes(query)
       );
     });
   }, [barbers, searchQuery]);
@@ -152,6 +161,25 @@ export default function Dashboard() {
     document
       .getElementById('featured-shops')
       ?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const toggleLike = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    shopId: string
+  ) => {
+    event.stopPropagation();
+
+    setLikedShops((current) => {
+      const next = new Set(current);
+
+      if (next.has(shopId)) {
+        next.delete(shopId);
+      } else {
+        next.add(shopId);
+      }
+
+      return next;
+    });
   };
 
   return (
@@ -247,12 +275,12 @@ export default function Dashboard() {
         "
         style={{ background: currentBanner.background }}
       >
-        {/* Decorative circles */}
         <div className="absolute -right-10 -top-14 h-32 w-32 rounded-full bg-white/30" />
+
         <div className="absolute -right-3 bottom-[-45px] h-36 w-36 rounded-full bg-[#ff7417]/10" />
+
         <div className="absolute left-[48%] top-[-25px] h-20 w-20 rounded-full bg-[#ffb56f]/15" />
 
-        {/* Barber decorative shape */}
         <div className="absolute right-[-5px] bottom-[-25px] hidden h-40 w-40 sm:block">
           <div className="absolute bottom-0 right-5 h-28 w-20 rounded-t-[50px] rounded-b-[18px] bg-black/85" />
 
@@ -262,7 +290,6 @@ export default function Dashboard() {
         </div>
 
         <div className="relative z-10 flex h-full flex-col justify-start p-4 pb-8 sm:p-5 sm:pb-8">
-
           <div>
             <div
               className="
@@ -308,11 +335,11 @@ export default function Dashboard() {
             </p>
           </div>
 
-          {/* Smaller left-positioned button */}
+          {/* Book Now - final adjusted position */}
           <Button
             onClick={handleBookNow}
             className="
-              mt-2
+              mt-1
               h-7
               w-fit
               self-start
@@ -396,7 +423,6 @@ export default function Dashboard() {
             "
           >
             See All
-
             <ArrowRight className="h-4 w-4" />
           </button>
         </div>
@@ -430,7 +456,7 @@ export default function Dashboard() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-col gap-4">
             {filteredBarbers.map((b, i) => {
               const barberReviews = reviews.filter(
                 (review) => review.barber_id === b.id
@@ -453,14 +479,16 @@ export default function Dashboard() {
                   ? uploaded
                   : [shopImage(b.id)];
 
+              const isLiked = likedShops.has(b.id);
+
               return (
                 <motion.div
                   key={b.id}
-                  initial={{ opacity: 0, y: 14 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
                     delay: i * 0.04,
-                    duration: 0.35,
+                    duration: 0.3,
                     ease: 'easeOut',
                   }}
                   role="button"
@@ -482,13 +510,18 @@ export default function Dashboard() {
                     }
                   }}
                   className="
+                    group
+                    relative
                     flex
+                    w-full
                     cursor-pointer
-                    flex-col
+                    items-stretch
+                    gap-3
                     overflow-hidden
                     rounded-[25px]
                     border border-orange-100
                     bg-white
+                    p-2.5
                     text-left
                     shadow-[6px_7px_16px_rgba(0,0,0,0.09),-5px_-5px_13px_rgba(255,255,255,0.95)]
                     transition-all
@@ -499,7 +532,22 @@ export default function Dashboard() {
                     focus-visible:ring-[#ff7417]
                   "
                 >
-                  <div className="relative h-44 overflow-hidden">
+                  {/* =================================================
+                      SHOP IMAGE
+                  ================================================= */}
+                  <div
+                    className="
+                      relative
+                      h-[150px]
+                      w-[43%]
+                      min-w-0
+                      shrink-0
+                      overflow-hidden
+                      rounded-[20px]
+                      bg-slate-100
+                      shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06)]
+                    "
+                  >
                     <ShopImageCarousel
                       images={gallery}
                       alt={b.shop_name}
@@ -509,45 +557,138 @@ export default function Dashboard() {
                       }}
                     />
 
+                    {/* Rating */}
                     <div
                       className="
                         absolute
-                        right-3
-                        top-3
+                        right-1.5
+                        top-1.5
                         z-10
                         inline-flex
                         items-center
                         gap-1
                         rounded-full
                         bg-black/75
-                        px-2.5
-                        py-1.5
+                        px-2
+                        py-1
                         shadow-[2px_3px_6px_rgba(0,0,0,0.18)]
                         backdrop-blur-sm
                       "
                     >
-                      <Star className="h-3.5 w-3.5 fill-[#ffc107] text-[#ffc107]" />
+                      <Star className="h-3 w-3 fill-[#ffc107] text-[#ffc107]" />
 
-                      <span className="text-xs font-bold text-white">
+                      <span className="text-[10px] font-bold text-white">
                         {rating.toFixed(1)}
                       </span>
 
-                      <span className="text-[10px] text-white/70">
+                      <span className="text-[9px] text-white/70">
                         ({reviewCount})
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex flex-1 flex-col p-4">
-                    <h3 className="mb-1 line-clamp-1 font-display text-lg font-bold text-black">
-                      {b.shop_name}
-                    </h3>
+                  {/* =================================================
+                      SHOP DETAILS
+                  ================================================= */}
+                  <div className="flex min-w-0 flex-1 flex-col py-1 pr-1">
 
-                    <p className="flex items-center gap-1 line-clamp-1 text-xs font-medium text-slate-500">
-                      <MapPin className="h-3.5 w-3.5 shrink-0 text-[#ff7417]" />
-                      {b.location}
+                    {/* Shop name + Like */}
+                    <div className="flex min-w-0 items-start justify-between gap-2">
+                      <h3
+                        className="
+                          min-w-0
+                          flex-1
+                          line-clamp-2
+                          font-display
+                          text-[17px]
+                          font-bold
+                          leading-tight
+                          tracking-[-0.2px]
+                          text-black
+                        "
+                      >
+                        {b.shop_name}
+                      </h3>
+
+                      {/* Clay Rose Red Like */}
+                      <button
+                        type="button"
+                        onClick={(event) => toggleLike(event, b.id)}
+                        aria-label={
+                          isLiked
+                            ? `Unlike ${b.shop_name}`
+                            : `Like ${b.shop_name}`
+                        }
+                        className={`
+                          flex
+                          h-9
+                          w-9
+                          shrink-0
+                          items-center
+                          justify-center
+                          rounded-[13px]
+                          transition-all
+                          active:scale-90
+                          ${
+                            isLiked
+                              ? 'bg-[#ffd9df] text-[#f0445e] shadow-[3px_4px_8px_rgba(240,68,94,0.22),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-2px_-2px_4px_rgba(190,40,65,0.10)]'
+                              : 'bg-[#fff0f3] text-[#f47b8c] shadow-[3px_4px_8px_rgba(240,68,94,0.14),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-2px_-2px_4px_rgba(190,40,65,0.08)]'
+                          }
+                        `}
+                      >
+                        <Heart
+                          className="h-5 w-5"
+                          fill={isLiked ? 'currentColor' : 'none'}
+                          strokeWidth={2.2}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Location */}
+                    <p className="mt-1 flex min-w-0 items-start gap-1.5 text-xs font-medium leading-tight text-slate-500">
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#ff7417]" />
+
+                      <span className="line-clamp-2">
+                        {b.location}
+                      </span>
                     </p>
 
+                    {/* Description */}
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+
+                        openShop(
+                          b.id,
+                          displayedImages.current[b.id] || gallery[0]
+                        );
+                      }}
+                      className="
+                        mt-1.5
+                        flex
+                        min-w-0
+                        items-start
+                        gap-1.5
+                        text-left
+                        text-xs
+                        font-medium
+                        leading-tight
+                        text-slate-500
+                        transition-colors
+                        hover:text-[#ff7417]
+                      "
+                    >
+                      <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+
+                      <span className="line-clamp-1">
+                        {b.description?.trim()
+                          ? `${b.description.trim()}...`
+                          : 'View shop details...'}
+                      </span>
+                    </button>
+
+                    {/* Visit */}
                     <Button
                       onClick={(event) => {
                         event.stopPropagation();
@@ -558,21 +699,23 @@ export default function Dashboard() {
                         );
                       }}
                       className="
-                        mt-4
-                        h-11
+                        mt-auto
+                        h-9
                         w-full
-                        rounded-[17px]
+                        rounded-[15px]
                         border-0
                         bg-[#ff7417]
+                        px-3
+                        text-xs
                         font-bold
                         text-white
-                        shadow-[5px_6px_12px_rgba(255,116,23,0.25),inset_2px_2px_5px_rgba(255,255,255,0.28),inset_-3px_-3px_6px_rgba(190,70,0,0.20)]
+                        shadow-[4px_5px_10px_rgba(255,116,23,0.25),inset_2px_2px_5px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.20)]
                         hover:bg-[#ff7417]
                         active:scale-[0.98]
                       "
                     >
                       Visit
-                      <ArrowRight className="ml-1 h-4 w-4" />
+                      <ArrowRight className="ml-1 h-3.5 w-3.5" />
                     </Button>
                   </div>
                 </motion.div>
