@@ -60,6 +60,16 @@ const adBanners = [
     background:
       'linear-gradient(135deg, #fff3e8 0%, #ffe0c5 50%, #ffcda7 100%)',
   },
+   {
+    id: 4,
+    tag: 'EXPERIENCEED BARBERS',
+    title: 'CUSTOM STYLR',
+    highlight: 'NEW LOOK',
+    description: 'Find your experienced barber in seconds',
+    button: 'Discover Now',
+    background:
+      'linear-gradient(135deg, #ec2727 0%, #ffe0c5 50%, #3dc3d4 100%)',
+  },
 ];
 
 export default function Dashboard() {
@@ -532,13 +542,39 @@ export default function Dashboard() {
                     focus-visible:ring-[#ff7417]
                   "
                 >
+                  {/* Rating - top-left blank space above image */}
+                  <div
+                    className="
+                      absolute
+                      left-3
+                      top-1.5
+                      z-20
+                      inline-flex
+                      items-center
+                      gap-1
+                      rounded-full
+                      bg-black/85
+                      px-2.5
+                      py-1
+                      shadow-[2px_3px_7px_rgba(0,0,0,0.16)]
+                    "
+                  >
+                    <Star className="h-3 w-3 fill-[#ffc107] text-[#ffc107]" />
+                    <span className="text-[9px] font-bold text-white">
+                      {rating.toFixed(1)}
+                    </span>
+                    <span className="text-[8px] text-white/70">
+                      ({reviewCount})
+                    </span>
+                  </div>
+
                   {/* =================================================
                       SHOP IMAGE
                   ================================================= */}
                   <div
                     className="
                       relative
-                      aspect-video
+                      aspect-[1.7/1]
                       h-auto
                       w-[47%]
                       mt-7
@@ -565,30 +601,8 @@ export default function Dashboard() {
                   ================================================= */}
                   <div className="flex min-w-0 flex-1 flex-col py-1 pr-1">
 
-                    {/* Rating + Shop name + Like */}
+                    {/* Shop name + Like */}
                     <div className="flex min-w-0 items-center gap-1.5">
-                      <div
-                        className="
-                          inline-flex
-                          shrink-0
-                          items-center
-                          gap-1
-                          rounded-full
-                          bg-black/85
-                          px-2
-                          py-1
-                          shadow-[2px_3px_7px_rgba(0,0,0,0.16)]
-                        "
-                      >
-                        <Star className="h-3 w-3 fill-[#ffc107] text-[#ffc107]" />
-                        <span className="text-[9px] font-bold text-white">
-                          {rating.toFixed(1)}
-                        </span>
-                        <span className="text-[8px] text-white/70">
-                          ({reviewCount})
-                        </span>
-                      </div>
-
                       <h3
                         className="
                           min-w-0
