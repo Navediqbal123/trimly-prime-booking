@@ -139,43 +139,43 @@ export default function DiscoverBarbers() {
   ];
 
   return (
-    <div className="min-h-screen w-full animate-fade-in bg-white px-0 pb-28 pt-4 text-black lg:pt-0">
+    <div className="min-h-screen w-full animate-fade-in bg-white pb-28 pt-1 text-black lg:pt-0">
       {/* Header */}
-      <div className="mb-5 px-0">
-        <h1 className="font-display text-[34px] font-bold leading-[1.05] tracking-[-1.5px] text-[#111111] sm:text-5xl">
+      <div className="mb-3">
+        <h1 className="font-display text-[32px] font-bold leading-[1] tracking-[-1.4px] text-[#111111] sm:text-5xl">
           Find a{' '}
           <span className="text-[#ff7417]">
             Barber
           </span>
         </h1>
 
-        <p className="mt-2 text-[15px] font-medium leading-tight text-slate-500 sm:text-base">
+        <p className="mt-1.5 text-[14px] font-medium leading-tight text-slate-500 sm:text-base">
           Discover best barber shops near you
         </p>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-4 w-full">
+      {/* Slim Search Bar */}
+      <div className="relative mb-3 w-full">
         <div
           className="
-            flex h-[64px] w-full items-center
-            rounded-[25px]
+            flex h-[54px] w-full items-center
+            rounded-[21px]
             border border-orange-100
             bg-white
-            p-2
-            shadow-[7px_8px_17px_rgba(0,0,0,0.10),-5px_-5px_14px_rgba(255,255,255,0.95)]
+            p-1.5
+            shadow-[6px_7px_15px_rgba(0,0,0,0.09),-4px_-4px_11px_rgba(255,255,255,0.95)]
           "
         >
-          {/* Search icon clay area */}
+          {/* Search Icon */}
           <div
             className="
-              flex h-[48px] w-[48px] shrink-0 items-center justify-center
-              rounded-[18px]
-              bg-[#fff4e8]
-              shadow-[inset_2px_2px_5px_rgba(255,255,255,0.9),inset_-3px_-3px_6px_rgba(230,110,20,0.12),3px_4px_8px_rgba(0,0,0,0.06)]
+              flex h-[41px] w-[41px] shrink-0 items-center justify-center
+              rounded-[15px]
+              bg-[#fff0df]
+              shadow-[3px_4px_8px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-2px_-2px_4px_rgba(230,110,20,0.10)]
             "
           >
-            <Search className="h-6 w-6 text-[#ff7417]" />
+            <Search className="h-[21px] w-[21px] text-[#ff7417]" />
           </div>
 
           <Input
@@ -187,8 +187,8 @@ export default function DiscoverBarbers() {
               flex-1
               border-0
               bg-transparent
-              px-4
-              text-[16px]
+              px-3
+              text-[15px]
               font-medium
               text-slate-800
               shadow-none
@@ -200,24 +200,15 @@ export default function DiscoverBarbers() {
             "
           />
 
-          {/* Filter icon */}
-          <div className="mr-1 hidden h-[46px] w-[52px] shrink-0 items-center justify-center border-l border-slate-200 pl-2 sm:flex">
-            <div
-              className="
-                flex h-[44px] w-[44px] items-center justify-center
-                rounded-[16px]
-                bg-white
-                shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95)]
-              "
-            >
-              <SlidersHorizontal className="h-5 w-5 text-[#ff7417]" />
-            </div>
+          {/* Filter Icon */}
+          <div className="mr-0.5 hidden h-[38px] w-[45px] shrink-0 items-center justify-center border-l border-orange-100 pl-1 sm:flex">
+            <SlidersHorizontal className="h-[19px] w-[19px] text-[#ff7417]" />
           </div>
         </div>
       </div>
 
       {/* Filter Chips */}
-      <div className="mb-5 flex gap-2.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {chips.map((c) => {
           const active = filter === c.id;
           const Icon = c.icon;
@@ -229,13 +220,15 @@ export default function DiscoverBarbers() {
               onClick={() => setFilter(c.id)}
               className={cn(
                 `
-                  inline-flex h-[48px]
-                  shrink-0 items-center justify-center
-                  gap-2
+                  inline-flex h-[40px]
+                  shrink-0
+                  items-center
+                  justify-center
+                  gap-1.5
                   rounded-full
                   border
-                  px-5
-                  text-[15px]
+                  px-3.5
+                  text-[13px]
                   font-semibold
                   transition-all
                   duration-200
@@ -246,20 +239,19 @@ export default function DiscoverBarbers() {
                     border-orange-300
                     bg-[#ff7417]
                     text-white
-                    shadow-[6px_7px_14px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(190,70,0,0.25)]
+                    shadow-[5px_6px_12px_rgba(255,116,23,0.28),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.22)]
                   `
                   : `
-                    border-slate-100
-                    bg-white
+                    border-orange-100
+                    bg-[#fff3e5]
                     text-slate-800
-                    shadow-[5px_6px_13px_rgba(0,0,0,0.09),-4px_-4px_10px_rgba(255,255,255,0.95)]
-                    hover:shadow-[6px_7px_15px_rgba(0,0,0,0.11),-4px_-4px_10px_rgba(255,255,255,0.95)]
+                    shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95),inset_1px_1px_3px_rgba(255,255,255,0.8)]
                   `,
               )}
             >
               <Icon
                 className={cn(
-                  'h-[18px] w-[18px] shrink-0',
+                  'h-[15px] w-[15px] shrink-0',
                   active ? 'text-white' : 'text-slate-800',
                 )}
               />
@@ -272,40 +264,40 @@ export default function DiscoverBarbers() {
 
       {/* Loading */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-20">
+        <div className="flex items-center justify-center py-16">
           <div
             className="
-              flex h-16 w-16 items-center justify-center
-              rounded-[22px]
+              flex h-14 w-14 items-center justify-center
+              rounded-[19px]
               bg-white
-              shadow-[6px_7px_15px_rgba(0,0,0,0.10),-5px_-5px_12px_rgba(255,255,255,0.95)]
+              shadow-[5px_6px_12px_rgba(0,0,0,0.09),-4px_-4px_10px_rgba(255,255,255,0.95)]
             "
           >
-            <Loader2 className="h-7 w-7 animate-spin text-[#ff7417]" />
+            <Loader2 className="h-6 w-6 animate-spin text-[#ff7417]" />
           </div>
         </div>
       ) : filtered.length === 0 ? (
         /* Empty State */
         <div
           className="
-            rounded-[28px]
+            rounded-[24px]
             border border-orange-100
             bg-white
-            p-10
+            p-8
             text-center
-            shadow-[7px_8px_17px_rgba(0,0,0,0.09),-5px_-5px_14px_rgba(255,255,255,0.95)]
+            shadow-[6px_7px_14px_rgba(0,0,0,0.08),-4px_-4px_11px_rgba(255,255,255,0.95)]
           "
         >
           <div
             className="
-              mx-auto mb-4
-              flex h-16 w-16 items-center justify-center
-              rounded-[22px]
-              bg-[#fff3e7]
-              shadow-[4px_5px_10px_rgba(0,0,0,0.08),inset_2px_2px_5px_rgba(255,255,255,0.9)]
+              mx-auto mb-3
+              flex h-14 w-14 items-center justify-center
+              rounded-[19px]
+              bg-[#fff1df]
+              shadow-[4px_5px_9px_rgba(0,0,0,0.07),inset_2px_2px_4px_rgba(255,255,255,0.9)]
             "
           >
-            <Scissors className="h-8 w-8 text-[#ff7417]" />
+            <Scissors className="h-7 w-7 text-[#ff7417]" />
           </div>
 
           <p className="text-sm font-semibold text-slate-600">
@@ -314,50 +306,48 @@ export default function DiscoverBarbers() {
         </div>
       ) : (
         /* Barber Shops */
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filtered.map((b, i) => {
             const { rating, reviews } = shopRating(b.id);
 
             return (
               <motion.div
                 key={b.id}
-                initial={{ opacity: 0, y: 14 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
                   delay: i * 0.03,
-                  duration: 0.3,
+                  duration: 0.25,
                 }}
                 onClick={() => navigate(`/barber/${b.id}`)}
                 className="
                   group
-                  flex w-full cursor-pointer
+                  flex w-full
+                  min-w-0
+                  cursor-pointer
                   items-center
-                  gap-3
-                  rounded-[26px]
+                  gap-2.5
+                  rounded-[23px]
                   border border-orange-100
                   bg-white
-                  p-3
+                  p-2
                   text-left
+                  shadow-[6px_7px_14px_rgba(0,0,0,0.09),-4px_-4px_11px_rgba(255,255,255,0.95)]
                   transition-all
                   duration-200
                   active:scale-[0.995]
-                  shadow-[7px_8px_17px_rgba(0,0,0,0.10),-5px_-5px_14px_rgba(255,255,255,0.95)]
-                  hover:shadow-[8px_9px_19px_rgba(0,0,0,0.12),-5px_-5px_14px_rgba(255,255,255,0.95)]
                 "
               >
                 {/* Shop Image */}
                 <div
                   className="
-                    relative
-                    h-[112px]
-                    w-[31%]
-                    min-w-[92px]
-                    max-w-[250px]
+                    h-[76px]
+                    w-[76px]
                     shrink-0
                     overflow-hidden
-                    rounded-[21px]
+                    rounded-[18px]
                     bg-slate-100
-                    shadow-[inset_2px_2px_5px_rgba(0,0,0,0.08)]
+                    shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08)]
                   "
                 >
                   <img
@@ -376,90 +366,93 @@ export default function DiscoverBarbers() {
                 </div>
 
                 {/* Shop Information */}
-                <div className="min-w-0 flex-1 self-stretch py-1">
-                  <div className="flex h-full min-w-0 flex-col justify-center">
-                    <h3 className="pr-1 font-display text-[19px] font-bold leading-tight tracking-[-0.4px] text-[#111111]">
-                      {b.shop_name}
-                    </h3>
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate pr-1 font-display text-[16px] font-bold leading-tight tracking-[-0.25px] text-[#111111]">
+                    {b.shop_name}
+                  </h3>
 
-                    {/* Location */}
-                    <div className="mt-2 flex min-w-0 items-center gap-1.5">
-                      <MapPin className="h-[16px] w-[16px] shrink-0 text-[#ff7417]" />
+                  {/* Location */}
+                  <div className="mt-1 flex min-w-0 items-center gap-1">
+                    <MapPin className="h-[13px] w-[13px] shrink-0 text-[#ff7417]" />
 
-                      <span className="min-w-0 truncate text-[14px] font-medium text-slate-500">
-                        {b.location}
-                      </span>
-                    </div>
+                    <span className="min-w-0 truncate text-[12px] font-medium text-slate-500">
+                      {b.location}
+                    </span>
+                  </div>
 
-                    {/* Rating */}
-                    <div className="mt-2 flex min-w-0 items-center gap-1.5">
-                      <Star className="h-[18px] w-[18px] shrink-0 fill-[#ffb300] text-[#ffb300]" />
+                  {/* Rating + Home Service */}
+                  <div className="mt-1 flex min-w-0 items-center gap-1.5">
+                    <Star className="h-[15px] w-[15px] shrink-0 fill-[#ffb300] text-[#ffb300]" />
 
-                      <span className="text-[15px] font-bold text-[#111111]">
-                        {rating.toFixed(1)}
-                      </span>
+                    <span className="text-[12px] font-bold text-[#111111]">
+                      {rating.toFixed(1)}
+                    </span>
 
-                      <span className="text-[13px] font-medium text-slate-500">
-                        ({reviews})
-                      </span>
-                    </div>
+                    <span className="text-[11px] font-medium text-slate-500">
+                      ({reviews})
+                    </span>
 
-                    {/* Home Service */}
                     {b.hasHome && (
-                      <div className="mt-2 inline-flex w-fit max-w-full items-center gap-1.5 rounded-full bg-[#fff1e3] px-2.5 py-1 shadow-[2px_3px_7px_rgba(0,0,0,0.06),inset_1px_1px_3px_rgba(255,255,255,0.9)]">
-                        <HomeIcon className="h-[14px] w-[14px] shrink-0 text-[#ff7417]" />
+                      <span
+                        className="
+                          ml-0.5
+                          inline-flex
+                          min-w-0
+                          max-w-[100px]
+                          items-center
+                          gap-1
+                          rounded-full
+                          bg-[#fff0df]
+                          px-2
+                          py-1
+                          shadow-[2px_3px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.9)]
+                        "
+                      >
+                        <HomeIcon className="h-[11px] w-[11px] shrink-0 text-[#ff7417]" />
 
-                        <span className="truncate text-[10px] font-bold uppercase tracking-wide text-[#ff7417]">
-                          Home Service
+                        <span className="truncate text-[8px] font-bold uppercase tracking-[0.4px] text-[#ff7417]">
+                          Home
                         </span>
-                      </div>
+                      </span>
                     )}
                   </div>
                 </div>
 
-                {/* Right Side Actions */}
-                <div className="flex h-full w-[76px] shrink-0 flex-col items-center justify-between gap-3 py-1">
+                {/* Right Actions */}
+                <div className="flex w-[62px] shrink-0 flex-col items-center justify-between gap-2">
                   {/* Heart */}
                   <div
                     className="
-                      flex h-[44px] w-[44px]
+                      flex h-[35px] w-[35px]
                       items-center justify-center
-                      rounded-[17px]
+                      rounded-[14px]
                       bg-white
-                      shadow-[5px_6px_12px_rgba(0,0,0,0.09),-3px_-3px_9px_rgba(255,255,255,0.95)]
+                      shadow-[4px_5px_9px_rgba(0,0,0,0.08),-3px_-3px_7px_rgba(255,255,255,0.95)]
                     "
                   >
-                    <Heart
-                      className="
-                        h-[22px] w-[22px]
-                        text-slate-700
-                        transition-all
-                        duration-200
-                        group-hover:scale-110
-                      "
-                    />
+                    <Heart className="h-[18px] w-[18px] text-slate-700 transition-transform duration-200 group-hover:scale-110" />
                   </div>
 
                   {/* Visit */}
                   <div
                     className="
-                      flex h-[44px] w-full
+                      flex h-[35px] w-full
                       items-center justify-center
-                      gap-1.5
+                      gap-1
                       rounded-full
                       bg-[#ff7417]
-                      px-2
-                      text-[14px]
+                      px-1.5
+                      text-[12px]
                       font-bold
                       text-white
-                      shadow-[6px_7px_14px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(190,70,0,0.25)]
+                      shadow-[5px_6px_11px_rgba(255,116,23,0.27),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.22)]
                       transition-transform
                       duration-200
                       group-hover:scale-[1.02]
                     "
                   >
                     <span>Visit</span>
-                    <ArrowRight className="h-4 w-4 shrink-0" />
+                    <ArrowRight className="h-[14px] w-[14px] shrink-0" />
                   </div>
                 </div>
               </motion.div>
