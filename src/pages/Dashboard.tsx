@@ -65,9 +65,9 @@ const adBanners = [
     tag: 'EXPERIENCEED BARBERS',
     title: 'CUSTOM STYLR',
     highlight: 'NEW LOOK',
-    description: 'Find your experienced barber in seconds',
+    description: 'Find your  barber in seconds',
     background:
-      'linear-gradient(135deg, #e25353 0%, #ffe0c5 50%, #3dc3d4 100%)',
+      'linear-gradient(130deg, #e25353 0%, #ffe0c5 50%, #3dc3d4 100%)',
   },
 ];
 
@@ -348,7 +348,7 @@ export default function Dashboard() {
           <Button
             onClick={handleBookNow}
             className="
-              mt-1
+              mt-0
               h-7
               w-fit
               self-start
@@ -598,7 +598,7 @@ export default function Dashboard() {
                   {/* =================================================
                       SHOP DETAILS
                   ================================================= */}
-                  <div className="flex min-w-0 flex-1 self-stretch flex-col pt-7 pr-1 pb-0">
+                  <div className="flex min-w-0 flex-1 self-stretch flex-col pt-0 pr-1 pb-0">
 
                     {/* Shop name + Like */}
                     <div className="flex min-w-0 items-center gap-1.5">
@@ -608,11 +608,12 @@ export default function Dashboard() {
                           flex-1
                           truncate
                           font-display
-                          text-[13px]
+                          text-[18px]
                           font-bold
-                          leading-tight
+                          leading-[1.05]
                           tracking-[-0.2px]
                           text-black
+                          line-clamp-2
                         "
                       >
                         {b.shop_name}
