@@ -608,12 +608,13 @@ export default function Dashboard() {
                           flex-1
                           truncate
                           font-display
-                          text-[18px]
+                          text-[16px]
                           font-bold
                           leading-[1.05]
                           tracking-[-0.2px]
                           text-black
-                          line-clamp-2
+                          line-clamp- 2
+                          break-words
                         "
                       >
                         {b.shop_name}
@@ -654,13 +655,13 @@ export default function Dashboard() {
                     </div>
 
                     {/* Location */}
-                    <p className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px] font-medium leading-tight text-slate-500">
-                      <MapPin className="h-3.5 w-3.5 shrink-0 text-[#ff7417]" />
+                   <p className="mt-0.5 flex min-w-0 items-start gap-1 text-[10px] font-medium leading-tight text-slate-500">
+  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ff7417]" />
 
-                      <span className="line-clamp-1 truncate">
-                        {b.location}
-                      </span>
-                    </p>
+  <span className="min-w-0 line-clamp-2 break-words">
+    {b.location}
+  </span>
+</p>
 
                     {/* Description */}
                     <button
