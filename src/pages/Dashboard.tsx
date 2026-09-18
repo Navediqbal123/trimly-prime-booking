@@ -613,7 +613,7 @@ export default function Dashboard() {
                           leading-[1.05]
                           tracking-[-0.2px]
                           text-black
-                          line-clamp- 2
+                          line-clamp-2
                           break-words
                         "
                       >
@@ -658,7 +658,7 @@ export default function Dashboard() {
                    <p className="mt-0.5 flex min-w-0 items-start gap-1 text-[10px] font-medium leading-tight text-slate-500">
   <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ff7417]" />
 
-  <span className="min-w-0 line-clamp-2 break-words">
+  <span className="min-w-0 line-clamp-2  break-words">
     {b.location}
   </span>
 </p>
