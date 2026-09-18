@@ -253,59 +253,79 @@ export default function MyBookings() {
 
     const currentRating = selectedRating[booking.id] || 0;
 
-    return (
+return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         whileHover={{ y: -2 }}
-        className="bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300"
+        className="
+          w-full overflow-hidden rounded-[26px]
+          border border-slate-100 bg-white
+          shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]
+          transition-all duration-300
+        "
       >
-        <div className="p-4">
-          <div className="flex items-start justify-between gap-3 mb-2">
-            <div className="flex items-center gap-3 min-w-0">
+        <div className="p-4 sm:p-5">
+          {/* Shop + status */}
+          <div className="flex min-w-0 items-start justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               {photo && (
-                <img
-                  src={photo}
-                  alt={shopName ? `${shopName} barber shop` : 'Barber shop'}
-                  loading="lazy"
-                  className="w-14 h-14 rounded-xl object-cover border border-border shrink-0"
-                />
+                <div className="shrink-0 rounded-[18px] bg-white p-1 shadow-[3px_4px_9px_rgba(0,0,0,0.10),-2px_-2px_6px_rgba(255,255,255,0.95)]">
+                  <img
+                    src={photo}
+                    alt={shopName ? `${shopName} barber shop` : 'Barber shop'}
+                    loading="lazy"
+                    className="h-16 w-16 rounded-[14px] object-cover sm:h-[72px] sm:w-[72px]"
+                  />
+                </div>
               )}
 
-              <div className="min-w-0">
-                {shopName && <h3 className="font-semibold truncate">{shopName}</h3>}
-                {serviceTitle && <p className="text-sm text-primary">{serviceTitle}</p>}
+              <div className="min-w-0 flex-1">
+                {shopName && (
+                  <h3 className="line-clamp-2 break-words font-display text-[20px] font-bold leading-[1.08] tracking-[-0.3px] text-black sm:text-[22px]">
+                    {shopName}
+                  </h3>
+                )}
+
+                {serviceTitle && (
+                  <p className="mt-1 line-clamp-2 break-words text-[15px] font-medium leading-tight text-orange-500 sm:text-base">
+                    {serviceTitle}
+                  </p>
+                )}
               </div>
             </div>
 
-            <div className="flex flex-col items-end gap-1 shrink-0">
+            <div className="flex shrink-0 flex-col items-end gap-1.5">
               <span
                 className={cn(
-                  'flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
+                  'flex items-center gap-1.5 rounded-full px-3 py-2 text-[12px] font-bold shadow-[3px_4px_9px_rgba(0,0,0,0.10),inset_1px_1px_3px_rgba(255,255,255,0.80)]',
                   config.className
                 )}
               >
-                <StatusIcon className="w-3 h-3" />
+                <StatusIcon className="h-4 w-4" />
                 {config.label}
               </span>
 
               {booking.created_at && (
-                <span className="text-[11px] text-muted-foreground">
+                <span className="whitespace-nowrap text-[11px] font-medium text-slate-500">
                   {timeAgo(booking.created_at)}
                 </span>
               )}
             </div>
           </div>
 
+          {/* Multiple services */}
           {services.length > 1 && (
-            <div className="mt-3 rounded-xl border border-border/70 divide-y divide-border/70 overflow-hidden">
+            <div className="mt-4 overflow-hidden rounded-[18px] border border-slate-100 bg-white shadow-[3px_4px_9px_rgba(0,0,0,0.07),-2px_-2px_7px_rgba(255,255,255,0.95)]">
               {services.filter((s) => s.name).map((s, i) => (
                 <div
                   key={s.id || `${s.name}-${i}`}
-                  className="flex items-center justify-between px-3 py-2 text-sm"
+                  className="flex items-center justify-between gap-3 border-b border-slate-100 px-3 py-2.5 text-sm last:border-b-0"
                 >
-                  <span className="truncate">{s.name}</span>
-                  <span className="font-semibold shrink-0">
+                  <span className="min-w-0 truncate font-medium text-slate-700">
+                    {s.name}
+                  </span>
+                  <span className="shrink-0 font-bold text-black">
                     ₹{Number(s.price ?? 0)}
                   </span>
                 </div>
@@ -313,43 +333,64 @@ export default function MyBookings() {
             </div>
           )}
 
-          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-3">
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              <span>{new Date(booking.date).toLocaleDateString()}</span>
+          {/* Date + time clay boxes */}
+          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:gap-3">
+            <div className="flex min-w-0 items-center gap-2 rounded-[17px] border border-orange-100 bg-[#fff5ed] px-3 py-2.5 shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95)]">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[11px] bg-[#ffb27f] shadow-[2px_3px_6px_rgba(0,0,0,0.10),inset_1px_1px_3px_rgba(255,255,255,0.55)]">
+                <Calendar className="h-4 w-4 text-[#d94f00]" />
+              </div>
+              <span className="min-w-0 whitespace-nowrap text-[12px] font-semibold text-slate-700 sm:text-sm">
+                {new Date(booking.date).toLocaleDateString('en-IN')}
+              </span>
             </div>
 
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              <span>{booking.time_slot}</span>
-            </div>
-
-            <div className="flex items-center gap-1">
-              <span className="font-medium text-foreground">
-                Total ₹{total}
+            <div className="flex min-w-0 items-center gap-2 rounded-[17px] border border-orange-100 bg-[#fff5ed] px-3 py-2.5 shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95)]">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[11px] bg-[#ffb27f] shadow-[2px_3px_6px_rgba(0,0,0,0.10),inset_1px_1px_3px_rgba(255,255,255,0.55)]">
+                <Clock className="h-4 w-4 text-[#d94f00]" />
+              </div>
+              <span className="min-w-0 whitespace-nowrap text-[12px] font-semibold text-slate-700 sm:text-sm">
+                {booking.time_slot}
               </span>
             </div>
           </div>
 
+          {/* Total */}
+          <div className="mt-4">
+            <span className="text-[18px] font-bold text-black sm:text-[20px]">
+              Total <span className="text-[#ef4444]">₹{total}</span>
+            </span>
+          </div>
+
+          {/* Cancel */}
           {(booking.status === 'pending' ||
             booking.status === 'confirmed' ||
             booking.status === 'approved') && (
-            <div className="flex gap-2 mt-4">
+            <div className="mt-4 w-full">
               <Button
                 variant="outline"
                 size="sm"
-                className="text-destructive hover:bg-destructive/10"
+                className="
+                  h-11 w-full rounded-full border-0
+                  bg-[#fca5a5] text-black
+                  font-bold
+                  shadow-[5px_6px_12px_rgba(239,68,68,0.22),inset_2px_2px_5px_rgba(255,255,255,0.55),inset_-3px_-3px_6px_rgba(185,28,28,0.18)]
+                  transition-all duration-200
+                  hover:bg-[#fca5a5] hover:text-black
+                  active:translate-y-[1px] active:shadow-[2px_3px_7px_rgba(239,68,68,0.18)]
+                "
                 onClick={() => handleCancelGroup(group)}
                 disabled={cancellingId === booking.id}
               >
                 {cancellingId === booking.id ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin text-black" />
                     Cancelling...
                   </>
                 ) : (
                   <>
-                    <XCircle className="w-4 h-4 mr-1" />
+                    <span className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#ef4444] shadow-[2px_2px_5px_rgba(0,0,0,0.14),inset_1px_1px_2px_rgba(255,255,255,0.35)]">
+                      <XCircle className="h-4 w-4 text-white" />
+                    </span>
                     Cancel
                   </>
                 )}
@@ -357,10 +398,11 @@ export default function MyBookings() {
             </div>
           )}
 
+          {/* Completed booking rating */}
           {isCompleted && (
-            <div className="mt-4 pt-4 border-t border-border">
+            <div className="mt-4 rounded-[20px] border border-slate-100 bg-white p-3.5 shadow-[4px_5px_11px_rgba(0,0,0,0.07),-3px_-3px_9px_rgba(255,255,255,0.95)]">
               {hasRated ? (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
                   <div className="flex items-center gap-1">
                     {Array.from({ length: 5 }).map((_, index) => {
                       const review = existingReviews.find(
@@ -371,10 +413,10 @@ export default function MyBookings() {
                         <Star
                           key={index}
                           className={cn(
-                            'w-4 h-4',
+                            'h-4 w-4',
                             index < (review?.rating || 0)
                               ? 'fill-yellow-400 text-yellow-400'
-                              : 'text-muted-foreground'
+                              : 'text-slate-300'
                           )}
                         />
                       );
@@ -384,11 +426,11 @@ export default function MyBookings() {
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm font-medium mb-2">
+                  <p className="mb-2 text-sm font-bold text-black">
                     Rate this Barber
                   </p>
 
-                  <div className="flex items-center gap-1 mb-3">
+                  <div className="mb-3 flex items-center gap-1">
                     {Array.from({ length: 5 }).map((_, index) => {
                       const starNumber = index + 1;
 
@@ -402,15 +444,15 @@ export default function MyBookings() {
                               [booking.id]: starNumber,
                             }))
                           }
-                          className="p-1 rounded-md transition-transform hover:scale-110"
+                          className="rounded-md p-1 transition-transform hover:scale-110"
                           aria-label={`Rate ${starNumber} star${starNumber > 1 ? 's' : ''}`}
                         >
                           <Star
                             className={cn(
-                              'w-6 h-6',
+                              'h-6 w-6',
                               starNumber <= currentRating
                                 ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-muted-foreground'
+                                : 'text-slate-300'
                             )}
                           />
                         </button>
@@ -422,6 +464,11 @@ export default function MyBookings() {
                     size="sm"
                     onClick={() => handleRating(group)}
                     disabled={!currentRating}
+                    className="
+                      rounded-full bg-[#ff7417] text-white
+                      shadow-[4px_5px_10px_rgba(255,116,23,0.25),inset_1px_1px_3px_rgba(255,255,255,0.30)]
+                      hover:bg-[#ff7417]
+                    "
                   >
                     Submit Rating
                   </Button>
@@ -437,42 +484,81 @@ export default function MyBookings() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-        <p className="text-muted-foreground">Loading your bookings...</p>
+        <Loader2 className="mb-4 h-8 w-8 animate-spin text-orange-500" />
+        <p className="text-slate-500">Loading your bookings...</p>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
-            My <span className="gradient-text">Bookings</span>
+    <div className="min-h-full w-full bg-white animate-fade-in">
+      {/* Header */}
+      <div className="mb-4 flex w-full flex-col gap-3">
+        <div className="min-w-0">
+          <h1 className="whitespace-nowrap font-display text-[31px] font-bold leading-none tracking-[-1.2px] text-black sm:text-4xl">
+            My <span className="text-[#ff7417]">Bookings</span>
           </h1>
 
-          <p className="text-muted-foreground">Manage your appointments</p>
+          <p className="mt-2 whitespace-nowrap text-[15px] font-medium text-slate-500 sm:text-base">
+            Manage your appointments
+          </p>
         </div>
 
+        {/* Full-width orange clay Refresh */}
         <Button
-          variant="outline"
           onClick={() => refetch()}
           disabled={isFetching}
+          className="
+            h-11 w-full rounded-full border-0
+            bg-[#f97316] text-white
+            text-sm font-bold
+            shadow-[6px_7px_14px_rgba(194,65,12,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(154,52,18,0.25)]
+            transition-all duration-200
+            hover:bg-[#f97316]
+            active:translate-y-[1px] active:shadow-[3px_4px_8px_rgba(194,65,12,0.22)]
+          "
         >
           <RefreshCw
-            className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`}
+            className={`mr-2 h-5 w-5 ${isFetching ? 'animate-spin' : ''}`}
           />
           Refresh
         </Button>
       </div>
 
+      {/* Upcoming / Past clay pill tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="upcoming">
+        <TabsList
+          className="
+            mb-4 flex h-12 w-full rounded-full
+            border border-slate-100 bg-white p-1
+            shadow-[5px_6px_13px_rgba(0,0,0,0.08),-4px_-4px_11px_rgba(255,255,255,0.95)]
+          "
+        >
+          <TabsTrigger
+            value="upcoming"
+            className="
+              h-full flex-1 rounded-full
+              text-sm font-bold text-slate-500
+              transition-all duration-200
+              data-[state=active]:bg-[#f97316]
+              data-[state=active]:text-white
+              data-[state=active]:shadow-[5px_6px_12px_rgba(194,65,12,0.24),inset_1px_1px_3px_rgba(255,255,255,0.28),inset_-2px_-2px_4px_rgba(154,52,18,0.20)]
+            "
+          >
             Upcoming ({upcomingBookings.length})
           </TabsTrigger>
 
-          <TabsTrigger value="past">
+          <TabsTrigger
+            value="past"
+            className="
+              h-full flex-1 rounded-full
+              text-sm font-bold text-slate-500
+              transition-all duration-200
+              data-[state=active]:bg-[#f97316]
+              data-[state=active]:text-white
+              data-[state=active]:shadow-[5px_6px_12px_rgba(194,65,12,0.24),inset_1px_1px_3px_rgba(255,255,255,0.28),inset_-2px_-2px_4px_rgba(154,52,18,0.20)]
+            "
+          >
             Past ({pastBookings.length})
           </TabsTrigger>
         </TabsList>
@@ -483,11 +569,15 @@ export default function MyBookings() {
               <BookingCard key={g[0].id} group={g} />
             ))
           ) : (
-            <div className="text-center py-12 bg-card rounded-xl border border-border">
-              <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No upcoming bookings</p>
+            <div className="rounded-[26px] border border-slate-100 bg-white py-12 text-center shadow-[6px_7px_15px_rgba(0,0,0,0.08),-5px_-5px_13px_rgba(255,255,255,0.95)]">
+              <Calendar className="mx-auto mb-4 h-12 w-12 text-slate-300" />
+              <p className="font-medium text-slate-500">No upcoming bookings</p>
               <Button
-                className="mt-4"
+                className="
+                  mt-4 rounded-full bg-[#f97316] text-white
+                  shadow-[4px_5px_10px_rgba(194,65,12,0.25),inset_1px_1px_3px_rgba(255,255,255,0.30)]
+                  hover:bg-[#f97316]
+                "
                 onClick={() => navigate('/discover')}
               >
                 Book Now
@@ -502,9 +592,9 @@ export default function MyBookings() {
               <BookingCard key={g[0].id} group={g} />
             ))
           ) : (
-            <div className="text-center py-12 bg-card rounded-xl border border-border">
-              <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No past bookings</p>
+            <div className="rounded-[26px] border border-slate-100 bg-white py-12 text-center shadow-[6px_7px_15px_rgba(0,0,0,0.08),-5px_-5px_13px_rgba(255,255,255,0.95)]">
+              <Calendar className="mx-auto mb-4 h-12 w-12 text-slate-300" />
+              <p className="font-medium text-slate-500">No past bookings</p>
             </div>
           )}
         </TabsContent>
