@@ -277,6 +277,8 @@ export interface ApprovedBarberData {
   id: string;
   shop_name: string;
   location: string;
+  latitude?: number | null;
+  longitude?: number | null;
   address?: string;
   locality?: string;
   city?: string;
@@ -292,6 +294,7 @@ export interface ApprovedBarberData {
   user_id: string;
   status: string;
   user?: { email: string; name: string };
+
 }
 
 export async function getApprovedBarbers(): Promise<ApiResponse<ApprovedBarberData[]>> {
@@ -319,6 +322,8 @@ export interface BarberProfileData {
   shop_name: string;
   location: string;
   status: string;
+   latitude?: number | null;
+  longitude?: number | null;
 }
 
 export async function getMyBarberProfile(): Promise<ApiResponse<BarberProfileData>> {
@@ -406,6 +411,8 @@ export interface UpdateShopData {
   location: string;
   description?: string;
   phone?: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export async function updateMyShop(data: UpdateShopData): Promise<ApiResponse> {

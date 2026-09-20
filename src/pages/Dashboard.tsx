@@ -21,11 +21,13 @@ import { shopImage } from '@/lib/shopMedia';
 import { supabase } from '@/lib/supabase';
 import { listAllShopMedia } from '@/lib/shopMediaStore';
 import { ShopImageCarousel } from '@/components/ShopImageCarousel';
-
+import GoogleMapView from '@/components/maps/GoogleMapView';
 interface Barber {
   id: string;
   shop_name: string;
   location: string;
+  latitude?: number | null;
+  longitude?: number | null;
   description?: string | null;
 }
 
@@ -101,6 +103,8 @@ export default function Dashboard() {
           id: b.id,
           shop_name: b.shop_name,
           location: b.location,
+          latitude: b.latitude,
+          longitude: b.longitude,
           description:
             'description' in b
               ? (b as Barber).description
@@ -387,6 +391,7 @@ export default function Dashboard() {
           ))}
         </div>
       </motion.section>
+      <GoogleMapView />
 
       {/* =========================================================
           BARBER SHOPS

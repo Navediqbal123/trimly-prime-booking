@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { getMyBarberProfile, updateMyShop, deleteMyShop, BarberProfileData } from '@/lib/api';
 import { listShopMedia, uploadShopImage, deleteShopImage } from '@/lib/shopMediaStore';
-import { shopImage } from '@/lib/shopMedia';
 
 export default function MyShop() {
   const [loading, setLoading] = useState(true);
@@ -18,12 +17,14 @@ export default function MyShop() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [profile, setProfile] = useState<BarberProfileData | null>(null);
 
-  const [formData, setFormData] = useState({
-    shopName: '',
-    location: '',
-    description: '',
-    phone: '',
-  });
+ const [formData, setFormData] = useState({
+  shopName: '',
+  location: '',
+  description: '',
+  phone: '',
+  latitude: null as number | null,
+  longitude: null as number | null,
+});
 
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -46,6 +47,8 @@ export default function MyShop() {
         location: res.data.location || '',
         description: (res.data as any).description || '',
         phone: (res.data as any).phone || '',
+        latitude: res.data.latitude ?? null,
+        longitude: res.data.longitude ?? null,
       });
 
       const media = await listShopMedia(res.data.id);
@@ -122,6 +125,8 @@ export default function MyShop() {
         location: formData.location.trim(),
         description: formData.description.trim(),
         phone: formData.phone.trim(),
+        latitude: formData.latitude,
+        longitude: formData.longitude,
       });
 
       if (res.success) {
