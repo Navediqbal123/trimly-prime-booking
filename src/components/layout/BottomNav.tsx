@@ -1,10 +1,11 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Calendar, Search, User } from 'lucide-react';
+import { Home, Calendar, Search, User, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const items = [
   { title: 'Home', href: '/dashboard', icon: Home },
   { title: 'Search', href: '/discover', icon: Search },
+  { title: 'Map', href: '/map', icon: MapPin },
   { title: 'Bookings', href: '/bookings', icon: Calendar },
   { title: 'Profile', href: '/profile', icon: User },
 ];

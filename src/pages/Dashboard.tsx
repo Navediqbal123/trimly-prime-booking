@@ -21,7 +21,6 @@ import { shopImage } from '@/lib/shopMedia';
 import { supabase } from '@/lib/supabase';
 import { listAllShopMedia } from '@/lib/shopMediaStore';
 import { ShopImageCarousel } from '@/components/ShopImageCarousel';
-import GoogleMapView from '@/components/maps/GoogleMapView';
 interface Barber {
   id: string;
   shop_name: string;
@@ -391,7 +390,7 @@ export default function Dashboard() {
           ))}
         </div>
       </motion.section>
-      <GoogleMapView />
+
 
       {/* =========================================================
           BARBER SHOPS
