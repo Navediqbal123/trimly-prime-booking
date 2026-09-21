@@ -1,6 +1,22 @@
+import { useEffect, useState } from 'react';
 import GoogleMapView from '@/components/maps/GoogleMapView';
+import { getApprovedBarbers, ApprovedBarberData } from '@/lib/api';
 
 export default function Map() {
+  const [barbers, setBarbers] = useState<ApprovedBarberData[]>([]);
+
+  useEffect(() => {
+    const loadBarbers = async () => {
+      const res = await getApprovedBarbers();
+
+      if (res.success && res.data) {
+        setBarbers(res.data);
+      }
+    };
+
+    loadBarbers();
+  }, []);
+
   return (
     <div className="min-h-screen bg-white px-4 pb-24 pt-4">
       <div className="mb-4">
@@ -10,7 +26,7 @@ export default function Map() {
         </p>
       </div>
 
-      <GoogleMapView />
+      <GoogleMapView barbers ={barbers} />
     </div>
   );
 }

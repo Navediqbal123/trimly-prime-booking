@@ -279,6 +279,7 @@ export interface ApprovedBarberData {
   location: string;
   latitude?: number | null;
   longitude?: number | null;
+  
   address?: string;
   locality?: string;
   city?: string;

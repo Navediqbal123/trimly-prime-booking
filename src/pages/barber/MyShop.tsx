@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { getMyBarberProfile, updateMyShop, deleteMyShop, BarberProfileData } from '@/lib/api';
 import { listShopMedia, uploadShopImage, deleteShopImage } from '@/lib/shopMediaStore';
+import ShopLocationSearch from '@/components/maps/ShopLocationSearch';
 
 export default function MyShop() {
   const [loading, setLoading] = useState(true);
@@ -312,22 +313,21 @@ export default function MyShop() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
+           <div className="space-y-2">
+  <Label htmlFor="location">Location</Label>
 
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-
-                <Input
-                  id="location"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  className="pl-10"
-                  placeholder="Shop address"
-                />
-              </div>
-            </div>
+  <ShopLocationSearch
+    value={formData.location}
+    onPlaceSelect={(data) => {
+      setFormData((prev) => ({
+        ...prev,
+        location: data.address,
+        latitude: data.latitude,
+        longitude: data.longitude,
+      }));
+    }}
+  />
+</div>
 
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
