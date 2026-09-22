@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { getMyBarberProfile, updateMyShop, deleteMyShop, BarberProfileData } from '@/lib/api';
 import { listShopMedia, uploadShopImage, deleteShopImage } from '@/lib/shopMediaStore';
 import ShopLocationSearch from '@/components/maps/ShopLocationSearch';
+import ShopLocationMap from '@/components/maps/ShopLocationMap';
 
 export default function MyShop() {
   const [loading, setLoading] = useState(true);
@@ -327,6 +328,33 @@ export default function MyShop() {
       }));
     }}
   />
+  <div className="space-y-2">
+  <Label htmlFor="location">Location</Label>
+
+  <ShopLocationSearch
+    value={formData.location}
+    onPlaceSelect={(data) => {
+      setFormData((prev) => ({
+        ...prev,
+        location: data.address,
+        latitude: data.latitude,
+        longitude: data.longitude,
+      }));
+    }}
+  />
+
+  <ShopLocationMap
+    latitude={formData.latitude}
+    longitude={formData.longitude}
+    onLocationSelect={(latitude, longitude) => {
+      setFormData((prev) => ({
+        ...prev,
+        latitude,
+        longitude,
+      }));
+    }}
+  />
+</div>
 </div>
 
             <div className="space-y-2">

@@ -171,14 +171,11 @@ function PlaceSearch({
 
   return (
     <div className="w-full space-y-3">
-
-      {/* Google Place Search */}
       <div
         ref={containerRef}
         className="w-full"
       />
 
-      {/* Current Location Button */}
       <Button
         type="button"
         variant="outline"
@@ -199,20 +196,17 @@ function PlaceSearch({
         )}
       </Button>
 
-      {/* Error */}
       {locationError && (
         <p className="text-xs text-red-500">
           {locationError}
         </p>
       )}
 
-      {/* Selected location */}
       {value && (
         <p className="text-xs text-muted-foreground">
           Selected: {value}
         </p>
       )}
-
     </div>
   );
 }
