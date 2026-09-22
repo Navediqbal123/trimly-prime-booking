@@ -28,7 +28,7 @@ export function BarberBottomNav() {
         left-0
         right-0
         bottom-0
-        z-[9999]
+        z-[900]
         w-full
         px-2
         pb-[calc(8px+env(safe-area-inset-bottom))]

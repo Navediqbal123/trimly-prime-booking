@@ -21,7 +21,7 @@ export function BottomNav() {
         left-0
         right-0
         bottom-0
-        z-[9999]
+        z-[900]
         w-full
         px-2
         pb-0
