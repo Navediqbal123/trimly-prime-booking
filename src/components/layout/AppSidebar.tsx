@@ -137,7 +137,7 @@ export function AppSidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
+    className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[1050] lg:hidden"
             onClick={() => setIsOpen(false)}
           />
         )}
@@ -151,7 +151,7 @@ export function AppSidebar() {
         }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         className={cn(
-          'fixed top-0 left-0 h-screen w-72 bg-sidebar border-r border-sidebar-border z-50 shadow-2xl',
+          'fixed top-0 left-0 h-screen w-72 bg-sidebar border-r border-sidebar-border z-[1100] shadow-2xl lg:z-auto',
           'flex flex-col',
           'lg:translate-x-0 lg:static'
         )}
