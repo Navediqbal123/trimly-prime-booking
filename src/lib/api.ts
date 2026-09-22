@@ -303,7 +303,47 @@ export async function getApprovedBarbers(): Promise<ApiResponse<ApprovedBarberDa
   if (!res.success) return { success: false, error: res.error };
   return { success: true, data: asList<ApprovedBarberData>(res.data) };
 }
+export interface NearbyBarberData {
+  id: string;
+  shop_name: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+  distance_km: number;
+}
 
+export async function getNearbyBarbers(
+  latitude: number,
+  longitude: number,
+  radiusKm: number = 10
+): Promise<ApiResponse<NearbyBarberData[]>> {
+  try {
+    const { data, error } = await supabase.rpc('get_nearby_barbers', {
+      p_lat: latitude,
+      p_lng: longitude,
+      p_radius_km: radiusKm,
+    });
+
+    if (error) {
+      console.error('Nearby barbers RPC error:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to find nearby barbers.',
+      };
+    }
+
+    return {
+      success: true,
+      data: (data ?? []) as NearbyBarberData[],
+    };
+  } catch (error) {
+    console.error('Nearby barbers error:', error);
+    return {
+      success: false,
+      error: 'Unable to find nearby barbers.',
+    };
+  }
+}
 
 // ==========================================
 // SERVICES ENDPOINTS
