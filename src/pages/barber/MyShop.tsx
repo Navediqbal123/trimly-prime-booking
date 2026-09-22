@@ -1,16 +1,35 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Store, Save, Loader2, MapPin, Phone, ImagePlus, Trash2, Camera } from 'lucide-react';
+import {
+  Store,
+  Save,
+  Loader2,
+  MapPin,
+  Phone,
+  ImagePlus,
+  Trash2,
+  Camera,
+} from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { getMyBarberProfile, updateMyShop, deleteMyShop, BarberProfileData } from '@/lib/api';
-import { listShopMedia, uploadShopImage, deleteShopImage } from '@/lib/shopMediaStore';
-import ShopLocationSearch from '@/components/maps/ShopLocationSearch';
-import ShopLocationMap from '@/components/maps/ShopLocationMap';
+
+import {
+  getMyBarberProfile,
+  updateMyShop,
+  deleteMyShop,
+  BarberProfileData,
+} from '@/lib/api';
+
+import {
+  listShopMedia,
+  uploadShopImage,
+  deleteShopImage,
+} from '@/lib/shopMediaStore';
 
 export default function MyShop() {
   const [loading, setLoading] = useState(true);
@@ -19,18 +38,17 @@ export default function MyShop() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [profile, setProfile] = useState<BarberProfileData | null>(null);
 
- const [formData, setFormData] = useState({
-  shopName: '',
-  location: '',
-  description: '',
-  phone: '',
-  latitude: null as number | null,
-  longitude: null as number | null,
-});
+  const [formData, setFormData] = useState({
+    shopName: '',
+    location: '',
+    description: '',
+    phone: '',
+  });
 
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
   const MAX_IMAGES = 5;
 
   useEffect(() => {
@@ -39,6 +57,7 @@ export default function MyShop() {
 
   const fetchProfile = async () => {
     setLoading(true);
+
     const res = await getMyBarberProfile();
 
     if (res.success && res.data) {
@@ -49,8 +68,6 @@ export default function MyShop() {
         location: res.data.location || '',
         description: (res.data as any).description || '',
         phone: (res.data as any).phone || '',
-        latitude: res.data.latitude ?? null,
-        longitude: res.data.longitude ?? null,
       });
 
       const media = await listShopMedia(res.data.id);
@@ -62,8 +79,11 @@ export default function MyShop() {
     setLoading(false);
   };
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const files = Array.from(e.target.files || []);
+
     e.target.value = '';
 
     if (!profile) return;
@@ -92,7 +112,10 @@ export default function MyShop() {
 
       toast.success(`${toUpload.length} photo(s) uploaded`);
     } catch (err: any) {
-      toast.error(err?.message || 'Upload failed. Ensure shop-images bucket exists.');
+      toast.error(
+        err?.message ||
+          'Upload failed. Ensure shop-images bucket exists.'
+      );
     } finally {
       setUploading(false);
     }
@@ -103,7 +126,9 @@ export default function MyShop() {
 
     try {
       await deleteShopImage(profile.id, url);
+
       setImages((prev) => prev.filter((u) => u !== url));
+
       toast.success('Photo removed');
     } catch (err: any) {
       toast.error(err?.message || 'Failed to remove');
@@ -114,11 +139,16 @@ export default function MyShop() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setSaving(true);
 
     try {
@@ -127,8 +157,6 @@ export default function MyShop() {
         location: formData.location.trim(),
         description: formData.description.trim(),
         phone: formData.phone.trim(),
-        latitude: formData.latitude,
-        longitude: formData.longitude,
       });
 
       if (res.success) {
@@ -147,7 +175,9 @@ export default function MyShop() {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-        <p className="text-muted-foreground">Loading shop details...</p>
+        <p className="text-muted-foreground">
+          Loading shop details...
+        </p>
       </div>
     );
   }
@@ -156,6 +186,7 @@ export default function MyShop() {
     <div className="page-black animate-fade-in">
       <div className="max-w-2xl mx-auto">
 
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
             My <span className="gradient-text">Shop</span>
@@ -185,13 +216,17 @@ export default function MyShop() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-muted-foreground">Status</p>
+
                     <p className="font-medium capitalize text-green-500">
                       {profile.status}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-muted-foreground">Barber ID</p>
+                    <p className="text-muted-foreground">
+                      Barber ID
+                    </p>
+
                     <p className="font-mono text-xs">
                       {profile.id.slice(0, 12)}...
                     </p>
@@ -224,7 +259,8 @@ export default function MyShop() {
 
               <CardContent>
                 <p className="text-xs text-muted-foreground mb-4">
-                  Upload up to {MAX_IMAGES} photos. They'll appear as an auto-sliding gallery on your shop card.
+                  Upload up to {MAX_IMAGES} photos. They'll appear as
+                  an auto-sliding gallery on your shop card.
                 </p>
 
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
@@ -267,6 +303,7 @@ export default function MyShop() {
                       ) : (
                         <>
                           <ImagePlus className="w-6 h-6" />
+
                           <span className="text-[10px] font-medium">
                             Add photo
                           </span>
@@ -289,6 +326,7 @@ export default function MyShop() {
           </motion.div>
         )}
 
+        {/* Shop Details */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -297,8 +335,11 @@ export default function MyShop() {
         >
           <form onSubmit={handleSubmit} className="space-y-5">
 
+            {/* Shop Name */}
             <div className="space-y-2">
-              <Label htmlFor="shopName">Shop Name</Label>
+              <Label htmlFor="shopName">
+                Shop Name
+              </Label>
 
               <div className="relative">
                 <Store className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -314,51 +355,36 @@ export default function MyShop() {
               </div>
             </div>
 
-           <div className="space-y-2">
-  <Label htmlFor="location">Location</Label>
-
-  <ShopLocationSearch
-    value={formData.location}
-    onPlaceSelect={(data) => {
-      setFormData((prev) => ({
-        ...prev,
-        location: data.address,
-        latitude: data.latitude,
-        longitude: data.longitude,
-      }));
-    }}
-  />
-  <div className="space-y-2">
-  <Label htmlFor="location">Location</Label>
-
-  <ShopLocationSearch
-    value={formData.location}
-    onPlaceSelect={(data) => {
-      setFormData((prev) => ({
-        ...prev,
-        location: data.address,
-        latitude: data.latitude,
-        longitude: data.longitude,
-      }));
-    }}
-  />
-
-  <ShopLocationMap
-    latitude={formData.latitude}
-    longitude={formData.longitude}
-    onLocationSelect={(latitude, longitude) => {
-      setFormData((prev) => ({
-        ...prev,
-        latitude,
-        longitude,
-      }));
-    }}
-  />
-</div>
-</div>
-
+            {/* Location - Display Only */}
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="location">
+                Location
+              </Label>
+
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+
+                <Input
+                  id="location"
+                  name="location"
+                  value={formData.location}
+                  readOnly
+                  disabled
+                  className="pl-10 cursor-not-allowed"
+                  placeholder="Shop location"
+                />
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                Shop location is set during shop creation.
+              </p>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description">
+                Description
+              </Label>
 
               <Textarea
                 id="description"
@@ -370,8 +396,11 @@ export default function MyShop() {
               />
             </div>
 
+            {/* Phone */}
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">
+                Phone
+              </Label>
 
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -387,6 +416,7 @@ export default function MyShop() {
               </div>
             </div>
 
+            {/* Save */}
             <Button
               type="submit"
               className="w-full"
@@ -416,8 +446,8 @@ export default function MyShop() {
           </h2>
 
           <p className="text-sm text-muted-foreground mb-4">
-            Permanently delete your shop and its related data. This action
-            cannot be undone.
+            Permanently delete your shop and its related data. This
+            action cannot be undone.
           </p>
 
           <Button
@@ -454,8 +484,8 @@ export default function MyShop() {
               </h2>
 
               <p className="text-sm text-muted-foreground mb-6">
-                This will permanently delete your shop and its related data.
-                This action cannot be undone.
+                This will permanently delete your shop and its related
+                data. This action cannot be undone.
               </p>
 
               <div className="flex gap-3">
@@ -472,26 +502,30 @@ export default function MyShop() {
                   type="button"
                   variant="destructive"
                   className="flex-1"
-                 onClick={async () => {
-  setDeleting(true);
+                  onClick={async () => {
+                    setDeleting(true);
 
-  try {
-    const result = await deleteMyShop();
+                    try {
+                      const result = await deleteMyShop();
 
-    if (result.error) {
-      toast.error(result.error);
-      return;
-    }
+                      if (result.error) {
+                        toast.error(result.error);
+                        return;
+                      }
 
-    toast.success('Shop permanently deleted.');
-    setShowDeleteConfirm(false);
-    window.location.href = '/dashboard';
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : 'Failed to delete shop');
-  } finally {
-    setDeleting(false);
-  }
-}}
+                      toast.success('Shop permanently deleted.');
+                      setShowDeleteConfirm(false);
+                      window.location.href = '/dashboard';
+                    } catch (error) {
+                      toast.error(
+                        error instanceof Error
+                          ? error.message
+                          : 'Failed to delete shop'
+                      );
+                    } finally {
+                      setDeleting(false);
+                    }
+                  }}
                 >
                   Continue
                 </Button>

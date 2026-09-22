@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import GoogleMapView from '@/components/maps/GoogleMapView';
+
 import { getApprovedBarbers, ApprovedBarberData } from '@/lib/api';
 
 export default function Map() {
@@ -26,7 +26,7 @@ export default function Map() {
         </p>
       </div>
 
-      <GoogleMapView barbers ={barbers} />
+     
     </div>
   );
 }
