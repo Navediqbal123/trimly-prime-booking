@@ -49,4 +49,4 @@ export interface Booking {
   created_at: string;
 }
 
-export const SUPER_ADMIN_EMAIL = 'dibazhar0.9@gmail.com';
+export const SUPER_ADMIN_EMAIL = 'dibazhar09@gmail.com';
