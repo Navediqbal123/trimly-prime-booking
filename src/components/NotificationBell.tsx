@@ -82,7 +82,13 @@ export function NotificationBell({ className }: { className?: string }) {
     setOpen(true);
     const latestItems = await load();
     if (latestItems.some(isUnread)) {
-      setItems((prev) => prev.map((n) => ({ ...n, read: true })));
+     setItems((prev) =>
+  prev.map((n) => ({
+    ...n,
+    read: true,
+    is_read: true,
+  }))
+);
       await markNotificationsRead();
     }
   };

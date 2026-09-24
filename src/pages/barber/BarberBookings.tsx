@@ -116,10 +116,13 @@ function BookingCard({
 
   const StatusIcon = config.icon;
   const isPending = booking.status === 'pending';
+  const isExpired =
+  isPending &&
+  new Date(`${booking.date}T${booking.time_slot}`) <= new Date();
   const isThisActing = !!acting && booking.ids.includes(acting.id);
   const isRejecting = isThisActing && acting?.action === 'rejected';
   const isApproving = isThisActing && acting?.action === 'approved';
-  const disableBoth = isThisActing;
+  const disableBoth = isThisActing || isExpired;
 
   const serviceList = (
     booking.services_list && booking.services_list.length > 0
@@ -152,7 +155,12 @@ function BookingCard({
     <motion.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full min-w-0 overflow-hidden rounded-[28px] border border-[#eeeeee] bg-white p-4 sm:p-5 shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)] transition-all duration-300"
+      className={cn(
+  "w-full min-w-0 overflow-hidden rounded-[28px] border p-4 sm:p-5 transition-all duration-300",
+  isExpired
+    ? "border-gray-300 bg-gray-200 opacity-70 shadow-[5px_6px_12px_rgba(0,0,0,0.10)]"
+    : "border-[#eeeeee] bg-white shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]"
+)}
     >
       {/* Customer + Status */}
       <div className="flex w-full min-w-0 items-center justify-between gap-3">
@@ -200,8 +208,17 @@ function BookingCard({
             config.className
           )}
         >
-          <StatusIcon className="h-4 w-4" />
-          {config.label}
+          {isExpired ? (
+  <>
+    <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+    EXPIRED
+  </>
+) : (
+  <>
+    <StatusIcon className="h-4 w-4" />
+    {config.label}
+  </>
+)}
         </span>
       </div>
 
