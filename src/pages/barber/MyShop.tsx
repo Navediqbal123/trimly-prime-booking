@@ -11,8 +11,6 @@ import {
   Camera,
   Pencil,
   FileText,
-  Map,
-  PhoneCall,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -128,9 +126,7 @@ export default function MyShop() {
 
     try {
       await deleteShopImage(profile.id, url);
-
       setImages((prev) => prev.filter((u) => u !== url));
-
       toast.success('Photo removed');
     } catch (err: any) {
       toast.error(err?.message || 'Failed to remove');
@@ -176,8 +172,8 @@ export default function MyShop() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <Loader2 className="w-8 h-8 animate-spin text-orange-500 mb-4" />
-        <p className="text-gray-500">
+        <Loader2 className="w-7 h-7 animate-spin text-orange-500 mb-3" />
+        <p className="text-gray-500 text-sm">
           Loading shop details...
         </p>
       </div>
@@ -185,83 +181,72 @@ export default function MyShop() {
   }
 
   return (
-    <div className="animate-fade-in max-w-4xl mx-auto px-3 sm:px-4 pb-10">
+    <div className="animate-fade-in w-full max-w-4xl mx-auto px-2 sm:px-4 pb-8">
 
       {/* ================= HEADER ================= */}
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-4xl sm:text-5xl font-display font-bold tracking-tight">
+      <div className="mb-5 sm:mb-7">
+        <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight">
           <span className="text-black">My </span>
           <span className="text-orange-500">Shop</span>
         </h1>
 
-        <p className="text-gray-500 text-base sm:text-lg mt-1">
+        <p className="text-gray-500 text-sm sm:text-base mt-1">
           Manage your shop details and info
         </p>
       </div>
 
-
-      {/* ================= MAIN SHOP FORM ================= */}
-      <form onSubmit={handleSubmit} className="space-y-5">
+      {/* ================= FORM ================= */}
+      <form onSubmit={handleSubmit} className="space-y-4">
 
         {/* ================= SHOP NAME ================= */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="
-            relative overflow-hidden
-            min-h-[155px]
-            rounded-[28px]
+            w-full
+            h-[140px]
+            rounded-[24px]
             bg-white
             border border-orange-100
-            shadow-[0_10px_30px_rgba(0,0,0,0.09)]
-            p-5 sm:p-6
+            shadow-[0_7px_22px_rgba(0,0,0,0.07)]
+            p-4 sm:p-5
+            flex items-center
           "
         >
-          {/* Decorative shop */}
-          <div className="
-            absolute right-5 bottom-4
-            w-20 h-20
-            rounded-[22px]
-            bg-orange-50
-            flex items-center justify-center
-            opacity-90
-          ">
-            <Store className="w-12 h-12 text-orange-400" />
-          </div>
+          <div className="flex items-center gap-3 sm:gap-4 w-full">
 
-          <div className="relative flex items-center gap-4">
-
-            {/* Left icon box */}
             <div className="
               shrink-0
-              w-16 h-16
-              rounded-[22px]
+              w-12 h-12 sm:w-14 sm:h-14
+              rounded-[18px]
               bg-orange-50
               border border-orange-100
               flex items-center justify-center
-              shadow-[0_5px_15px_rgba(249,115,22,0.12)]
             ">
-              <Store className="w-8 h-8 text-orange-500" />
+              <Store className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500" />
             </div>
 
-            <div className="flex-1 min-w-0 pr-8 sm:pr-20">
-
+            <div className="min-w-0 flex-1">
               <label
                 htmlFor="shopName"
-                className="block text-lg sm:text-xl font-bold text-gray-900 mb-3"
+                className="
+                  block
+                  text-base sm:text-lg
+                  font-bold
+                  text-gray-900
+                  mb-2
+                "
               >
                 Shop Name
               </label>
 
               <div className="
                 relative
-                flex items-center
-                rounded-2xl
+                h-11 sm:h-12
+                rounded-xl
                 border-2 border-orange-100
-                bg-orange-50/30
-                px-4
-                focus-within:border-orange-300
-                transition-all
+                bg-orange-50/20
+                flex items-center
               ">
                 <Input
                   id="shopName"
@@ -270,98 +255,81 @@ export default function MyShop() {
                   onChange={handleChange}
                   placeholder="Your shop name"
                   className="
+                    h-full
                     border-0
                     bg-transparent
                     shadow-none
                     focus-visible:ring-0
-                    px-0
-                    pr-8
-                    h-12
-                    text-base sm:text-lg
+                    px-3
+                    pr-10
+                    text-sm sm:text-base
                     text-gray-700
                   "
                 />
 
                 <Pencil className="
-                  absolute right-4
-                  w-5 h-5
+                  absolute
+                  right-3
+                  w-4 h-4
                   text-gray-400
                 " />
               </div>
-
             </div>
+
           </div>
         </motion.div>
 
 
         {/* ================= LOCATION ================= */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className="
-            relative overflow-hidden
-            min-h-[155px]
-            rounded-[28px]
+            w-full
+            h-[140px]
+            rounded-[24px]
             bg-white
             border border-green-100
-            shadow-[0_10px_30px_rgba(0,0,0,0.09)]
-            p-5 sm:p-6
+            shadow-[0_7px_22px_rgba(0,0,0,0.07)]
+            p-4 sm:p-5
+            flex items-center
           "
         >
-          {/* Map graphic */}
-          <div className="
-            absolute right-4 bottom-2
-            w-28 h-24
-            rounded-[28px]
-            bg-green-50
-            flex items-center justify-center
-          ">
-            <Map className="w-14 h-14 text-green-300" />
+          <div className="flex items-center gap-3 sm:gap-4 w-full">
 
-            <div className="
-              absolute
-              top-3 right-6
-              w-9 h-9
-              rounded-full
-              bg-orange-400
-              flex items-center justify-center
-              shadow-[0_5px_12px_rgba(249,115,22,0.35)]
-            ">
-              <MapPin className="w-5 h-5 text-white" />
-            </div>
-          </div>
-
-          <div className="relative flex items-center gap-4">
-
-            {/* Left icon */}
             <div className="
               shrink-0
-              w-16 h-16
-              rounded-[22px]
+              w-12 h-12 sm:w-14 sm:h-14
+              rounded-[18px]
               bg-green-50
               border border-green-100
               flex items-center justify-center
             ">
-              <MapPin className="w-9 h-9 text-green-500" />
+              <MapPin className="w-6 h-6 sm:w-7 sm:h-7 text-green-500" />
             </div>
 
-            <div className="flex-1 min-w-0 pr-10 sm:pr-28">
-
+            <div className="min-w-0 flex-1">
               <label
                 htmlFor="location"
-                className="block text-lg sm:text-xl font-bold text-gray-900 mb-3"
+                className="
+                  block
+                  text-base sm:text-lg
+                  font-bold
+                  text-gray-900
+                  mb-2
+                "
               >
                 Location
               </label>
 
               <div className="
                 relative
-                flex items-center
-                rounded-2xl
+                h-11 sm:h-12
+                rounded-xl
                 border-2 border-green-100
-                bg-green-50/30
-                px-4
+                bg-green-50/20
+                flex items-center
               ">
                 <Input
                   id="location"
@@ -371,97 +339,90 @@ export default function MyShop() {
                   disabled
                   placeholder="Shop location"
                   className="
+                    h-full
                     border-0
                     bg-transparent
                     shadow-none
                     focus-visible:ring-0
-                    px-0
-                    pr-8
-                    h-12
-                    text-base sm:text-lg
+                    px-3
+                    pr-10
+                    text-sm sm:text-base
                     text-gray-500
                     disabled:opacity-100
                   "
                 />
 
                 <MapPin className="
-                  absolute right-4
-                  w-5 h-5
+                  absolute
+                  right-3
+                  w-4 h-4
                   text-gray-400
                 " />
               </div>
 
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="
+                text-xs sm:text-sm
+                text-gray-500
+                mt-1.5
+                truncate
+              ">
                 Shop location is set during shop creation.
               </p>
-
             </div>
+
           </div>
         </motion.div>
 
 
         {/* ================= DESCRIPTION ================= */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="
-            relative overflow-hidden
-            min-h-[190px]
-            rounded-[28px]
+            w-full
+            h-[140px]
+            rounded-[24px]
             bg-white
             border border-blue-100
-            shadow-[0_10px_30px_rgba(0,0,0,0.09)]
-            p-5 sm:p-6
+            shadow-[0_7px_22px_rgba(0,0,0,0.07)]
+            p-4 sm:p-5
+            flex items-center
           "
         >
-          {/* Decorative document */}
-          <div className="
-            absolute right-4 top-8
-            w-24 h-28
-            rounded-[22px]
-            bg-blue-50
-            flex items-center justify-center
-            opacity-90
-          ">
-            <FileText className="w-14 h-14 text-blue-400" />
+          <div className="flex items-center gap-3 sm:gap-4 w-full">
 
-            <Pencil className="
-              absolute
-              bottom-4 right-1
-              w-8 h-8
-              text-orange-500
-            " />
-          </div>
-
-          <div className="relative flex gap-4">
-
-            {/* Left icon */}
             <div className="
               shrink-0
-              w-16 h-16
-              rounded-[22px]
+              w-12 h-12 sm:w-14 sm:h-14
+              rounded-[18px]
               bg-blue-50
               border border-blue-100
               flex items-center justify-center
             ">
-              <FileText className="w-8 h-8 text-blue-500" />
+              <FileText className="w-6 h-6 sm:w-7 sm:h-7 text-blue-500" />
             </div>
 
-            <div className="flex-1 min-w-0 pr-8 sm:pr-20">
-
+            <div className="min-w-0 flex-1">
               <label
                 htmlFor="description"
-                className="block text-lg sm:text-xl font-bold text-gray-900 mb-3"
+                className="
+                  block
+                  text-base sm:text-lg
+                  font-bold
+                  text-gray-900
+                  mb-2
+                "
               >
                 Description
               </label>
 
               <div className="
                 relative
-                rounded-2xl
+                h-[76px]
+                rounded-xl
                 border-2 border-blue-100
-                bg-blue-50/30
+                bg-blue-50/20
                 overflow-hidden
               ">
                 <Textarea
@@ -471,91 +432,86 @@ export default function MyShop() {
                   onChange={handleChange}
                   placeholder="Tell customers about your shop..."
                   className="
-                    min-h-[105px]
+                    w-full
+                    h-full
                     resize-none
                     border-0
                     bg-transparent
                     shadow-none
                     focus-visible:ring-0
-                    text-base sm:text-lg
+                    px-3
+                    py-2.5
+                    pr-9
+                    text-sm sm:text-base
                     text-gray-600
-                    p-4
                   "
                 />
 
                 <Pencil className="
                   absolute
-                  bottom-3 right-3
-                  w-5 h-5
+                  right-3
+                  bottom-3
+                  w-4 h-4
                   text-gray-400
+                  pointer-events-none
                 " />
               </div>
-
             </div>
+
           </div>
         </motion.div>
 
 
         {/* ================= PHONE ================= */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
           className="
-            relative overflow-hidden
-            min-h-[155px]
-            rounded-[28px]
+            w-full
+            h-[140px]
+            rounded-[24px]
             bg-white
             border border-purple-100
-            shadow-[0_10px_30px_rgba(0,0,0,0.09)]
-            p-5 sm:p-6
+            shadow-[0_7px_22px_rgba(0,0,0,0.07)]
+            p-4 sm:p-5
+            flex items-center
           "
         >
-          {/* Decorative phone */}
-          <div className="
-            absolute right-5 bottom-3
-            w-24 h-24
-            rounded-[28px]
-            bg-purple-50
-            flex items-center justify-center
-          ">
-            <PhoneCall className="
-              w-14 h-14
-              text-purple-400
-              rotate-[-15deg]
-            " />
-          </div>
+          <div className="flex items-center gap-3 sm:gap-4 w-full">
 
-          <div className="relative flex items-center gap-4">
-
-            {/* Left icon */}
             <div className="
               shrink-0
-              w-16 h-16
-              rounded-[22px]
+              w-12 h-12 sm:w-14 sm:h-14
+              rounded-[18px]
               bg-purple-50
               border border-purple-100
               flex items-center justify-center
             ">
-              <Phone className="w-8 h-8 text-purple-500" />
+              <Phone className="w-6 h-6 sm:w-7 sm:h-7 text-purple-500" />
             </div>
 
-            <div className="flex-1 min-w-0 pr-8 sm:pr-24">
-
+            <div className="min-w-0 flex-1">
               <label
                 htmlFor="phone"
-                className="block text-lg sm:text-xl font-bold text-gray-900 mb-3"
+                className="
+                  block
+                  text-base sm:text-lg
+                  font-bold
+                  text-gray-900
+                  mb-2
+                "
               >
                 Phone
               </label>
 
               <div className="
                 relative
-                flex items-center
-                rounded-2xl
+                h-11 sm:h-12
+                rounded-xl
                 border-2 border-purple-100
-                bg-purple-50/30
-                px-4
+                bg-purple-50/20
+                flex items-center
               ">
                 <Input
                   id="phone"
@@ -564,54 +520,55 @@ export default function MyShop() {
                   onChange={handleChange}
                   placeholder="+91 XXXXX XXXXX"
                   className="
+                    h-full
                     border-0
                     bg-transparent
                     shadow-none
                     focus-visible:ring-0
-                    px-0
-                    pr-8
-                    h-12
-                    text-base sm:text-lg
+                    px-3
+                    pr-10
+                    text-sm sm:text-base
                     text-gray-700
                   "
                 />
 
                 <Pencil className="
-                  absolute right-4
-                  w-5 h-5
+                  absolute
+                  right-3
+                  w-4 h-4
                   text-gray-400
                 " />
               </div>
-
             </div>
+
           </div>
         </motion.div>
 
 
-        {/* ================= SAVE ================= */}
+        {/* ================= SAVE BUTTON ================= */}
         <motion.button
           whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={saving}
           className="
             w-full
-            h-16
-            rounded-[28px]
+            h-12 sm:h-13
+            rounded-full
             bg-orange-500
             hover:bg-orange-600
             text-white
-            font-bold
-            text-lg sm:text-xl
-            flex items-center justify-center gap-3
-            shadow-[0_12px_28px_rgba(249,115,22,0.35)]
+            font-semibold
+            text-base sm:text-lg
+            flex items-center justify-center gap-2.5
+            shadow-[0_8px_20px_rgba(249,115,22,0.28)]
             transition-all
             disabled:opacity-60
           "
         >
           {saving ? (
-            <Loader2 className="w-6 h-6 animate-spin" />
+            <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
-            <Save className="w-6 h-6" />
+            <Save className="w-5 h-5" />
           )}
 
           Save Changes
@@ -623,31 +580,20 @@ export default function MyShop() {
       {/* ================= SHOP STATUS ================= */}
       {profile && (
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="
-            mt-8
-            rounded-[28px]
+            mt-7
+            rounded-[24px]
             bg-white
             border border-gray-100
-            shadow-[0_10px_30px_rgba(0,0,0,0.08)]
-            p-6
+            shadow-[0_7px_22px_rgba(0,0,0,0.07)]
+            p-5
           "
         >
-          <div className="flex items-center gap-3 mb-5">
-            <div className="
-              w-12 h-12
-              rounded-2xl
-              bg-orange-50
-              flex items-center justify-center
-            ">
-              <Store className="w-6 h-6 text-orange-500" />
-            </div>
-
-            <h2 className="text-xl font-bold text-gray-900">
-              Shop Status
-            </h2>
-          </div>
+          <h2 className="text-lg font-bold text-gray-900 mb-4">
+            Shop Status
+          </h2>
 
           <div className="grid grid-cols-2 gap-4 text-sm">
 
@@ -679,44 +625,39 @@ export default function MyShop() {
       {/* ================= SHOP PHOTOS ================= */}
       {profile && (
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="
-            mt-5
-            rounded-[28px]
+            mt-4
+            rounded-[24px]
             bg-white
             border border-gray-100
-            shadow-[0_10px_30px_rgba(0,0,0,0.08)]
-            p-6
+            shadow-[0_7px_22px_rgba(0,0,0,0.07)]
+            p-5
           "
         >
-          <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-3 mb-4">
 
             <div className="
-              w-12 h-12
+              w-11 h-11
               rounded-2xl
               bg-blue-50
               flex items-center justify-center
             ">
-              <Camera className="w-6 h-6 text-blue-500" />
+              <Camera className="w-5 h-5 text-blue-500" />
             </div>
 
-            <h2 className="text-xl font-bold text-gray-900">
+            <h2 className="text-lg font-bold text-gray-900">
               Shop Photos
             </h2>
 
-            <span className="
-              ml-auto
-              text-xs
-              font-medium
-              text-gray-500
-            ">
+            <span className="ml-auto text-xs text-gray-500">
               {images.length}/{MAX_IMAGES}
             </span>
 
           </div>
 
-          <p className="text-sm text-gray-500 mb-5">
+          <p className="text-sm text-gray-500 mb-4">
             Upload up to {MAX_IMAGES} photos. They'll appear as
             an auto-sliding gallery on your shop card.
           </p>
@@ -781,8 +722,7 @@ export default function MyShop() {
                   border-gray-200
                   hover:border-orange-400
                   flex flex-col
-                  items-center
-                  justify-center
+                  items-center justify-center
                   gap-1
                   text-gray-400
                   hover:text-orange-500
@@ -817,24 +757,24 @@ export default function MyShop() {
       )}
 
 
-      {/* ================= DANGER ZONE ================= */}
+      {/* ================= DELETE SHOP ================= */}
       <motion.div
-        initial={{ opacity: 0, y: 15 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className="
-          mt-5
-          rounded-[28px]
+          mt-4
+          rounded-[24px]
           border border-red-100
           bg-white
-          shadow-[0_10px_30px_rgba(0,0,0,0.07)]
-          p-6
+          shadow-[0_7px_22px_rgba(0,0,0,0.06)]
+          p-5
         "
       >
         <h2 className="text-lg font-bold text-red-500 mb-2">
           Delete Shop Permanently
         </h2>
 
-        <p className="text-sm text-gray-500 mb-5">
+        <p className="text-sm text-gray-500 mb-4">
           Permanently delete your shop and its related data.
           This action cannot be undone.
         </p>
@@ -842,7 +782,7 @@ export default function MyShop() {
         <Button
           type="button"
           variant="destructive"
-          className="w-full rounded-2xl h-12"
+          className="w-full rounded-2xl h-11"
           disabled={deleting}
           onClick={() => setShowDeleteConfirm(true)}
         >
@@ -872,7 +812,7 @@ export default function MyShop() {
               exit={{ opacity: 0, scale: 0.95 }}
               className="
                 w-full max-w-md
-                rounded-[28px]
+                rounded-[24px]
                 bg-white
                 p-6
                 shadow-2xl
