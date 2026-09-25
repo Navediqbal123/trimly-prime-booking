@@ -670,21 +670,20 @@ export default function BarberBookings() {
       staleTime: 60_000,
     });
 
-  const nameFor = (b: BookingData) => {
-    const uid =
-      b.user_id || b.customer_id;
+ const nameFor = (b: BookingData) => {
+  const uid =
+    b.user_id || b.customer_id;
 
-    return (
-      b.user?.full_name ||
-      b.user?.name ||
-      (uid
-        ? profileMap[uid]?.name
-        : '') ||
-      b.user?.email ||
-      ''
-    );
-  };
-
+  return (
+    b.user?.full_name ||
+    b.user?.name ||
+    (uid
+      ? profileMap[uid]?.name
+      : '') ||
+    b.user?.email ||
+    ''
+  );
+};
   const avatarFor = (b: BookingData) => {
     const uid =
       b.user_id || b.customer_id;
