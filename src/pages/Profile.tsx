@@ -16,7 +16,6 @@ import { toast } from 'sonner';
 
 export default function Profile() {
   const { user } = useAuth();
-
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [initializing, setInitializing] = useState(true);
@@ -156,7 +155,7 @@ export default function Profile() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
 
         {/* ================= TOP PROFILE CARD ================= */}
         <motion.div
@@ -191,6 +190,7 @@ export default function Profile() {
                 "
               >
                 <div className="w-full h-full rounded-full overflow-hidden bg-orange-50 flex items-center justify-center">
+
                   {formData.avatar_url ? (
                     <img
                       src={formData.avatar_url}
@@ -200,6 +200,7 @@ export default function Profile() {
                   ) : (
                     <User className="w-14 h-14 text-orange-400" />
                   )}
+
                 </div>
               </div>
 
@@ -263,6 +264,7 @@ export default function Profile() {
                 "
               >
                 <User className="w-5 h-5" />
+
                 <span className="capitalize">
                   {user?.role?.replace('_', ' ') || 'User'}
                 </span>
@@ -279,34 +281,47 @@ export default function Profile() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className="
-            rounded-[28px]
+            rounded-[22px]
             bg-white
             border border-green-100
-            shadow-[0_10px_30px_rgba(0,0,0,0.09)]
-            p-5 sm:p-7
+            shadow-[0_8px_22px_rgba(0,0,0,0.07)]
+            px-3.5 py-3
+            sm:px-4 sm:py-3.5
           "
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
 
-            {/* Green Icon */}
+            {/* Small Clay Icon */}
             <div
               className="
                 shrink-0
-                w-16 h-16
-                rounded-[22px]
-                bg-green-50
+                w-12 h-12
+                rounded-[16px]
+                bg-gradient-to-br from-green-50 to-green-100/70
                 border border-green-100
                 flex items-center justify-center
-                shadow-[inset_0_2px_8px_rgba(255,255,255,0.8)]
+                shadow-[
+                  inset_2px_2px_6px_rgba(255,255,255,0.95),
+                  inset_-2px_-2px_6px_rgba(34,197,94,0.08),
+                  3px_3px_8px_rgba(34,197,94,0.08)
+                ]
               "
             >
-              <User className="w-8 h-8 text-green-500" />
+              <User className="w-5 h-5 text-green-500" />
             </div>
 
             <div className="flex-1 min-w-0">
+
               <label
                 htmlFor="full_name"
-                className="block text-lg sm:text-xl font-bold text-gray-900 mb-2"
+                className="
+                  block
+                  text-base
+                  sm:text-[17px]
+                  font-bold
+                  text-gray-900
+                  mb-1.5
+                "
               >
                 Full Name
               </label>
@@ -315,10 +330,13 @@ export default function Profile() {
                 className="
                   relative
                   flex items-center
-                  rounded-2xl
-                  border-2 border-green-100
-                  bg-green-50/30
-                  px-4
+                  min-h-[42px]
+                  rounded-xl
+                  border
+                  border-green-100
+                  bg-green-50/20
+                  px-3
+                  shadow-[inset_1px_1px_4px_rgba(255,255,255,0.8)]
                   focus-within:border-green-300
                   transition-colors
                 "
@@ -334,18 +352,19 @@ export default function Profile() {
                     bg-transparent
                     border-none
                     outline-none
-                    py-3
-                    pr-10
-                    text-base sm:text-lg
+                    py-1.5
+                    pr-8
+                    text-sm
+                    sm:text-[15px]
                     font-medium
                     text-gray-900
                   "
                 />
 
-                <Pencil className="absolute right-4 w-5 h-5 text-gray-400" />
+                <Pencil className="absolute right-3 w-4 h-4 text-gray-400" />
               </div>
-            </div>
 
+            </div>
           </div>
         </motion.div>
 
@@ -356,34 +375,47 @@ export default function Profile() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="
-            rounded-[28px]
+            rounded-[22px]
             bg-white
             border border-blue-100
-            shadow-[0_10px_30px_rgba(0,0,0,0.09)]
-            p-5 sm:p-7
+            shadow-[0_8px_22px_rgba(0,0,0,0.07)]
+            px-3.5 py-3
+            sm:px-4 sm:py-3.5
           "
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
 
-            {/* Blue Icon */}
+            {/* Small Clay Icon */}
             <div
               className="
                 shrink-0
-                w-16 h-16
-                rounded-[22px]
-                bg-blue-50
+                w-12 h-12
+                rounded-[16px]
+                bg-gradient-to-br from-blue-50 to-blue-100/70
                 border border-blue-100
                 flex items-center justify-center
+                shadow-[
+                  inset_2px_2px_6px_rgba(255,255,255,0.95),
+                  inset_-2px_-2px_6px_rgba(59,130,246,0.08),
+                  3px_3px_8px_rgba(59,130,246,0.08)
+                ]
               "
             >
-              <Mail className="w-8 h-8 text-blue-500" />
+              <Mail className="w-5 h-5 text-blue-500" />
             </div>
 
             <div className="flex-1 min-w-0">
 
               <label
                 htmlFor="email"
-                className="block text-lg sm:text-xl font-bold text-gray-900 mb-2"
+                className="
+                  block
+                  text-base
+                  sm:text-[17px]
+                  font-bold
+                  text-gray-900
+                  mb-1.5
+                "
               >
                 Email
               </label>
@@ -392,10 +424,13 @@ export default function Profile() {
                 className="
                   relative
                   flex items-center
-                  rounded-2xl
-                  border-2 border-blue-100
-                  bg-blue-50/30
-                  px-4
+                  min-h-[42px]
+                  rounded-xl
+                  border
+                  border-blue-100
+                  bg-blue-50/20
+                  px-3
+                  shadow-[inset_1px_1px_4px_rgba(255,255,255,0.8)]
                 "
               >
                 <input
@@ -407,23 +442,23 @@ export default function Profile() {
                     bg-transparent
                     border-none
                     outline-none
-                    py-3
-                    pr-10
-                    text-base sm:text-lg
+                    py-1.5
+                    pr-8
+                    text-sm
+                    sm:text-[15px]
                     text-gray-500
                     disabled:opacity-100
                   "
                 />
 
-                <Lock className="absolute right-4 w-5 h-5 text-gray-400" />
+                <Lock className="absolute right-3 w-4 h-4 text-gray-400" />
               </div>
 
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 mt-1">
                 Email cannot be changed
               </p>
 
             </div>
-
           </div>
         </motion.div>
 
@@ -434,34 +469,47 @@ export default function Profile() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
           className="
-            rounded-[28px]
+            rounded-[22px]
             bg-white
             border border-orange-100
-            shadow-[0_10px_30px_rgba(0,0,0,0.09)]
-            p-5 sm:p-7
+            shadow-[0_8px_22px_rgba(0,0,0,0.07)]
+            px-3.5 py-3
+            sm:px-4 sm:py-3.5
           "
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
 
-            {/* Orange Icon */}
+            {/* Small Clay Icon */}
             <div
               className="
                 shrink-0
-                w-16 h-16
-                rounded-[22px]
-                bg-orange-50
+                w-12 h-12
+                rounded-[16px]
+                bg-gradient-to-br from-orange-50 to-orange-100/70
                 border border-orange-100
                 flex items-center justify-center
+                shadow-[
+                  inset_2px_2px_6px_rgba(255,255,255,0.95),
+                  inset_-2px_-2px_6px_rgba(249,115,22,0.08),
+                  3px_3px_8px_rgba(249,115,22,0.08)
+                ]
               "
             >
-              <Phone className="w-8 h-8 text-orange-500" />
+              <Phone className="w-5 h-5 text-orange-500" />
             </div>
 
             <div className="flex-1 min-w-0">
 
               <label
                 htmlFor="phone"
-                className="block text-lg sm:text-xl font-bold text-gray-900 mb-2"
+                className="
+                  block
+                  text-base
+                  sm:text-[17px]
+                  font-bold
+                  text-gray-900
+                  mb-1.5
+                "
               >
                 Phone Number
               </label>
@@ -470,10 +518,13 @@ export default function Profile() {
                 className="
                   relative
                   flex items-center
-                  rounded-2xl
-                  border-2 border-orange-100
-                  bg-orange-50/30
-                  px-4
+                  min-h-[42px]
+                  rounded-xl
+                  border
+                  border-orange-100
+                  bg-orange-50/20
+                  px-3
+                  shadow-[inset_1px_1px_4px_rgba(255,255,255,0.8)]
                   focus-within:border-orange-300
                   transition-colors
                 "
@@ -489,48 +540,51 @@ export default function Profile() {
                     bg-transparent
                     border-none
                     outline-none
-                    py-3
-                    pr-10
-                    text-base sm:text-lg
+                    py-1.5
+                    pr-8
+                    text-sm
+                    sm:text-[15px]
                     font-medium
                     text-gray-900
                   "
                 />
 
-                <Pencil className="absolute right-4 w-5 h-5 text-gray-400" />
+                <Pencil className="absolute right-3 w-4 h-4 text-gray-400" />
               </div>
 
             </div>
-
           </div>
         </motion.div>
 
 
-        {/* ================= SAVE BUTTON ================= */}
+        {/* ================= SLIM SAVE BUTTON ================= */}
         <motion.button
           whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={loading || initializing}
           className="
             w-full
-            h-16
-            rounded-[24px]
+            h-12
+            sm:h-[50px]
+            rounded-full
             bg-orange-500
             hover:bg-orange-600
             text-white
             font-bold
-            text-lg sm:text-xl
-            flex items-center justify-center gap-3
-            shadow-[0_10px_25px_rgba(249,115,22,0.35)]
+            text-base
+            sm:text-lg
+            flex items-center justify-center
+            gap-2.5
+            shadow-[0_8px_20px_rgba(249,115,22,0.28)]
             transition-all
             disabled:opacity-60
             disabled:cursor-not-allowed
           "
         >
           {loading ? (
-            <Loader2 className="w-6 h-6 animate-spin" />
+            <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
-            <Save className="w-6 h-6" />
+            <Save className="w-5 h-5" />
           )}
 
           Save Changes
