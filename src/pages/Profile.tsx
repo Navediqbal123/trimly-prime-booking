@@ -80,7 +80,7 @@ export default function Profile() {
     const { error: upErr } = await supabase.storage
       .from('avatar')
       .upload(path, file, {
-        upsert: true,
+        upsert: false,
         contentType: file.type,
       });
 
@@ -543,9 +543,9 @@ export default function Profile() {
                     py-1.5
                     pr-8
                     text-sm
-                    sm:text-[15px]
-                    font-medium
-                    text-gray-900
+                     sm:text-[15px]
+                     font-medium
+                     text-gray-900
                   "
                 />
 
@@ -556,38 +556,39 @@ export default function Profile() {
           </div>
         </motion.div>
 
-
-        {/* ================= SLIM SAVE BUTTON ================= */}
+        {/* ================= SAVE BUTTON ================= */}
         <motion.button
-          whileTap={{ scale: 0.98 }}
           type="submit"
-          disabled={loading || initializing}
+          disabled={loading || uploading || initializing}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
           className="
             w-full
-            h-12
-            sm:h-[50px]
-            rounded-full
+            rounded-[18px]
             bg-orange-500
-            hover:bg-orange-600
             text-white
-            font-bold
+            font-semibold
+            py-3
             text-base
-            sm:text-lg
-            flex items-center justify-center
-            gap-2.5
-            shadow-[0_8px_20px_rgba(249,115,22,0.28)]
-            transition-all
+            flex items-center justify-center gap-2
+            shadow-[0_8px_18px_rgba(249,115,22,0.25)]
+            hover:bg-orange-600
+            transition-colors
             disabled:opacity-60
-            disabled:cursor-not-allowed
           "
         >
           {loading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Saving...
+            </>
           ) : (
-            <Save className="w-5 h-5" />
+            <>
+              <Save className="w-5 h-5" />
+              Save Changes
+            </>
           )}
-
-          Save Changes
         </motion.button>
 
       </form>
