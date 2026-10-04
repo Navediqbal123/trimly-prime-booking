@@ -60,9 +60,10 @@ function asList<T>(payload: unknown): T[] {
   if (Array.isArray(payload)) return payload as T[];
   if (payload && typeof payload === 'object') {
     const obj = payload as Record<string, unknown>;
-    for (const key of ['data', 'services', 'barbers', 'results', 'items', 'rows']) {
+    for (const key of ['data', 'services', 'barbers', 'results', 'items', 'rows', 'liked_shops', 'likes', 'shops']) {
       if (Array.isArray(obj[key])) return obj[key] as T[];
     }
+    if (obj.data && typeof obj.data === 'object') return asList<T>(obj.data);
   }
   return [];
 }
@@ -303,6 +304,60 @@ export async function getApprovedBarbers(): Promise<ApiResponse<ApprovedBarberDa
   if (!res.success) return { success: false, error: res.error };
   return { success: true, data: asList<ApprovedBarberData>(res.data) };
 }
+
+export interface LikedShopData extends Partial<ApprovedBarberData> {
+  id: string;
+  shop_id?: string;
+  barber_id?: string;
+}
+
+function normalizeLikedShop(raw: unknown): LikedShopData | null {
+  if (typeof raw === 'string') {
+    return { id: raw, shop_id: raw, barber_id: raw };
+  }
+  if (!raw || typeof raw !== 'object') return null;
+
+  const row = raw as Record<string, any>;
+  const embeddedShop = row.shop ?? row.barber ?? row.shop_details ?? row.barber_details ?? row;
+  const shop = embeddedShop && typeof embeddedShop === 'object'
+    ? embeddedShop as Record<string, any>
+    : {};
+  const id = row.shop_id ?? row.barber_id ?? row.shopId ?? row.barberId ?? shop.id ?? row.id;
+  if (id === undefined || id === null || String(id).length === 0) return null;
+
+  return {
+    ...shop,
+    id: String(id),
+    shop_id: String(id),
+    barber_id: String(id),
+    shop_name: shop.shop_name ?? shop.name,
+    location: shop.location ?? shop.address,
+  };
+}
+
+export async function getLikedShops(customerId: string): Promise<ApiResponse<LikedShopData[]>> {
+  const res = await apiCall<unknown>(`/api/liked-shops/${encodeURIComponent(customerId)}`, { method: 'GET' });
+  if (!res.success) return { success: false, error: res.error };
+  const likes = asList<unknown>(res.data)
+    .map(normalizeLikedShop)
+    .filter((shop): shop is LikedShopData => shop !== null);
+  return { success: true, data: likes };
+}
+
+export async function likeShop(customerId: string, shopId: string): Promise<ApiResponse> {
+  return apiCall('/api/liked-shops/like', {
+    method: 'POST',
+    body: JSON.stringify({ customer_id: customerId, shop_id: shopId, barber_id: shopId }),
+  });
+}
+
+export async function unlikeShop(customerId: string, shopId: string): Promise<ApiResponse> {
+  return apiCall('/api/liked-shops/unlike', {
+    method: 'DELETE',
+    body: JSON.stringify({ customer_id: customerId, shop_id: shopId, barber_id: shopId }),
+  });
+}
+
 export interface NearbyBarberData {
   id: string;
   shop_name: string;
