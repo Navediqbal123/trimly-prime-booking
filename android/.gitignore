@@ -99,3 +99,16 @@ app/src/main/assets/public
 app/src/main/assets/capacitor.config.json
 app/src/main/assets/capacitor.plugins.json
 app/src/main/res/xml/config.xml
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# Build/dependency files
+dist/
+node_modules/
+
+# Android signing files
+*.jks
+*.keystore
+*.pem
