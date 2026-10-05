@@ -17,6 +17,7 @@ import {
   ChevronDown,
   Clock,
   Mail,
+  Heart,
 } from 'lucide-react';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
@@ -35,6 +36,7 @@ const baseUserNavItems: NavItemType[] = [
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { title: 'Discover Barbers', href: '/discover', icon: Search },
   { title: 'My Bookings', href: '/bookings', icon: Calendar },
+  { title: 'Liked Shops ❤️', href: '/liked-shops', icon: Heart },
   { title: 'My Profile', href: '/profile', icon: User },
 ];
 

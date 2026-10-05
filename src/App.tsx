@@ -14,6 +14,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import DiscoverBarbers from "./pages/DiscoverBarbers";
 import MyBookings from "./pages/MyBookings";
+import LikedShops from "./pages/LikedShops";
 import Profile from "./pages/Profile";
 import Map from "./pages/Map";
 import BecomeBarber from "./pages/BecomeBarber";
@@ -66,6 +67,7 @@ function AppRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/discover" element={<DiscoverBarbers />} />
         <Route path="/bookings" element={<MyBookings />} />
+        <Route path="/liked-shops" element={<LikedShops />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/map" element={<Map />} />
         <Route path="/become-barber" element={<BecomeBarber />} />

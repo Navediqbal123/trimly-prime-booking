@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -8,19 +8,15 @@ import {
   ArrowRight,
   Search,
   SlidersHorizontal,
-  MapPin,
-  Star,
   Sparkles,
-  Heart,
-  MessageCircle,
 } from 'lucide-react';
-import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { getApprovedBarbers } from '@/lib/api';
 import { shopImage } from '@/lib/shopMedia';
 import { supabase } from '@/lib/supabase';
 import { listAllShopMedia } from '@/lib/shopMediaStore';
-import { ShopImageCarousel } from '@/components/ShopImageCarousel';
+import { ShopCard } from '@/components/ShopCard';
+import { useLikedShops } from '@/hooks/useLikedShops';
 interface Barber {
   id: string;
   shop_name: string;
@@ -73,14 +69,11 @@ const adBanners = [
 ];
 
 export default function Dashboard() {
-  const { user } = useProtectedUser();
   const navigate = useNavigate();
-
-  const displayedImages = useRef<Record<string, string>>({});
+  const { likedShopIds, toggleLike, pendingShopIds } = useLikedShops();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeBanner, setActiveBanner] = useState(0);
-  const [likedShops, setLikedShops] = useState<Set<string>>(new Set());
 
   const { data: shops, isLoading } = useQuery({
     queryKey: ['approvedBarbersHome'],
@@ -173,25 +166,6 @@ export default function Dashboard() {
     document
       .getElementById('featured-shops')
       ?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const toggleLike = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    shopId: string
-  ) => {
-    event.stopPropagation();
-
-    setLikedShops((current) => {
-      const next = new Set(current);
-
-      if (next.has(shopId)) {
-        next.delete(shopId);
-      } else {
-        next.add(shopId);
-      }
-
-      return next;
-    });
   };
 
   return (
@@ -492,247 +466,19 @@ export default function Dashboard() {
                   ? uploaded
                   : [shopImage(b.id)];
 
-              const isLiked = likedShops.has(b.id);
-
               return (
-                <motion.div
+                <ShopCard
                   key={b.id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: i * 0.04,
-                    duration: 0.3,
-                    ease: 'easeOut',
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() =>
-                    openShop(
-                      b.id,
-                      displayedImages.current[b.id] || gallery[0]
-                    )
-                  }
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-
-                      openShop(
-                        b.id,
-                        displayedImages.current[b.id] || gallery[0]
-                      );
-                    }
-                  }}
-                  className="
-                    group
-                    relative
-                    flex
-                    w-full
-                    cursor-pointer
-                    items-start
-                    gap-2.5
-                    overflow-hidden
-                    rounded-[25px]
-                    border border-orange-100
-                    bg-white
-                    p-2
-                    text-left
-                    shadow-[6px_7px_16px_rgba(0,0,0,0.09),-5px_-5px_13px_rgba(255,255,255,0.95)]
-                    transition-all
-                    hover:-translate-y-0.5
-                    hover:shadow-[8px_10px_20px_rgba(0,0,0,0.12),-5px_-5px_13px_rgba(255,255,255,0.95)]
-                    focus-visible:outline-none
-                    focus-visible:ring-2
-                    focus-visible:ring-[#ff7417]
-                  "
-                >
-                  {/* Rating - top-left blank space above image */}
-                  <div
-                    className="
-                      absolute
-                      left-3
-                      top-1.5
-                      z-20
-                      inline-flex
-                      items-center
-                      gap-1
-                      rounded-full
-                      bg-black/85
-                      px-2.5
-                      py-1
-                      shadow-[2px_3px_7px_rgba(0,0,0,0.16)]
-                    "
-                  >
-                    <Star className="h-3 w-3 fill-[#ffc107] text-[#ffc107]" />
-                    <span className="text-[9px] font-bold text-white">
-                      {rating.toFixed(1)}
-                    </span>
-                    <span className="text-[8px] text-white/70">
-                      ({reviewCount})
-                    </span>
-                  </div>
-
-                  {/* =================================================
-                      SHOP IMAGE
-                  ================================================= */}
-                  <div
-                    className="
-                      relative
-                      aspect-[1.7/1]
-                      h-auto
-                      w-[47%]
-                      mt-7
-                      min-w-0
-                      shrink-0
-                      overflow-hidden
-                      rounded-[20px]
-                      bg-slate-100
-                      shadow-[inset_2px_2px_5px_rgba(0,0,0,0.06)]
-                    "
-                  >
-                    <ShopImageCarousel
-                      images={gallery}
-                      alt={b.shop_name}
-                      className="absolute inset-0 h-full w-full"
-                      onImageChange={(image) => {
-                        displayedImages.current[b.id] = image;
-                      }}
-                    />
-                  </div>
-
-                  {/* =================================================
-                      SHOP DETAILS
-                  ================================================= */}
-                  <div className="flex min-w-0 flex-1 self-stretch flex-col pt-0 pr-1 pb-0">
-
-                    {/* Shop name + Like */}
-                    <div className="flex min-w-0 items-center gap-1.5">
-                      <h3
-                        className="
-                          min-w-0
-                          flex-1
-                          truncate
-                          font-display
-                          text-[16px]
-                          font-bold
-                          leading-[1.05]
-                          tracking-[-0.2px]
-                          text-black
-                          line-clamp-2
-                          break-words
-                        "
-                      >
-                        {b.shop_name}
-                      </h3>
-
-                      {/* Clay Rose Red Like */}
-                      <button
-                        type="button"
-                        onClick={(event) => toggleLike(event, b.id)}
-                        aria-label={
-                          isLiked
-                            ? `Unlike ${b.shop_name}`
-                            : `Like ${b.shop_name}`
-                        }
-                        className={`
-                          flex
-                          h-7
-                          w-7
-                          shrink-0
-                          items-center
-                          justify-center
-                          rounded-[13px]
-                          transition-all
-                          active:scale-90
-                          ${
-                            isLiked
-                              ? 'bg-[#ffd9df] text-[#f0445e] shadow-[3px_4px_8px_rgba(240,68,94,0.22),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-2px_-2px_4px_rgba(190,40,65,0.10)]'
-                              : 'bg-[#fff0f3] text-[#f47b8c] shadow-[3px_4px_8px_rgba(240,68,94,0.14),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-2px_-2px_4px_rgba(190,40,65,0.08)]'
-                          }
-                        `}
-                      >
-                        <Heart
-                          className="h-[18px] w-[18px]"
-                          fill={isLiked ? 'currentColor' : 'none'}
-                          strokeWidth={2.2}
-                        />
-                      </button>
-                    </div>
-
-                    {/* Location */}
-                   <p className="mt-0.5 flex min-w-0 items-start gap-1 text-[10px] font-medium leading-tight text-slate-500">
-  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ff7417]" />
-
-  <span className="min-w-0 line-clamp-2  break-words">
-    {b.location}
-  </span>
-</p>
-
-                    {/* Description */}
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-
-                        openShop(
-                          b.id,
-                          displayedImages.current[b.id] || gallery[0]
-                        );
-                      }}
-                      className="
-                        mt-0.5
-                        flex
-                        min-w-0
-                        items-center
-                        gap-1.5
-                        text-left
-                        text-[10px]
-                        font-medium
-                        leading-tight
-                        text-slate-500
-                        transition-colors
-                        hover:text-[#ff7417]
-                      "
-                    >
-                      <MessageCircle className="h-3 w-3 shrink-0 text-slate-400" />
-
-                      <span className="line-clamp-1">
-                        {b.description?.trim()
-                          ? `${b.description.trim()}...`
-                          : 'View shop details...'}
-                      </span>
-                    </button>
-
-                    {/* Visit */}
-                    <Button
-                      onClick={(event) => {
-                        event.stopPropagation();
-
-                        openShop(
-                          b.id,
-                          displayedImages.current[b.id] || gallery[0]
-                        );
-                      }}
-                      className="
-                        mt-auto
-                        h-7
-                        w-full
-                        rounded-full
-                        border-0
-                        bg-[#f66b0a]
-                        px-2.5
-                        text-[10px]
-                        font-bold
-                        text-white
-                        shadow-[4px_5px_9px_rgba(205,75,0,0.28),inset_2px_2px_4px_rgba(255,255,255,0.30),inset_-2px_-2px_5px_rgba(165,55,0,0.28)]
-                        hover:bg-[#f66b0a]
-                        active:scale-[0.98]
-                      "
-                    >
-                      Visit
-                      <ArrowRight className="ml-1 h-3 w-3" />
-                    </Button>
-                  </div>
-                </motion.div>
+                  shop={b}
+                  rating={rating}
+                  reviewCount={reviewCount}
+                  gallery={gallery}
+                  isLiked={likedShopIds.has(b.id)}
+                  isLikePending={pendingShopIds.has(b.id)}
+                  animationIndex={i}
+                  onToggleLike={toggleLike}
+                  onOpen={openShop}
+                />
               );
             })}
           </div>
