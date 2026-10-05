@@ -1,0 +1,1 @@
+Use the shared shop-card component and customer-scoped likes query for both dashboard and saved-shop views so like state stays consistent.
