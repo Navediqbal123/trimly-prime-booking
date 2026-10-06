@@ -32,8 +32,15 @@ export default function Map() {
 
   if (!GOOGLE_MAPS_API_KEY) {
     return (
-      <div className="fixed inset-x-0 bottom-0 top-[96px] overflow-hidden bg-white">
-        <div className="px-5 pt-4">
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          overflow: "hidden",
+          background: "#ffffff",
+        }}
+      >
+        <div className="px-5 pt-5">
           <h1 className="text-2xl font-bold text-slate-800">
             Trimly Map
           </h1>
@@ -47,8 +54,19 @@ export default function Map() {
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 top-[96px] z-0 overflow-hidden bg-transparent">
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+        background: "transparent",
+      }}
+      className="z-0"
+    >
       <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
+        {/* FULL SCREEN GOOGLE MAP */}
         <GoogleMap
           defaultCenter={DEFAULT_CENTER}
           defaultZoom={13}
@@ -59,9 +77,12 @@ export default function Map() {
           fullscreenControl
           streetViewControl={false}
           mapTypeControl={false}
-          className="h-full w-full"
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
         >
-          {/* Barber Shop Markers */}
+          {/* BARBER SHOP MARKERS */}
           {barbers.map((barber) => {
             if (
               typeof barber.latitude !== "number" ||
@@ -89,11 +110,17 @@ export default function Map() {
           })}
         </GoogleMap>
 
-        {/* Search + Filters */}
-        <div className="pointer-events-none absolute left-0 right-0 top-4 z-20 px-5">
+        {/* SEARCH + FILTER AREA */}
+        <div
+          className="pointer-events-none absolute left-0 right-0 z-30 px-5"
+          style={{
+            top: "88px",
+          }}
+        >
+          {/* SEARCH BAR */}
           <div className="pointer-events-auto rounded-[24px] bg-white shadow-[0_8px_25px_rgba(0,0,0,0.12)]">
             <div className="flex h-[58px] items-center gap-3 px-4">
-              {/* Search Icon */}
+              {/* SEARCH ICON */}
               <svg
                 width="25"
                 height="25"
@@ -111,7 +138,7 @@ export default function Map() {
                 Search barber shops near you...
               </span>
 
-              {/* Filter Icon */}
+              {/* FILTER ICON */}
               <svg
                 width="23"
                 height="23"
@@ -131,9 +158,9 @@ export default function Map() {
             </div>
           </div>
 
-          {/* Filter Chips */}
+          {/* FILTER CHIPS */}
           <div className="pointer-events-auto mt-4 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {/* Near Me */}
+            {/* NEAR ME */}
             <button
               type="button"
               className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-orange-500 px-5 text-sm font-semibold text-white shadow-[0_5px_15px_rgba(249,115,22,0.25)]"
@@ -152,7 +179,7 @@ export default function Map() {
               Near Me
             </button>
 
-            {/* Open Now */}
+            {/* OPEN NOW */}
             <button
               type="button"
               className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_5px_15px_rgba(0,0,0,0.10)]"
@@ -171,7 +198,7 @@ export default function Map() {
               Open Now
             </button>
 
-            {/* Top Rated */}
+            {/* TOP RATED */}
             <button
               type="button"
               className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_5px_15px_rgba(0,0,0,0.10)]"
@@ -184,12 +211,12 @@ export default function Map() {
                 stroke="currentColor"
                 strokeWidth="2"
               >
-                <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z" />
+                <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z" />
               </svg>
               Top Rated
             </button>
 
-            {/* All */}
+            {/* ALL */}
             <button
               type="button"
               className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_5px_15px_rgba(0,0,0,0.10)]"
@@ -212,10 +239,13 @@ export default function Map() {
           </div>
         </div>
 
-        {/* Current Location */}
+        {/* CURRENT LOCATION BUTTON */}
         <button
           type="button"
-          className="absolute right-5 top-[245px] z-20 flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-[0_6px_18px_rgba(0,0,0,0.15)]"
+          className="absolute right-5 z-30 flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-[0_6px_18px_rgba(0,0,0,0.15)]"
+          style={{
+            top: "245px",
+          }}
           aria-label="Current location"
         >
           <svg
