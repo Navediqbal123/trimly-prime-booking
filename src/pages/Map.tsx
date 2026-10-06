@@ -30,16 +30,23 @@ export default function Map() {
     loadBarbers();
   }, []);
 
+  // Map page par body scrolling completely lock
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    const previousOverscroll = document.body.style.overscrollBehavior;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.overscrollBehavior = "none";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.overscrollBehavior = previousOverscroll;
+    };
+  }, []);
+
   if (!GOOGLE_MAPS_API_KEY) {
     return (
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          overflow: "hidden",
-          background: "#ffffff",
-        }}
-      >
+      <div className="fixed inset-0 z-[5] overflow-hidden bg-white">
         <div className="px-5 pt-5">
           <h1 className="text-2xl font-bold text-slate-800">
             Trimly Map
@@ -55,72 +62,74 @@ export default function Map() {
 
   return (
     <div
+      className="fixed inset-0 z-[5] overflow-hidden"
       style={{
-        position: "fixed",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        overflow: "hidden",
-        background: "transparent",
+        width: "100vw",
+        height: "100dvh",
+        touchAction: "none",
       }}
-      className="z-0"
     >
       <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
-        {/* FULL SCREEN GOOGLE MAP */}
-        <GoogleMap
-          defaultCenter={DEFAULT_CENTER}
-          defaultZoom={13}
-          mapId="DEMO_MAP_ID"
-          gestureHandling="greedy"
-          disableDefaultUI={false}
-          zoomControl
-          fullscreenControl
-          streetViewControl={false}
-          mapTypeControl={false}
+        {/* FULL SCREEN MAP */}
+        <div
+          className="absolute inset-0"
           style={{
             width: "100%",
             height: "100%",
           }}
         >
-          {/* BARBER SHOP MARKERS */}
-          {barbers.map((barber) => {
-            if (
-              typeof barber.latitude !== "number" ||
-              typeof barber.longitude !== "number"
-            ) {
-              return null;
-            }
+          <GoogleMap
+            defaultCenter={DEFAULT_CENTER}
+            defaultZoom={13}
+            mapId="DEMO_MAP_ID"
+            gestureHandling="greedy"
+            disableDefaultUI={false}
+            zoomControl
+            fullscreenControl
+            streetViewControl={false}
+            mapTypeControl={false}
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            {/* BARBER SHOP MARKERS */}
+            {barbers.map((barber) => {
+              if (
+                typeof barber.latitude !== "number" ||
+                typeof barber.longitude !== "number"
+              ) {
+                return null;
+              }
 
-            return (
-              <AdvancedMarker
-                key={barber.id}
-                position={{
-                  lat: barber.latitude,
-                  lng: barber.longitude,
-                }}
-                title={barber.shop_name || "Barber Shop"}
-              >
-                <Pin
-                  background="#f97316"
-                  borderColor="#ffffff"
-                  glyphColor="#ffffff"
-                />
-              </AdvancedMarker>
-            );
-          })}
-        </GoogleMap>
+              return (
+                <AdvancedMarker
+                  key={barber.id}
+                  position={{
+                    lat: barber.latitude,
+                    lng: barber.longitude,
+                  }}
+                  title={barber.shop_name || "Barber Shop"}
+                >
+                  <Pin
+                    background="#f97316"
+                    borderColor="#ffffff"
+                    glyphColor="#ffffff"
+                  />
+                </AdvancedMarker>
+              );
+            })}
+          </GoogleMap>
+        </div>
 
-        {/* SEARCH + FILTER AREA */}
+        {/* SEARCH + FILTERS */}
         <div
-          className="pointer-events-none absolute left-0 right-0 z-30 px-5"
-          style={{
-            top: "88px",
-          }}
+          className="pointer-events-none absolute left-0 right-0 z-[20] px-5"
+          style={{ top: "88px" }}
         >
           {/* SEARCH BAR */}
           <div className="pointer-events-auto rounded-[24px] bg-white shadow-[0_8px_25px_rgba(0,0,0,0.12)]">
             <div className="flex h-[58px] items-center gap-3 px-4">
-              {/* SEARCH ICON */}
               <svg
                 width="25"
                 height="25"
@@ -138,7 +147,6 @@ export default function Map() {
                 Search barber shops near you...
               </span>
 
-              {/* FILTER ICON */}
               <svg
                 width="23"
                 height="23"
@@ -160,7 +168,6 @@ export default function Map() {
 
           {/* FILTER CHIPS */}
           <div className="pointer-events-auto mt-4 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {/* NEAR ME */}
             <button
               type="button"
               className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-orange-500 px-5 text-sm font-semibold text-white shadow-[0_5px_15px_rgba(249,115,22,0.25)]"
@@ -179,7 +186,6 @@ export default function Map() {
               Near Me
             </button>
 
-            {/* OPEN NOW */}
             <button
               type="button"
               className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_5px_15px_rgba(0,0,0,0.10)]"
@@ -198,7 +204,6 @@ export default function Map() {
               Open Now
             </button>
 
-            {/* TOP RATED */}
             <button
               type="button"
               className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_5px_15px_rgba(0,0,0,0.10)]"
@@ -211,12 +216,11 @@ export default function Map() {
                 stroke="currentColor"
                 strokeWidth="2"
               >
-                <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z" />
+                <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z" />
               </svg>
               Top Rated
             </button>
 
-            {/* ALL */}
             <button
               type="button"
               className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_5px_15px_rgba(0,0,0,0.10)]"
@@ -239,13 +243,11 @@ export default function Map() {
           </div>
         </div>
 
-        {/* CURRENT LOCATION BUTTON */}
+        {/* CURRENT LOCATION */}
         <button
           type="button"
-          className="absolute right-5 z-30 flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-[0_6px_18px_rgba(0,0,0,0.15)]"
-          style={{
-            top: "245px",
-          }}
+          className="absolute right-5 z-[20] flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-[0_6px_18px_rgba(0,0,0,0.15)]"
+          style={{ top: "245px" }}
           aria-label="Current location"
         >
           <svg
