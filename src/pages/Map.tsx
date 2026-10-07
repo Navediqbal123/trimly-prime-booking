@@ -62,13 +62,12 @@ export default function Map() {
 
   return (
     <div
-      className="fixed inset-0 z-[5] overflow-hidden"
-      style={{
-        width: "100vw",
-        height: "100dvh",
-        touchAction: "none",
-      }}
-    >
+  className="fixed left-0 right-0 top-0 bottom-[105px] z-[5] overflow-hidden"
+  style={{
+    width: "100%",
+    touchAction: "none",
+  }}
+>
       <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
         {/* FULL SCREEN MAP */}
         <div
