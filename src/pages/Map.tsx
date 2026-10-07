@@ -71,13 +71,13 @@ export default function Map() {
 >
       <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
         {/* FULL SCREEN MAP */}
-        <div
-          className="absolute inset-0"
-          style={{
-            width: "100%",
-            height: "100%",
-          }}
-        >
+       <div
+  className="absolute left-0 top-0"
+  style={{
+    width: "100%",
+    height: "calc(100dvh - 95px)",
+  }}
+>
           <GoogleMap
             defaultCenter={DEFAULT_CENTER}
             defaultZoom={13}
