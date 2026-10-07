@@ -62,9 +62,10 @@ export default function Map() {
 
   return (
     <div
-  className="fixed left-0 right-0 top-0 bottom-[105px] z-[5] overflow-hidden"
+  className="fixed inset-0 z-[5] overflow-hidden"
   style={{
-    width: "100%",
+    width: "100vw",
+    height: "100dvh",
     touchAction: "none",
   }}
 >
