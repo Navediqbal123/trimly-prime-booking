@@ -54,6 +54,7 @@ export function AppSidebar() {
   const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending } = useProtectedUser();
   const location = useLocation();
   const headerVisible = useHideOnScroll(0);
+  const showCustomerHeader = location.pathname === '/dashboard' || location.pathname.startsWith('/admin/');
 
   const isBarberApproved = isBarber;
   const isPending = isBarberPending;
@@ -97,6 +98,7 @@ export function AppSidebar() {
   return (
     <>
       {/* Mobile header keeps its reserved page space while sliding out of view. */}
+      {showCustomerHeader && (
       <motion.div
         initial={false}
         animate={{ y: headerVisible || isOpen ? 0 : '-100%' }}
@@ -129,6 +131,7 @@ export function AppSidebar() {
           <NotificationBell />
         </div>
       </motion.div>
+      )}
 
 
       {/* Mobile Overlay */}
