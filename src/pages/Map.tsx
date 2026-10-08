@@ -62,7 +62,7 @@ export default function Map() {
 
   return (
     <div
-      className="fixed inset-0 z-[5] overflow-hidden"
+  className="fixed left-[-12px] right-0 top-[-60px] bottom-0 z-[5] overflow-hidden"
       style={{
         width: "100vw",
         height: "100dvh",
