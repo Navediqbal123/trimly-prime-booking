@@ -30,7 +30,7 @@ export default function Map() {
     loadBarbers();
   }, []);
 
-  // Map page par body scrolling completely lock
+  // Lock page scrolling while Map page is open
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     const previousOverscroll = document.body.style.overscrollBehavior;
@@ -62,22 +62,22 @@ export default function Map() {
 
   return (
     <div
-  className="fixed inset-0 z-[5] overflow-hidden"
-  style={{
-    width: "100vw",
-    height: "100dvh",
-    touchAction: "none",
-  }}
->
+      className="fixed inset-0 z-[5] overflow-hidden"
+      style={{
+        width: "100vw",
+        height: "100dvh",
+        touchAction: "none",
+      }}
+    >
       <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
         {/* FULL SCREEN MAP */}
-       <div
-  className="absolute left-0 top-0"
-  style={{
-    width: "100%",
-    height: "calc(100dvh - 95px)",
-  }}
->
+        <div
+          className="absolute left-0 top-0"
+          style={{
+            width: "100%",
+            height: "calc(100dvh - 95px)",
+          }}
+        >
           <GoogleMap
             defaultCenter={DEFAULT_CENTER}
             defaultZoom={13}
@@ -123,16 +123,14 @@ export default function Map() {
         </div>
 
         {/* SEARCH + FILTERS */}
-        <div
-          className="pointer-events-none absolute left-0 right-0 z-[20] px-5"
-          style={{ top: "88px" }}
-        >
+        <div className="pointer-events-none absolute left-0 right-0 top-0 z-[20] px-5 pt-5">
           {/* SEARCH BAR */}
-          <div className="pointer-events-auto rounded-[24px] bg-white shadow-[0_8px_25px_rgba(0,0,0,0.12)]">
-            <div className="flex h-[58px] items-center gap-3 px-4">
+          <div className="pointer-events-auto rounded-[28px] bg-white shadow-[0_8px_25px_rgba(0,0,0,0.14)]">
+            <div className="flex min-h-[68px] items-center gap-4 px-5">
+              {/* Search Icon */}
               <svg
-                width="25"
-                height="25"
+                width="30"
+                height="30"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="#64748b"
@@ -143,13 +141,17 @@ export default function Map() {
                 <path d="m20 20-4-4" />
               </svg>
 
-              <span className="flex-1 text-[16px] text-slate-500">
-                Search barber shops near you...
+              {/* Search Text */}
+              <span className="flex-1 text-[18px] leading-[1.35] text-slate-500">
+                Search barber shops
+                <br />
+                near you...
               </span>
 
+              {/* Filter Icon */}
               <svg
-                width="23"
-                height="23"
+                width="27"
+                height="27"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="#111827"
@@ -159,22 +161,41 @@ export default function Map() {
                 <path d="M4 6h16" />
                 <path d="M7 12h10" />
                 <path d="M10 18h4" />
-                <circle cx="9" cy="6" r="1.5" fill="white" />
-                <circle cx="15" cy="12" r="1.5" fill="white" />
-                <circle cx="12" cy="18" r="1.5" fill="white" />
+
+                <circle
+                  cx="9"
+                  cy="6"
+                  r="1.5"
+                  fill="white"
+                />
+
+                <circle
+                  cx="15"
+                  cy="12"
+                  r="1.5"
+                  fill="white"
+                />
+
+                <circle
+                  cx="12"
+                  cy="18"
+                  r="1.5"
+                  fill="white"
+                />
               </svg>
             </div>
           </div>
 
           {/* FILTER CHIPS */}
-          <div className="pointer-events-auto mt-4 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="pointer-events-auto mt-4 flex gap-4">
+            {/* NEAR ME */}
             <button
               type="button"
-              className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-orange-500 px-5 text-sm font-semibold text-white shadow-[0_5px_15px_rgba(249,115,22,0.25)]"
+              className="flex h-[56px] flex-1 items-center justify-center gap-2 rounded-full bg-orange-500 px-4 text-[17px] font-semibold text-white shadow-[0_6px_18px_rgba(249,115,22,0.28)]"
             >
               <svg
-                width="19"
-                height="19"
+                width="23"
+                height="23"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -183,16 +204,18 @@ export default function Map() {
                 <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
                 <circle cx="12" cy="10" r="2.5" />
               </svg>
+
               Near Me
             </button>
 
+            {/* OPEN NOW */}
             <button
               type="button"
-              className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_5px_15px_rgba(0,0,0,0.10)]"
+              className="flex h-[56px] flex-1 items-center justify-center gap-2 rounded-full bg-white px-4 text-[17px] font-semibold text-slate-800 shadow-[0_6px_18px_rgba(0,0,0,0.10)]"
             >
               <svg
-                width="19"
-                height="19"
+                width="23"
+                height="23"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -201,58 +224,21 @@ export default function Map() {
                 <circle cx="12" cy="12" r="9" />
                 <path d="M12 7v5l3 2" />
               </svg>
+
               Open Now
-            </button>
-
-            <button
-              type="button"
-              className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_5px_15px_rgba(0,0,0,0.10)]"
-            >
-              <svg
-                width="19"
-                height="19"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z" />
-              </svg>
-              Top Rated
-            </button>
-
-            <button
-              type="button"
-              className="flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-slate-800 shadow-[0_5px_15px_rgba(0,0,0,0.10)]"
-            >
-              <svg
-                width="19"
-                height="19"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <rect x="4" y="4" width="6" height="6" rx="1" />
-                <rect x="14" y="4" width="6" height="6" rx="1" />
-                <rect x="4" y="14" width="6" height="6" rx="1" />
-                <rect x="14" y="14" width="6" height="6" rx="1" />
-              </svg>
-              All
             </button>
           </div>
         </div>
 
-        {/* CURRENT LOCATION */}
+        {/* CURRENT LOCATION BUTTON */}
         <button
           type="button"
-          className="absolute right-5 z-[20] flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-[0_6px_18px_rgba(0,0,0,0.15)]"
-          style={{ top: "245px" }}
+          className="absolute right-5 top-[235px] z-[20] flex h-[60px] w-[60px] items-center justify-center rounded-[20px] bg-white shadow-[0_7px_20px_rgba(0,0,0,0.15)]"
           aria-label="Current location"
         >
           <svg
-            width="27"
-            height="27"
+            width="30"
+            height="30"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
