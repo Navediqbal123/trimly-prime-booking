@@ -14,14 +14,29 @@ export default function LikedShops() {
   const navigate = useNavigate();
   const { likedShops, likedShopIds, toggleLike, pendingShopIds, isLoading, error } = useLikedShops();
 
-  const { data: barbers = [] } = useQuery({
+  // Shares the Dashboard's cache entry, so it must return the same { list, error } shape.
+  const { data: approvedShops } = useQuery({
     queryKey: ['approvedBarbersHome'],
     queryFn: async () => {
       const response = await getApprovedBarbers();
-      return response.success ? response.data ?? [] : [];
+      if (!response.success || !response.data) {
+        return { list: [], error: response.error || 'Failed to load shops' };
+      }
+      return {
+        list: response.data.map((b) => ({
+          id: b.id,
+          shop_name: b.shop_name,
+          location: b.location,
+          latitude: b.latitude,
+          longitude: b.longitude,
+          description: 'description' in b ? (b as { description?: string | null }).description ?? null : null,
+        })),
+        error: null,
+      };
     },
     refetchOnWindowFocus: true,
   });
+  const barbers = Array.isArray(approvedShops?.list) ? approvedShops.list : [];
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['barberRatings'],
