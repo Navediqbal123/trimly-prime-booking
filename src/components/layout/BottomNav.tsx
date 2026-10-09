@@ -27,7 +27,7 @@ export function BottomNav() {
         shadow-[0_-6px_20px_rgba(0,0,0,0.08)]
       "
     >
-      <div className="flex w-full items-stretch px-1 py-1.5">
+      <div className="flex w-full items-stretch px-1 py-1">
         {items.map((item) => {
           const active = pathname === item.href;
           const Icon = item.icon;
@@ -43,7 +43,7 @@ export function BottomNav() {
             >
               <div
                 className={cn(
-                  'flex h-[40px] w-[72px] flex-col items-center justify-center rounded-[20px] transition-all duration-200',
+                  'flex h-[44px] w-[72px] flex-col items-center justify-center rounded-[20px] transition-all duration-200',
                   active &&
                     'bg-orange-50 shadow-[3px_4px_10px_rgba(249,115,22,0.10),-2px_-2px_7px_rgba(255,255,255,0.95)]'
                 )}
