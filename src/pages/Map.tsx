@@ -122,7 +122,7 @@ export default function Map() {
           </GoogleMap>
         </div>
 {/* SEARCH + FILTERS */}
-<div className="pointer-events-none absolute left-0 right-0 top-0 z-[20] px-5 pt-5">
+<div className="pointer-events-none absolute left-[12px] right-0 top-0 z-[20] px-5 pt-5">
   {/* SEARCH BOX */}
   <div className="pointer-events-auto relative mb-3 w-full">
     <div
