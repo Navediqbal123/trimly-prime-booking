@@ -293,7 +293,10 @@ export default function Map() {
         touchAction: "none",
       }}
     >
-      <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
+<APIProvider
+  apiKey={GOOGLE_MAPS_API_KEY}
+  libraries={["places"]}
+>
         {/* FULL SCREEN MAP */}
 
         <div
