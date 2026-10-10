@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   APIProvider,
   Map as GoogleMap,
@@ -44,58 +44,63 @@ function MapController({
   return null;
 }
 
+type PlaceSuggestion = {
+  placePrediction: any;
+  text: string;
+};
+
 function PlaceAutocompleteController({
-  inputRef,
-  onPlaceSelected,
+  query,
+  selectedLocation,
+  onSuggestionsChange,
 }: {
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  onPlaceSelected: (
-    latitude: number,
-    longitude: number,
-    address: string
-  ) => void;
+  query: string;
+  selectedLocation: { lat: number; lng: number } | null;
+  onSuggestionsChange: (suggestions: PlaceSuggestion[]) => void;
 }) {
   const places = useMapsLibrary("places");
 
   useEffect(() => {
-    if (!places || !inputRef.current) return;
+    let cancelled = false;
+    const input = query.trim();
 
-    const autocomplete = new places.Autocomplete(
-      inputRef.current,
-      {
-        fields: [
-          "geometry",
-          "formatted_address",
-          "name",
-        ],
+    if (!places || input.length < 2 || selectedLocation) {
+      onSuggestionsChange([]);
+      return;
+    }
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const { suggestions } =
+          await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+            input,
+            includedRegionCodes: ["in"],
+          });
+
+        if (cancelled) return;
+
+        const results: PlaceSuggestion[] = suggestions.flatMap((suggestion) => {
+          const prediction = suggestion.placePrediction;
+          if (!prediction) return [];
+
+          return [{
+            placePrediction: prediction,
+            text: prediction.text.toString(),
+          }];
+        });
+
+        onSuggestionsChange(results);
+      } catch (error) {
+        console.error("Google Places autocomplete error:", error);
+        if (!cancelled) onSuggestionsChange([]);
       }
-    );
-
-    const listener = autocomplete.addListener(
-      "place_changed",
-      () => {
-        const place = autocomplete.getPlace();
-        const location = place.geometry?.location;
-
-        if (!location) return;
-
-        const latitude = location.lat();
-        const longitude = location.lng();
-
-        onPlaceSelected(
-          latitude,
-          longitude,
-          place.formatted_address ||
-            place.name ||
-            ""
-        );
-      }
-    );
+    }, 250);
 
     return () => {
-      listener.remove();
+      cancelled = true;
+      window.clearTimeout(timer);
     };
-  }, [places, inputRef, onPlaceSelected]);
+  }, [places, query, selectedLocation, onSuggestionsChange]);
 
   return null;
 }
@@ -103,14 +108,12 @@ function PlaceAutocompleteController({
 export default function Map() {
   const [barbers, setBarbers] = useState<ApprovedBarberData[]>([]);
   const [query, setQuery] = useState("");
+  const [placeSuggestions, setPlaceSuggestions] = useState<PlaceSuggestion[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
-
-  // Google Places Autocomplete
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Near Me / location search
   const [nearbyBarbers, setNearbyBarbers] = useState<
@@ -222,7 +225,31 @@ export default function Map() {
         setNearbyLoading(false);
       }
     },
-    []
+    [],
+  );
+
+  const handleSuggestionSelect = useCallback(
+    async (suggestion: PlaceSuggestion) => {
+      try {
+        const place = suggestion.placePrediction.toPlace();
+        await place.fetchFields({
+          fields: ["location", "formattedAddress", "displayName"],
+        });
+
+        const location = place.location;
+        if (!location) return;
+
+        await handlePlaceSelected(
+          location.lat(),
+          location.lng(),
+          place.formattedAddress || place.displayName || suggestion.text,
+        );
+        setPlaceSuggestions([]);
+      } catch (error) {
+        console.error("Could not select Google place:", error);
+      }
+    },
+    [handlePlaceSelected],
   );
 
   // ==========================================
@@ -329,11 +356,12 @@ export default function Map() {
     value: string
   ) => {
     setQuery(value);
+    setSelectedLocation(null);
 
     // When the user clears the search,
     // return to the normal barber list.
     if (!value.trim()) {
-      setSelectedLocation(null);
+      setPlaceSuggestions([]);
       setNearbyBarbers([]);
       setFilter("all");
     }
@@ -463,8 +491,9 @@ export default function Map() {
         libraries={["places"]}
       >
         <PlaceAutocompleteController
-          inputRef={searchInputRef}
-          onPlaceSelected={handlePlaceSelected}
+          query={query}
+          selectedLocation={selectedLocation}
+          onSuggestionsChange={setPlaceSuggestions}
         />
 
         {/* FULL SCREEN MAP */}
@@ -571,14 +600,17 @@ export default function Map() {
 
               {/* GOOGLE PLACE SEARCH INPUT */}
               <input
-                ref={searchInputRef}
                 type="text"
                 value={query}
-                onChange={(event) =>
-                  handleSearchChange(
-                    event.target.value
-                  )
-                }
+                onChange={(event) => {
+                  handleSearchChange(event.target.value);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && placeSuggestions.length > 0) {
+                    event.preventDefault();
+                    void handleSuggestionSelect(placeSuggestions[0]);
+                  }
+                }}
                 placeholder="Search places..."
                 className="
                   h-full
@@ -622,6 +654,28 @@ export default function Map() {
                 </svg>
               </div>
             </div>
+
+            {placeSuggestions.length > 0 && (
+              <div className="absolute left-0 right-0 top-[60px] z-[1000] max-h-[260px] overflow-y-auto rounded-2xl border border-orange-100 bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.18)]">
+                {placeSuggestions.map((suggestion, index) => (
+                  <button
+                    key={`${suggestion.text}-${index}`}
+                    type="button"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => void handleSuggestionSelect(suggestion)}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-slate-700 hover:bg-orange-50 active:bg-orange-100"
+                  >
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-50 text-orange-500">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+                        <circle cx="12" cy="10" r="2.5" />
+                      </svg>
+                    </span>
+                    <span className="min-w-0 flex-1">{suggestion.text}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* CATEGORY BUTTONS */}
