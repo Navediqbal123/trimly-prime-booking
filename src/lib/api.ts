@@ -93,6 +93,8 @@ async function fetchServiceList(endpoint: string): Promise<ApiResponse<ServiceDa
 export interface BarberRegisterData {
   shop_name: string;
   location: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface BarberRegisterResponse {

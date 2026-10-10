@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
@@ -8,12 +8,7 @@ import {
   Scissors,
   Loader2,
   Clock,
-  Users,
-  CalendarCheck,
-  TrendingUp,
-  ShieldCheck,
   User,
-  Mail,
   Phone,
   Building2,
   Map as MapIcon,
@@ -21,13 +16,16 @@ import {
   ImageIcon,
   Send,
   ChevronDown,
+  Mail,
+  LocateFixed,
+  CheckCircle2,
+  ShieldCheck,
+  ArrowLeft,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { registerBarber } from '@/lib/api';
-import barberHero from '@/assets/barber-hero.jpg';
 
 const STATES = [
   'Andhra Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Delhi', 'Goa', 'Gujarat', 'Haryana',
@@ -36,41 +34,49 @@ const STATES = [
   'West Bengal',
 ];
 
-/** Reusable premium field card */
-function FieldCard({
-  icon: Icon,
-  label,
-  helper,
-  children,
-}: {
-  icon: React.ElementType;
-  label: string;
-  helper?: string;
-  children: React.ReactNode;
-}) {
+type Coordinates = { latitude: number; longitude: number };
+
+const inputCls =
+  'h-12 min-w-0 rounded-xl border border-[#D7D9E0] bg-white text-[15px] text-[#151827] shadow-none placeholder:text-[#7C8295] focus-visible:ring-1 focus-visible:ring-[#FF7417]/40';
+
+function IconTile({ children, tone = 'orange' }: { children: React.ReactNode; tone?: 'orange' | 'purple' | 'blue' | 'green' | 'pink' }) {
+  const tones = {
+    orange: 'bg-[#FFF0DE] text-[#E96A12]',
+    purple: 'bg-[#F0E6FF] text-[#7540D8]',
+    blue: 'bg-[#DDF4FF] text-[#087FC5]',
+    green: 'bg-[#DDF9E7] text-[#168447]',
+    pink: 'bg-[#FFE5EF] text-[#D92E72]',
+  };
   return (
-    <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-[0_2px_10px_rgba(16,10,40,0.05)]">
-      <div className="flex items-start gap-3">
-        <div className="w-9 h-9 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
-          <Icon className="w-4.5 h-4.5 text-primary" strokeWidth={1.8} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <Label className="text-sm font-semibold text-black">{label}</Label>
-          {helper && <p className="text-xs text-black/55 mt-0.5">{helper}</p>}
-          <div className="mt-3">{children}</div>
-        </div>
-      </div>
+    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${tones[tone]} shadow-[inset_0_1px_2px_rgba(255,255,255,0.9),0_2px_3px_rgba(20,20,40,0.07)]`}>
+      {children}
     </div>
   );
 }
 
-const inputCls =
-  'h-12 rounded-xl bg-white border-black/15 text-black placeholder:text-black/40 focus-visible:ring-primary/30';
+function FieldRow({
+  icon,
+  tone,
+  children,
+}: {
+  icon: React.ReactNode;
+  tone?: 'orange' | 'purple' | 'blue' | 'green' | 'pink';
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-2.5 rounded-2xl border border-[#ECECF1] bg-white p-2.5 shadow-[0_2px_5px_rgba(22,25,45,0.035)]">
+      <IconTile tone={tone}>{icon}</IconTile>
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}
 
 export default function BecomeBarber() {
   const { updateLocalRole, isBarber, isBarberPending, refreshBarberStatus } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
   const [form, setForm] = useState({
     shopName: '',
     name: '',
@@ -90,313 +96,190 @@ export default function BecomeBarber() {
     if (isBarber) navigate('/barber-hub', { replace: true });
   }, [isBarber, navigate]);
 
+  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm((previous) => ({ ...previous, [key]: e.target.value }));
+
+  const pick = (key: string) => fileRefs.current[key]?.click();
+
+  const onFile = (callback: (url: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) callback(URL.createObjectURL(file));
+  };
+
+  const captureCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Location is not supported by this device or browser.');
+      return;
+    }
+
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoordinates({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+        setLocating(false);
+        toast.success('Current location captured successfully.');
+      },
+      (error) => {
+        setLocating(false);
+        if (error.code === error.PERMISSION_DENIED) {
+          toast.error('Location permission denied. Allow location access and try again.');
+        } else if (error.code === error.TIMEOUT) {
+          toast.error('Location request timed out. Please try again.');
+        } else {
+          toast.error('Could not get your location. Turn on device location and try again.');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
+    );
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.shopName.trim() || !form.name.trim() || !form.phone.trim() || !form.city.trim() || !form.state) {
+      toast.error('Please fill in all required fields.');
+      return;
+    }
+    if (!coordinates) {
+      toast.error('Please tap “Use Current Location” before submitting.');
+      return;
+    }
+
+    setLoading(true);
+    const location = [form.locality, form.city, form.state].filter(Boolean).join(', ');
+
+    try {
+      // Coordinates are included in the request; the backend registration handler must save them too.
+      const registrationPayload = {
+        shop_name: form.shopName.trim(),
+        location,
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
+      } as Parameters<typeof registerBarber>[0];
+      const response = await registerBarber(registrationPayload);
+
+      if (response.success || response.data) {
+        updateLocalRole('barber_pending');
+        localStorage.setItem('trimly_barber_status', JSON.stringify({ role: 'barber_pending', status: 'pending' }));
+        toast.success('Request submitted, waiting for admin approval.');
+        setTimeout(() => refreshBarberStatus(), 3000);
+      } else {
+        toast.error(response.error || 'Failed to submit application.');
+      }
+    } catch (error) {
+      console.error('Barber registration error:', error);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (isBarber) return null;
 
   if (isBarberPending) {
     return (
-      <div className="page-black animate-fade-in">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto">
-          <div className="rounded-3xl border border-black/10 bg-white p-8 text-center shadow-lg">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-              <Clock className="w-10 h-10 text-primary" />
-            </div>
-            <h2 className="text-2xl font-bold mb-3 text-black">Application Pending</h2>
-            <p className="text-black/60 mb-6">
-              Your barber application is under review. We'll notify you once it's approved.
-            </p>
-            <Button variant="outline" onClick={() => navigate('/dashboard')}>
-              Back to Dashboard
-            </Button>
-          </div>
+      <div className="min-h-screen bg-[#FAFAFC] px-4 py-8">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-md rounded-3xl border border-[#ECECF1] bg-white p-7 text-center shadow-sm">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#FFF0DE] text-[#E96A12]"><Clock className="h-8 w-8" /></div>
+          <h2 className="mb-2 text-2xl font-bold text-[#151827]">Application Pending</h2>
+          <p className="mb-6 text-sm text-[#73798B]">Your barber application is under review. We'll notify you once it's approved.</p>
+          <Button variant="outline" onClick={() => navigate('/dashboard')}>Back to Dashboard</Button>
         </motion.div>
       </div>
     );
   }
 
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm((p) => ({ ...p, [k]: e.target.value }));
-
-  const pick = (key: string) => fileRefs.current[key]?.click();
-
-  const onFile = (key: string, cb: (url: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) cb(URL.createObjectURL(f));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const location = [form.locality, form.city, form.state].filter(Boolean).join(', ');
-    if (!form.shopName.trim() || !form.name.trim() || !form.phone.trim() || !form.city.trim() || !form.state) {
-      toast.error('Please fill in all required fields');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await registerBarber({ shop_name: form.shopName, location });
-      if (response.success || response.data) {
-        updateLocalRole('barber_pending');
-        localStorage.setItem(
-          'trimly_barber_status',
-          JSON.stringify({ role: 'barber_pending', status: 'pending' })
-        );
-        toast.success('Request submitted, waiting for admin approval');
-        setTimeout(() => refreshBarberStatus(), 3000);
-      } else {
-        toast.error(response.error || 'Failed to submit application');
-      }
-    } catch (err) {
-      console.error('Barber registration error:', err);
-      toast.error('Something went wrong. Please try again.');
-    }
-
-    setLoading(false);
-  };
-
   return (
-    <div className="page-black animate-fade-in overflow-x-hidden">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="max-w-xl mx-auto pb-10 space-y-5"
-      >
-        {/* HERO */}
-        <section className="hero-dark relative isolate mt-3 mb-2 mx-auto w-full max-w-[560px] overflow-hidden rounded-[28px] bg-[#0B0705] shadow-[0_14px_40px_rgba(0,0,0,0.30)]">
-          {/* Image + overlay layer (never above the text) */}
-          <div className="absolute inset-0 z-0">
-            <img
-              src={barberHero}
-              alt="Premium barbershop interior with leather barber chair"
-              className="absolute inset-0 w-full h-full object-cover object-[74%_center]"
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,6,4,0.88)_0%,rgba(9,6,4,0.72)_45%,rgba(9,6,4,0.28)_75%,rgba(9,6,4,0.08)_100%)]" />
-          </div>
+    <div className="min-h-screen overflow-x-hidden bg-[#FAFAFC] px-3 pb-5 pt-3 text-[#151827] sm:px-5">
+      <motion.main initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mx-auto w-full max-w-lg">
+        <header className="relative mb-5 px-10 text-center">
+          <button type="button" onClick={() => navigate(-1)} aria-label="Go back" className="absolute left-0 top-0 flex h-9 w-9 items-center justify-center rounded-xl border border-[#ECECF1] bg-white text-[#70778D] shadow-sm">
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <h1 className="font-display text-[25px] font-bold leading-tight tracking-[-0.04em] text-[#11152A]">Become a <span className="text-[#F36F16]">Barber</span></h1>
+          <div className="mx-auto mt-1.5 h-1 w-10 rounded-full bg-[#F36F16]" />
+          <p className="mx-auto mt-2 max-w-xs text-xs leading-relaxed text-[#73798B]">Fill in the details below to get your shop approved on Trimly.</p>
+        </header>
 
-          <div className="relative z-10 flex min-h-[240px] sm:min-h-[280px] flex-col justify-center px-6 py-9 sm:px-9 sm:py-11 max-w-[78%]">
-            <div className="inline-flex self-start items-center gap-2 rounded-full border border-[#E9C46A]/80 bg-black/45 px-3 py-1.5 mb-4">
-              <Scissors className="w-3.5 h-3.5 hero-gold" strokeWidth={1.8} />
-              <span className="text-[10px] font-semibold tracking-[0.2em] uppercase hero-gold-soft">Trimly Partners</span>
+        <form onSubmit={handleSubmit} className="space-y-2.5">
+          <FieldRow icon={<Store className="h-6 w-6" />} tone="orange">
+            <Input aria-label="Shop name" value={form.shopName} onChange={set('shopName')} placeholder="Your shop name" className={inputCls} required />
+          </FieldRow>
+          <FieldRow icon={<User className="h-6 w-6" />} tone="purple">
+            <Input aria-label="Full name" value={form.name} onChange={set('name')} placeholder="Enter your full name" className={inputCls} required />
+          </FieldRow>
+          <FieldRow icon={<Mail className="h-6 w-6" />} tone="blue">
+            <Input aria-label="Email" type="email" value={form.email} onChange={set('email')} placeholder="Enter your email" className={inputCls} />
+          </FieldRow>
+          <FieldRow icon={<Phone className="h-6 w-6" />} tone="green">
+            <Input aria-label="Phone number" type="tel" value={form.phone} onChange={set('phone')} placeholder="Enter your phone number" className={inputCls} required />
+          </FieldRow>
+          <FieldRow icon={<Building2 className="h-6 w-6" />} tone="pink">
+            <Input aria-label="Shop landline number" type="tel" value={form.shopNumber} onChange={set('shopNumber')} placeholder="Enter shop landline number" className={inputCls} />
+          </FieldRow>
+          <FieldRow icon={<MapPin className="h-6 w-6" />} tone="orange">
+            <Input aria-label="Locality address" value={form.locality} onChange={set('locality')} placeholder="House no., Building, Street" className={inputCls} />
+          </FieldRow>
+          <FieldRow icon={<MapPin className="h-6 w-6" />} tone="purple">
+            <Input aria-label="Village, town or city" value={form.city} onChange={set('city')} placeholder="Enter your village, town or city" className={inputCls} required />
+          </FieldRow>
+          <FieldRow icon={<MapIcon className="h-6 w-6" />} tone="blue">
+            <div className="relative">
+              <select aria-label="State" value={form.state} onChange={set('state')} required className="h-12 w-full appearance-none rounded-xl border border-[#D7D9E0] bg-white px-3 pr-9 text-[15px] text-[#151827] outline-none focus:ring-1 focus:ring-[#FF7417]/40">
+                <option value="">Select your state</option>
+                {STATES.map((state) => <option key={state} value={state}>{state}</option>)}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7C8295]" />
             </div>
-            <h1 className="font-display font-bold leading-[1.12] text-[30px] sm:text-[38px] text-white">
-              Open Your
-              <br />
-              <span className="hero-gold">Barber Shop</span>
-            </h1>
-            <p className="mt-3 text-[13px] sm:text-sm leading-relaxed hero-sub max-w-[19rem]">
-              Fill in the details below to get your shop approved on Trimly.
-            </p>
-          </div>
-        </section>
+          </FieldRow>
 
+          <FieldRow icon={coordinates ? <CheckCircle2 className="h-6 w-6" /> : <LocateFixed className="h-6 w-6" />} tone="green">
+            <button type="button" onClick={captureCurrentLocation} disabled={locating} className={`flex h-12 w-full items-center justify-center gap-2 rounded-xl border px-2 text-sm font-semibold transition-colors disabled:opacity-70 ${coordinates ? 'border-[#B8E8C6] bg-[#E5F9EA] text-[#16753A]' : 'border-[#B8E8C6] bg-[#E5F9EA] text-[#16753A] hover:bg-[#D9F4E0]'}`}>
+              {locating ? <Loader2 className="h-5 w-5 animate-spin" /> : coordinates ? <CheckCircle2 className="h-5 w-5" /> : <LocateFixed className="h-5 w-5" />}
+              {locating ? 'Getting Current Location…' : coordinates ? 'Location Captured ✓' : 'Use Current Location'}
+            </button>
+          </FieldRow>
+          {coordinates && <p className="-mt-1 px-2 text-[11px] text-[#687185]">GPS location captured. It will be submitted with your application.</p>}
 
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* SHOP INFORMATION */}
-          <section className="rounded-3xl border border-black/10 bg-white p-4 shadow-[0_4px_20px_rgba(16,10,40,0.06)] space-y-3">
-            <h2 className="font-display text-lg font-bold text-black px-1">Shop Information</h2>
-
-            <FieldCard icon={Store} label="Your Shop Name" helper="This will be shown to customers">
-              <Input
-                value={form.shopName}
-                onChange={set('shopName')}
-                placeholder="Enter your shop name"
-                className={inputCls}
-                required
-              />
-            </FieldCard>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <FieldCard icon={User} label="1. Name">
-                <Input value={form.name} onChange={set('name')} placeholder="Enter your full name" className={inputCls} required />
-              </FieldCard>
-              <FieldCard icon={Mail} label="2. Email">
-                <Input type="email" value={form.email} onChange={set('email')} placeholder="Enter your email" className={inputCls} />
-              </FieldCard>
-              <FieldCard icon={Phone} label="3. Phone Number">
-                <Input value={form.phone} onChange={set('phone')} placeholder="Enter your phone number" className={inputCls} required />
-              </FieldCard>
-              <FieldCard icon={Building2} label="11. Shop Number">
-                <Input value={form.shopNumber} onChange={set('shopNumber')} placeholder="Enter shop landline number" className={inputCls} />
-              </FieldCard>
-            </div>
-
-            <FieldCard icon={MapPin} label="4. Locality Address">
-              <Input value={form.locality} onChange={set('locality')} placeholder="House no., Building, Street, Locality" className={inputCls} />
-            </FieldCard>
-
-            <FieldCard icon={Building2} label="5. Village / Town or City Address">
-              <Input value={form.city} onChange={set('city')} placeholder="Enter your village, town or city" className={inputCls} required />
-            </FieldCard>
-
-            <FieldCard icon={MapIcon} label="6. State">
-              <div className="relative">
-                <select
-                  value={form.state}
-                  onChange={set('state')}
-                  required
-                  className="h-12 w-full appearance-none rounded-xl border border-black/15 bg-white px-3 pr-10 text-sm text-black outline-none focus:ring-2 focus:ring-primary/30"
-                >
-                  <option value="">Select your state</option>
-                  {STATES.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/50" />
-              </div>
-            </FieldCard>
-          </section>
-
-          {/* SHOP PHOTOS */}
-          <section className="rounded-3xl border border-black/10 bg-white p-4 shadow-[0_4px_20px_rgba(16,10,40,0.06)]">
-            <div className="flex items-start gap-3 mb-3">
-              <div className="w-9 h-9 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
-                <ImageIcon className="w-4.5 h-4.5 text-primary" strokeWidth={1.8} />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-black">7. Shop Photos (2–5 photos)</h3>
-                <p className="text-xs text-black/55 mt-0.5">Upload clear photos of your shop (exterior)</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {shopPhotos.map((src, i) => (
-                <button
-                  type="button"
-                  key={i}
-                  onClick={() => pick(`shop-${i}`)}
-                  className={`relative aspect-video w-full overflow-hidden rounded-2xl border border-dashed ${
-                    i < 2 ? 'border-primary/50 bg-primary/[0.04]' : 'border-black/20 bg-black/[0.02]'
-                  } flex flex-col items-center justify-center gap-1.5`}
-                >
-                  {src ? (
-                    <img src={src} alt={`Shop photo ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" />
-                  ) : (
-                    <>
-                      <Camera className="w-5 h-5 text-primary" strokeWidth={1.8} />
-                      <span className="text-xs font-medium text-black">Add Photo</span>
-                      <span className="text-[11px] text-black/50">{i < 2 ? 'Required' : 'Optional'}</span>
-                    </>
-                  )}
-                  <input
-                    ref={(el) => (fileRefs.current[`shop-${i}`] = el)}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={onFile(`shop-${i}`, (url) =>
-                      setShopPhotos((p) => p.map((v, idx) => (idx === i ? url : v)))
-                    )}
-                  />
+          <FieldRow icon={<ImageIcon className="h-6 w-6" />} tone="pink">
+            <div className="grid grid-cols-3 gap-1.5">
+              {shopPhotos.map((src, index) => (
+                <button key={index} type="button" onClick={() => pick(`shop-${index}`)} className={`relative flex h-[76px] min-w-0 flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed ${index < 2 ? 'border-[#F08AB5] bg-[#FFF5F9]' : 'border-[#B8BED0] bg-[#F8F9FC]'}`}>
+                  {src ? <img src={src} alt={`Shop photo ${index + 1}`} className="absolute inset-0 h-full w-full object-cover" /> : <><Camera className={`mb-1 h-5 w-5 ${index < 2 ? 'text-[#D92E72]' : 'text-[#75809B]'}`} /><span className="text-center text-[10px] font-semibold leading-tight text-[#424A60]">Add Photo</span><span className="text-[9px] text-[#73798B]">{index < 2 ? 'Required' : 'Optional'}</span></>}
+                  <input ref={(element) => { fileRefs.current[`shop-${index}`] = element; }} type="file" accept="image/*" className="hidden" onChange={onFile((url) => setShopPhotos((previous) => previous.map((value, i) => i === index ? url : value)))} />
                 </button>
               ))}
             </div>
-          </section>
+          </FieldRow>
 
-          {/* INSIDE CHAIRS */}
-          <section className="rounded-3xl border border-black/10 bg-white p-4 shadow-[0_4px_20px_rgba(16,10,40,0.06)]">
-            <div className="flex items-start gap-3 mb-3">
-              <div className="w-9 h-9 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Scissors className="w-4.5 h-4.5 text-primary" strokeWidth={1.8} />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-black">8. Inside the Chairs (Number of seats)</h3>
-                <p className="text-xs text-black/55 mt-0.5">
-                  Upload a clear photo showing the number of chairs / seats inside your shop
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => pick('chairs')}
-              className="relative aspect-video w-full overflow-hidden rounded-2xl border border-dashed border-primary/50 bg-primary/[0.04] flex flex-col items-center justify-center gap-1.5"
-            >
-              {chairPhoto ? (
-                <img src={chairPhoto} alt="Inside the shop" className="absolute inset-0 w-full h-full object-cover" />
-              ) : (
-                <>
-                  <Camera className="w-6 h-6 text-primary" strokeWidth={1.8} />
-                  <span className="text-sm font-medium text-black">Upload Photo</span>
-                  <span className="text-[11px] text-black/50">16:9 ratio</span>
-                </>
-              )}
-              <input
-                ref={(el) => (fileRefs.current['chairs'] = el)}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={onFile('chairs', setChairPhoto)}
-              />
+          <FieldRow icon={<Scissors className="h-6 w-6" />} tone="purple">
+            <button type="button" onClick={() => pick('chairs')} className="relative flex min-h-[96px] w-full items-center gap-3 overflow-hidden rounded-xl border border-dashed border-[#C8A4FF] bg-[#FBF8FF] px-3 py-3 text-left">
+              {chairPhoto && <img src={chairPhoto} alt="Chair photo preview" className="absolute inset-0 h-full w-full object-cover" />}
+              {!chairPhoto && <><Camera className="h-7 w-7 shrink-0 text-[#7540D8]" /><span className="h-10 w-px shrink-0 bg-[#D8C5F5]" /><span className="min-w-0"><span className="block text-sm font-bold text-[#7540D8]">Add Chair Photo</span><span className="mt-0.5 block text-xs leading-snug text-[#73798B]">Show the number of chairs / seats inside your shop</span></span></>}
+              <input ref={(element) => { fileRefs.current.chairs = element; }} type="file" accept="image/*" className="hidden" onChange={onFile(setChairPhoto)} />
             </button>
-          </section>
+          </FieldRow>
 
-          {/* BARBER PROFILE PHOTO */}
-          <section className="rounded-3xl border border-black/10 bg-white p-4 shadow-[0_4px_20px_rgba(16,10,40,0.06)]">
-            <div className="flex items-start gap-3 mb-3">
-              <div className="w-9 h-9 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
-                <User className="w-4.5 h-4.5 text-primary" strokeWidth={1.8} />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-black">9. Barber Profile Photo</h3>
-                <p className="text-xs text-black/55 mt-0.5">Upload your professional profile photo</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => pick('profile')}
-              className="relative aspect-video w-full overflow-hidden rounded-2xl border border-dashed border-primary/50 bg-primary/[0.04] flex flex-col items-center justify-center gap-1.5"
-            >
-              {profilePhoto ? (
-                <img src={profilePhoto} alt="Barber profile" className="absolute inset-0 w-full h-full object-cover" />
-              ) : (
-                <>
-                  <Camera className="w-6 h-6 text-primary" strokeWidth={1.8} />
-                  <span className="text-sm font-medium text-black">Upload Photo</span>
-                  <span className="text-[11px] text-black/50">Required · 16:9 ratio</span>
-                </>
-              )}
-              <input
-                ref={(el) => (fileRefs.current['profile'] = el)}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={onFile('profile', setProfilePhoto)}
-              />
+          <FieldRow icon={<User className="h-6 w-6" />} tone="orange">
+            <button type="button" onClick={() => pick('profile')} className="relative flex min-h-[96px] w-full items-center gap-3 overflow-hidden rounded-xl border border-dashed border-[#F5B17E] bg-[#FFF9F3] px-3 py-3 text-left">
+              {profilePhoto && <img src={profilePhoto} alt="Profile photo preview" className="absolute inset-0 h-full w-full object-cover" />}
+              {!profilePhoto && <><Camera className="h-7 w-7 shrink-0 text-[#E96A12]" /><span className="h-10 w-px shrink-0 bg-[#F5D0B3]" /><span className="min-w-0"><span className="block text-sm font-bold text-[#E96A12]">Add Profile Photo</span><span className="mt-0.5 block text-xs leading-snug text-[#73798B]">Upload your professional profile photo</span></span></>}
+              <input ref={(element) => { fileRefs.current.profile = element; }} type="file" accept="image/*" className="hidden" onChange={onFile(setProfilePhoto)} />
             </button>
-          </section>
+          </FieldRow>
 
-          {/* VERIFICATION NOTICE */}
-          <section className="rounded-2xl border border-primary/20 bg-primary/[0.06] p-4 flex items-start gap-3">
-            <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" strokeWidth={1.8} />
-            <div>
-              <p className="text-sm font-medium text-black">
-                We verify all details to ensure trust and safety for our customers.
-              </p>
-              <p className="text-xs text-black/60 mt-1">You will be notified once your shop is approved.</p>
-            </div>
-          </section>
+          <div className="flex items-start gap-2 rounded-xl border border-[#ECECF1] bg-white p-3 text-xs leading-relaxed text-[#73798B]">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#7540D8]" />
+            <p>We verify all details to ensure trust and safety for our customers. You will be notified once your shop is approved.</p>
+          </div>
 
-          {/* SUBMIT */}
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full h-14 rounded-2xl text-base font-semibold text-primary-foreground shadow-lg bg-gradient-to-r from-[hsl(262_83%_58%)] to-[hsl(280_80%_60%)] hover:opacity-95"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <Send className="w-5 h-5 mr-2" />
-                Submit for Approval
-              </>
-            )}
+          <Button type="submit" disabled={loading || locating} className="h-13 w-full rounded-2xl bg-gradient-to-r from-[#FF6A00] to-[#FF8A18] text-base font-bold text-white shadow-none hover:from-[#F56500] hover:to-[#F98010]">
+            {loading ? <><Loader2 className="h-5 w-5 animate-spin" /> Submitting…</> : <><Send className="h-5 w-5" /> Submit for Approval</>}
           </Button>
         </form>
-      </motion.div>
+      </motion.main>
     </div>
   );
 }
