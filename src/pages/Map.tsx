@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   APIProvider,
   Map as GoogleMap,
   AdvancedMarker,
   Pin,
+  useMap,
+  useMapsLibrary,
 } from "@vis.gl/react-google-maps";
 
 import {
@@ -25,12 +27,92 @@ const DEFAULT_CENTER = {
 
 type Filter = "all" | "near" | "top" | "home";
 
+function MapController({
+  selectedLocation,
+}: {
+  selectedLocation: { lat: number; lng: number } | null;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map || !selectedLocation) return;
+
+    map.panTo(selectedLocation);
+    map.setZoom(13);
+  }, [map, selectedLocation]);
+
+  return null;
+}
+
+function PlaceAutocompleteController({
+  inputRef,
+  onPlaceSelected,
+}: {
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  onPlaceSelected: (
+    latitude: number,
+    longitude: number,
+    address: string
+  ) => void;
+}) {
+  const places = useMapsLibrary("places");
+
+  useEffect(() => {
+    if (!places || !inputRef.current) return;
+
+    const autocomplete = new places.Autocomplete(
+      inputRef.current,
+      {
+        fields: [
+          "geometry",
+          "formatted_address",
+          "name",
+        ],
+      }
+    );
+
+    const listener = autocomplete.addListener(
+      "place_changed",
+      () => {
+        const place = autocomplete.getPlace();
+        const location = place.geometry?.location;
+
+        if (!location) return;
+
+        const latitude = location.lat();
+        const longitude = location.lng();
+
+        onPlaceSelected(
+          latitude,
+          longitude,
+          place.formatted_address ||
+            place.name ||
+            ""
+        );
+      }
+    );
+
+    return () => {
+      listener.remove();
+    };
+  }, [places, inputRef, onPlaceSelected]);
+
+  return null;
+}
+
 export default function Map() {
   const [barbers, setBarbers] = useState<ApprovedBarberData[]>([]);
   const [query, setQuery] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
 
-  // Near Me
+  // Google Places Autocomplete
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Near Me / location search
   const [nearbyBarbers, setNearbyBarbers] = useState<
     NearbyBarberData[]
   >([]);
@@ -94,6 +176,56 @@ export default function Map() {
   }, [barbers]);
 
   // ==========================================
+  // GOOGLE PLACE SELECTED
+  // ==========================================
+
+  const handlePlaceSelected = useCallback(
+    async (
+      latitude: number,
+      longitude: number,
+      address: string
+    ) => {
+      setSelectedLocation({
+        lat: latitude,
+        lng: longitude,
+      });
+
+      setQuery(address);
+      setFilter("all");
+      setNearbyLoading(true);
+
+      try {
+        const res = await getNearbyBarbers(
+          latitude,
+          longitude,
+          10
+        );
+
+        if (res.success && res.data) {
+          setNearbyBarbers(res.data);
+        } else {
+          setNearbyBarbers([]);
+
+          console.error(
+            "Location search barbers error:",
+            res.error
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Location search error:",
+          error
+        );
+
+        setNearbyBarbers([]);
+      } finally {
+        setNearbyLoading(false);
+      }
+    },
+    []
+  );
+
+  // ==========================================
   // CURRENT LOCATION
   // ==========================================
 
@@ -104,7 +236,9 @@ export default function Map() {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(
-          new Error("Location is not supported by this browser.")
+          new Error(
+            "Location is not supported by this browser."
+          )
         );
         return;
       }
@@ -138,6 +272,11 @@ export default function Map() {
 
       const { latitude, longitude } =
         await getCurrentLocation();
+
+      setSelectedLocation({
+        lat: latitude,
+        lng: longitude,
+      });
 
       const res = await getNearbyBarbers(
         latitude,
@@ -183,19 +322,44 @@ export default function Map() {
   };
 
   // ==========================================
+  // SEARCH INPUT CHANGE
+  // ==========================================
+
+  const handleSearchChange = (
+    value: string
+  ) => {
+    setQuery(value);
+
+    // When the user clears the search,
+    // return to the normal barber list.
+    if (!value.trim()) {
+      setSelectedLocation(null);
+      setNearbyBarbers([]);
+      setFilter("all");
+    }
+  };
+
+  // ==========================================
   // FILTERED BARBERS
   // ==========================================
 
   const filteredBarbers = useMemo(() => {
-    const search = query.trim().toLowerCase();
-
+    // If a Google place was selected, show
+    // barber shops around that location.
     const source =
-      filter === "near"
+      selectedLocation
+        ? nearbyBarbers
+        : filter === "near"
         ? nearbyBarbers
         : barbers;
 
+    const search =
+      selectedLocation
+        ? ""
+        : query.trim().toLowerCase();
+
     return source.filter((barber) => {
-      // Search
+      // Normal barber/shop search
       if (search) {
         const shopName =
           barber.shop_name?.toLowerCase() || "";
@@ -235,6 +399,7 @@ export default function Map() {
     query,
     filter,
     homeServiceIds,
+    selectedLocation,
   ]);
 
   // ==========================================
@@ -293,12 +458,16 @@ export default function Map() {
         touchAction: "none",
       }}
     >
-<APIProvider
-  apiKey={GOOGLE_MAPS_API_KEY}
-  libraries={["places"]}
->
-        {/* FULL SCREEN MAP */}
+      <APIProvider
+        apiKey={GOOGLE_MAPS_API_KEY}
+        libraries={["places"]}
+      >
+        <PlaceAutocompleteController
+          inputRef={searchInputRef}
+          onPlaceSelected={handlePlaceSelected}
+        />
 
+        {/* FULL SCREEN MAP */}
         <div
           className="absolute left-0 top-0"
           style={{
@@ -321,12 +490,17 @@ export default function Map() {
               height: "100%",
             }}
           >
-            {/* BARBER SHOP MARKERS */}
+            <MapController
+              selectedLocation={selectedLocation}
+            />
 
+            {/* BARBER SHOP MARKERS */}
             {filteredBarbers.map((barber) => {
               if (
-                typeof barber.latitude !== "number" ||
-                typeof barber.longitude !== "number"
+                typeof barber.latitude !==
+                  "number" ||
+                typeof barber.longitude !==
+                  "number"
               ) {
                 return null;
               }
@@ -355,10 +529,8 @@ export default function Map() {
         </div>
 
         {/* SEARCH + FILTERS */}
-
         <div className="pointer-events-none absolute left-0 right-0 top-0 z-[20] px-5 pt-5">
           {/* SEARCH BOX */}
-
           <div className="pointer-events-auto relative mb-3 w-full">
             <div
               className="
@@ -371,7 +543,6 @@ export default function Map() {
               "
             >
               {/* Search Icon */}
-
               <div
                 className="
                   flex h-[41px] w-[41px] shrink-0 items-center justify-center
@@ -398,15 +569,17 @@ export default function Map() {
                 </svg>
               </div>
 
-              {/* WORKING SEARCH INPUT */}
-
+              {/* GOOGLE PLACE SEARCH INPUT */}
               <input
+                ref={searchInputRef}
                 type="text"
                 value={query}
                 onChange={(event) =>
-                  setQuery(event.target.value)
+                  handleSearchChange(
+                    event.target.value
+                  )
                 }
-                placeholder="Search barber shops..."
+                placeholder="Search places..."
                 className="
                   h-full
                   min-w-0
@@ -420,10 +593,10 @@ export default function Map() {
                   outline-none
                   placeholder:text-slate-400
                 "
+                autoComplete="off"
               />
 
               {/* Filter Icon */}
-
               <div
                 className="
                   mr-0.5
@@ -452,10 +625,8 @@ export default function Map() {
           </div>
 
           {/* CATEGORY BUTTONS */}
-
           <div className="pointer-events-auto mb-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {/* ALL */}
-
             <button
               type="button"
               onClick={() =>
@@ -495,12 +666,10 @@ export default function Map() {
                 <path d="m3 12 9 5 9-5" />
                 <path d="m3 16 9 5 9-5" />
               </svg>
-
               All
             </button>
 
             {/* NEAR ME */}
-
             <button
               type="button"
               onClick={() =>
@@ -554,7 +723,6 @@ export default function Map() {
             </button>
 
             {/* TOP RATED */}
-
             <button
               type="button"
               onClick={() =>
@@ -590,12 +758,10 @@ export default function Map() {
               >
                 <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z" />
               </svg>
-
               Top Rated
             </button>
 
             {/* HOME SERVICE */}
-
             <button
               type="button"
               onClick={() =>
@@ -634,8 +800,7 @@ export default function Map() {
                 <path d="M3 10.5 12 3l9 7.5" />
                 <path d="M5 9.5V21h14V9.5" />
                 <path d="M9 21v-6h6v6" />
-                        </svg>
-
+              </svg>
               Home Service
             </button>
           </div>
@@ -644,7 +809,9 @@ export default function Map() {
         {/* CURRENT LOCATION BUTTON */}
         <button
           type="button"
-          className="absolute right-5 top-[235px] z-[20] flex h-[60px] w-[60px] items-center justify-center rounded-[20px] bg-white shadow-[0_7px_20px_rgba(0,0,0,0.15)]"
+          onClick={loadNearbyBarbers}
+          disabled={nearbyLoading}
+          className="absolute right-5 top-[235px] z-[20] flex h-[60px] w-[60px] items-center justify-center rounded-[20px] bg-white shadow-[0_7px_20px_rgba(0,0,0,0.15)] disabled:opacity-70"
           aria-label="Current location"
         >
           <svg
@@ -655,8 +822,16 @@ export default function Map() {
             stroke="currentColor"
             strokeWidth="2"
           >
-            <circle cx="12" cy="12" r="3" />
-            <circle cx="12" cy="12" r="8" />
+            <circle
+              cx="12"
+              cy="12"
+              r="3"
+            />
+            <circle
+              cx="12"
+              cy="12"
+              r="8"
+            />
             <path d="M12 2v3" />
             <path d="M12 19v3" />
             <path d="M2 12h3" />
