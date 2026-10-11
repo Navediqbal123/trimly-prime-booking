@@ -337,8 +337,10 @@ function normalizeLikedShop(raw: unknown): LikedShopData | null {
   };
 }
 
-export async function getLikedShops(customerId: string): Promise<ApiResponse<LikedShopData[]>> {
-  const res = await apiCall<unknown>(`/api/liked-shops/${encodeURIComponent(customerId)}`, { method: 'GET' });
+// Backend identifies the customer from the authenticated token (req.user.id),
+// so no customer_id is sent in the URL or body.
+export async function getLikedShops(_customerId?: string): Promise<ApiResponse<LikedShopData[]>> {
+  const res = await apiCall<unknown>('/api/liked-shops/', { method: 'GET' });
   if (!res.success) return { success: false, error: res.error };
   const likes = asList<unknown>(res.data)
     .map(normalizeLikedShop)
@@ -346,17 +348,17 @@ export async function getLikedShops(customerId: string): Promise<ApiResponse<Lik
   return { success: true, data: likes };
 }
 
-export async function likeShop(customerId: string, shopId: string): Promise<ApiResponse> {
+export async function likeShop(_customerId: string, shopId: string): Promise<ApiResponse> {
   return apiCall('/api/liked-shops/like', {
     method: 'POST',
-    body: JSON.stringify({ customer_id: customerId, shop_id: shopId, barber_id: shopId }),
+    body: JSON.stringify({ shop_id: shopId }),
   });
 }
 
-export async function unlikeShop(customerId: string, shopId: string): Promise<ApiResponse> {
+export async function unlikeShop(_customerId: string, shopId: string): Promise<ApiResponse> {
   return apiCall('/api/liked-shops/unlike', {
     method: 'DELETE',
-    body: JSON.stringify({ customer_id: customerId, shop_id: shopId, barber_id: shopId }),
+    body: JSON.stringify({ shop_id: shopId }),
   });
 }
 
