@@ -324,7 +324,36 @@ export function AppSidebar() {
             </>
           )}
         </nav>
+{/* Light / Dark Theme Toggle */}
+<button
+  type="button"
+  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+  className="mx-4 mb-3 flex w-[calc(100%-2rem)] items-center justify-between rounded-xl border border-border bg-secondary/40 px-4 py-3 text-foreground transition-colors hover:bg-secondary"
+  aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+>
+  <span className="flex items-center gap-3">
+    {theme === 'dark' ? (
+      <Sun className="h-5 w-5 text-[#ff7417]" />
+    ) : (
+      <Moon className="h-5 w-5 text-[#ff7417]" />
+    )}
+    <span className="text-sm font-medium">
+      {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+    </span>
+  </span>
 
+  <span
+    className={`relative h-6 w-11 rounded-full transition-colors ${
+      theme === 'dark' ? 'bg-[#ff7417]' : 'bg-muted-foreground/30'
+    }`}
+  >
+    <span
+      className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
+        theme === 'dark' ? 'translate-x-[22px]' : 'translate-x-0.5'
+      }`}
+    />
+  </span>
+</button>
         {/* User Profile Section */}
         <div className="border-t border-border">
           <button
@@ -369,40 +398,7 @@ export function AppSidebar() {
                     </span>
                   </div>
 
-                  {/* Light / Dark Theme Toggle */}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setTheme(theme === 'dark' ? 'light' : 'dark')
-                    }
-                    className="w-full flex items-center justify-between gap-3 rounded-lg border border-border bg-secondary/40 px-3 py-3 text-foreground transition-colors hover:bg-secondary"
-                    aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-                  >
-                    <span className="flex items-center gap-3">
-                      {theme === 'dark' ? (
-                        <Sun className="h-5 w-5 text-[#ff7417]" />
-                      ) : (
-                        <Moon className="h-5 w-5 text-[#ff7417]" />
-                      )}
-                      <span className="text-sm font-medium">
-                        {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                      </span>
-                    </span>
-
-                    <span
-                      className={cn(
-                        'relative h-6 w-11 rounded-full transition-colors duration-200',
-                        theme === 'dark' ? 'bg-[#ff7417]' : 'bg-muted-foreground/30'
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          'absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200',
-                          theme === 'dark' ? 'translate-x-[22px]' : 'translate-x-0.5'
-                        )}
-                      />
-                    </span>
-                  </button>
+                 
 
                   <Button
                     variant="ghost"
