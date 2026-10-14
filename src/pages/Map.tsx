@@ -509,13 +509,13 @@ export default function Map() {
             defaultZoom={13}
             mapId="DEMO_MAP_ID"
             gestureHandling="greedy"
-            disableDefaultUI={false}
-            zoomControl
-            fullscreenControl
+            disableDefaultUI={true}
+            zoomControl={false}
+            fullscreenControl={false}
             streetViewControl={false}
             mapTypeControl={false}
             style={{
-              width: "100%",
+              width: "100%",            
               height: "100%",
             }}
           >
@@ -701,8 +701,8 @@ export default function Map() {
                 active:scale-[0.97]
                 ${
                   filter === "all"
-                    ? "bg-[#ff7417] text-white shadow-[5px_6px_12px_rgba(255,116,23,0.28),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.22)]"
-                    : "bg-[#fff3e5] text-slate-800 shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95),inset_1px_1px_3px_rgba(255,255,255,0.8)]"
+                    ? "bg-[#ff7417] text-white"
+                    : "bg-[#fff3e5] text-slate-800"
                 }
               `}
             >
@@ -745,8 +745,8 @@ export default function Map() {
                 active:scale-[0.97]
                 ${
                   filter === "near"
-                    ? "bg-[#ff7417] text-white border-orange-300 shadow-[5px_6px_12px_rgba(255,116,23,0.28),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.22)]"
-                    : "bg-[#fff3e5] text-slate-800 shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95),inset_1px_1px_3px_rgba(255,255,255,0.8)]"
+                    ? "bg-[#ff7417] text-white border-orange-300"
+                    : "bg-[#fff3e5] text-slate-800"
                 }
                 ${
                   nearbyLoading
@@ -797,8 +797,8 @@ export default function Map() {
                 active:scale-[0.97]
                 ${
                   filter === "top"
-                    ? "bg-[#ff7417] text-white border-orange-300 shadow-[5px_6px_12px_rgba(255,116,23,0.28),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.22)]"
-                    : "bg-[#fff3e5] text-slate-800 shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95),inset_1px_1px_3px_rgba(255,255,255,0.8)]"
+                    ? "bg-[#ff7417] text-white border-orange-300"
+                    : "bg-[#fff3e5] text-slate-800"
                 }
               `}
             >
@@ -836,8 +836,8 @@ export default function Map() {
                 active:scale-[0.97]
                 ${
                   filter === "home"
-                    ? "bg-[#ff7417] text-white border-orange-300 shadow-[5px_6px_12px_rgba(255,116,23,0.28),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.22)]"
-                    : "bg-[#fff3e5] text-slate-800 shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95),inset_1px_1px_3px_rgba(255,255,255,0.8)]"
+                    ? "bg-[#ff7417] text-white border-orange-300"
+                    : "bg-[#fff3e5] text-slate-800"
                 }
               `}
             >
