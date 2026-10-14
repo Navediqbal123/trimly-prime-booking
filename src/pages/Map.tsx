@@ -479,12 +479,12 @@ export default function Map() {
 
   return (
     <div
-      className="fixed left-[-16px] right-0 top-0 bottom-0 z-[5] overflow-hidden"
-      style={{
-        width: "calc(100% + 32px)",
-        height: "100dvh",
-        touchAction: "none",
-      }}
+     className="fixed left-[-16px] right-0 top-0 bottom-0 z-[5] overflow-hidden"
+style={{
+  width: "calc(100% + 32px)",
+  height: "calc(100dvh + 45px)",
+  touchAction: "none",
+}}
     >
       <APIProvider
         apiKey={GOOGLE_MAPS_API_KEY}
@@ -556,21 +556,10 @@ export default function Map() {
             })}
           </GoogleMap>
         </div>
-{/* MAP PAGE HEADING */}
-{/* MAP PAGE HEADING */}
-<div className="pointer-events-none absolute left-5 right-5 top-3 z-[20]">
-  <h1 className="text-4xl font-bold tracking-tight leading-none">
-    <span className="font-serif text-black">Explore </span>
-    <span className="font-serif text-[#FF7417]">Nearby</span>
-  </h1>
 
-  <p className="mt-2 text-base font-medium text-slate-500">
-    Find the best barber shops around you
-  </p>
-</div>
         {/* SEARCH + FILTERS */}
         
-          {/* SEARCH BOX */}<div className="pointer-events-none absolute left-0 right-0 top-[105px] z-[20] px-5 pt-5">
+          {/* SEARCH BOX */}<div className="pointer-events-none absolute left-0 right-0 top-0 z-[20] px-5 pt-5">
           <div className="pointer-events-auto relative mb-3 w-full">
             <div
               className="
