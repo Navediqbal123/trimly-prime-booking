@@ -23,7 +23,6 @@ import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/NotificationBell';
 import { useHideOnScroll } from '@/hooks/useHideOnScroll';
-
 import { cn } from '@/lib/utils';
 
 interface NavItemType {
@@ -51,18 +50,36 @@ const adminNavItems: NavItemType[] = [
 export function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const { user, signOut, isAdmin, isSuperAdmin, isBarber, isBarberPending } = useProtectedUser();
+
+  const {
+    user,
+    signOut,
+    isAdmin,
+    isSuperAdmin,
+    isBarber,
+    isBarberPending,
+  } = useProtectedUser();
+
   const location = useLocation();
   const headerVisible = useHideOnScroll(0);
-  const showCustomerHeader = location.pathname === '/dashboard' || location.pathname.startsWith('/admin/');
+
+  const showCustomerHeader =
+    location.pathname === '/dashboard' ||
+    location.pathname.startsWith('/admin/');
 
   const isBarberApproved = isBarber;
   const isPending = isBarberPending;
   const hasNoBarber = !isBarber && !isBarberPending;
 
-  const NavLink = ({ item, nested = false }: { item: NavItemType; nested?: boolean }) => {
+  const NavLink = ({
+    item,
+    nested = false,
+  }: {
+    item: NavItemType;
+    nested?: boolean;
+  }) => {
     const isActive = location.pathname === item.href;
-    
+
     return (
       <Link
         to={item.href}
@@ -71,21 +88,32 @@ export function AppSidebar() {
           'flex items-center gap-3 rounded-lg transition-all duration-200',
           'hover:bg-sidebar-accent/60 group',
           nested ? 'px-4 py-2.5 ml-4' : 'px-4 py-3',
-          isActive && 'bg-primary/15 text-primary border border-primary/30 glow-primary'
+          isActive &&
+            'bg-primary/15 text-primary border border-primary/30 glow-primary'
         )}
       >
-        <item.icon className={cn(
-          'transition-colors',
-          nested ? 'w-4 h-4' : 'w-5 h-5',
-          isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
-        )} />
-        <span className={cn(
-          'transition-colors',
-          nested ? 'text-sm' : 'font-medium',
-          isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
-        )}>
+        <item.icon
+          className={cn(
+            'transition-colors',
+            nested ? 'w-4 h-4' : 'w-5 h-5',
+            isActive
+              ? 'text-primary'
+              : 'text-muted-foreground group-hover:text-foreground'
+          )}
+        />
+
+        <span
+          className={cn(
+            'transition-colors',
+            nested ? 'text-sm' : 'font-medium',
+            isActive
+              ? 'text-primary'
+              : 'text-muted-foreground group-hover:text-foreground'
+          )}
+        >
           {item.title}
         </span>
+
         {isActive && (
           <ChevronRight className="w-4 h-4 ml-auto text-primary" />
         )}
@@ -93,56 +121,87 @@ export function AppSidebar() {
     );
   };
 
-  const userInitials = (user?.full_name || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const userInitials = (user?.full_name || 'U')
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <>
-      {/* Mobile header keeps its reserved page space while sliding out of view. */}
+      {/* Mobile Customer Header */}
       {showCustomerHeader && (
-      <motion.div
-        initial={false}
-        animate={{ y: headerVisible || isOpen ? 0 : '-100%' }}
-        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="lg:hidden"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          zIndex: 1000,
-          backgroundColor: '#ffffff',
-          willChange: 'transform',
-        }}
-      >
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(!isOpen)}
-              className="h-12 w-12 [&_svg]:size-7"
-            >
-              {isOpen ? <X /> : <Menu />}
-            </Button>
-            <span className="text-3xl sm:text-4xl font-display font-extrabold tracking-wide" style={{ color: '#000000' }}>
-              Trimly
-            </span>
-          </div>
-          <NotificationBell />
-        </div>
-      </motion.div>
-      )}
+        <motion.div
+          initial={false}
+          animate={{ y: headerVisible || isOpen ? 0 : '-100%' }}
+          transition={{
+            duration: 0.25,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="lg:hidden"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            zIndex: 1000,
+            backgroundColor: '#ffffff',
+            willChange: 'transform',
+          }}
+        >
+          <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-3 bg-white">
+            {/* Orange 3D Menu Button + TrimlyHub */}
+            <div className="flex min-w-0 items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                aria-label={isOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={isOpen}
+                className="
+                  flex h-12 w-12 shrink-0 items-center justify-center
+                  rounded-full
+                  bg-gradient-to-b from-[#ff963f] to-[#ff7417]
+                  text-white
+                  shadow-[inset_0_2px_3px_rgba(255,255,255,0.35),inset_0_-3px_4px_rgba(190,65,0,0.18),0_5px_10px_rgba(255,116,23,0.20)]
+                  transition-transform duration-150
+                  active:scale-95
+                "
+              >
+                {isOpen ? (
+                  <X className="h-6 w-6" strokeWidth={2.5} />
+                ) : (
+                  <Menu className="h-6 w-6" strokeWidth={2.5} />
+                )}
+              </button>
 
+              <Link
+                to="/dashboard"
+                aria-label="TrimlyHub home"
+                className="flex min-w-0 items-center whitespace-nowrap"
+              >
+                <span className="text-[25px] font-display font-extrabold leading-none tracking-tight text-black sm:text-3xl">
+                  Trimly<span className="text-[#ff7417]">Hub</span>
+                </span>
+              </Link>
+            </div>
+
+            {/* Orange 3D Notification Bell */}
+            <NotificationBell />
+          </div>
+        </motion.div>
+      )}
 
       {/* Mobile Overlay */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            key="overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-    className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[1050] lg:hidden"
+            className="fixed inset-0 z-[1050] bg-background/80 backdrop-blur-sm lg:hidden"
             onClick={() => setIsOpen(false)}
           />
         )}
@@ -154,14 +213,18 @@ export function AppSidebar() {
         animate={{
           x: isOpen ? 0 : '-100%',
         }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        transition={{
+          type: 'spring',
+          damping: 25,
+          stiffness: 300,
+        }}
         className={cn(
           'fixed top-0 left-0 h-screen w-72 bg-sidebar border-r border-sidebar-border z-[1100] shadow-2xl lg:z-auto',
           'flex flex-col',
           'lg:translate-x-0 lg:static'
         )}
       >
-        {/* Logo */}
+        {/* Desktop Sidebar Logo */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -173,10 +236,12 @@ export function AppSidebar() {
               <div className="w-12 h-12 rounded-xl flex items-center justify-center btn-gold shrink-0">
                 <Scissors className="w-6 h-6" />
               </div>
-              <span className="text-3xl font-display font-extrabold tracking-wide leading-none" style={{ color: '#000000' }}>
-                Trimly
+
+              <span className="text-3xl font-display font-extrabold tracking-wide leading-none text-black">
+                Trimly<span className="text-[#ff7417]">Hub</span>
               </span>
             </Link>
+
             <NotificationBell className="hidden lg:block" />
           </div>
         </motion.div>
@@ -200,8 +265,12 @@ export function AppSidebar() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.25, duration: 0.3 }}
             >
-              <NavLink 
-                item={{ title: 'Become a Barber', href: '/become-barber', icon: Scissors }} 
+              <NavLink
+                item={{
+                  title: 'Become a Barber',
+                  href: '/become-barber',
+                  icon: Scissors,
+                }}
               />
             </motion.div>
           )}
@@ -214,7 +283,9 @@ export function AppSidebar() {
             >
               <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/10 border border-accent/30">
                 <Clock className="w-4 h-4 text-accent" />
-                <span className="text-sm text-accent font-medium">Waiting for approval</span>
+                <span className="text-sm text-accent font-medium">
+                  Waiting for approval
+                </span>
               </div>
             </motion.div>
           )}
@@ -222,8 +293,12 @@ export function AppSidebar() {
           {isBarberApproved && (
             <>
               <div className="my-4 border-t border-border" />
-              <NavLink 
-                item={{ title: 'Barber Hub', href: '/barber-hub', icon: Scissors }} 
+              <NavLink
+                item={{
+                  title: 'Barber Hub',
+                  href: '/barber-hub',
+                  icon: Scissors,
+                }}
               />
             </>
           )}
@@ -231,11 +306,13 @@ export function AppSidebar() {
           {isSuperAdmin && (
             <>
               <div className="my-4 border-t border-border" />
+
               <div className="px-4 py-2">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Admin
                 </p>
               </div>
+
               {adminNavItems.map((item) => (
                 <NavLink key={item.href} item={item} />
               ))}
@@ -243,18 +320,24 @@ export function AppSidebar() {
           )}
         </nav>
 
-        {/* User Profile Section - Bottom */}
+        {/* User Profile Section */}
         <div className="border-t border-border">
           <button
             onClick={() => setProfileOpen(!profileOpen)}
             className="w-full p-4 flex items-center gap-3 hover:bg-secondary/50 transition-colors duration-200"
           >
             <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-              <span className="text-sm font-bold text-primary">{userInitials}</span>
+              <span className="text-sm font-bold text-primary">
+                {userInitials}
+              </span>
             </div>
+
             <div className="flex-1 min-w-0 text-left">
-              <p className="font-semibold text-sm truncate">{user?.full_name || 'User'}</p>
+              <p className="font-semibold text-sm truncate">
+                {user?.full_name || 'User'}
+              </p>
             </div>
+
             <motion.div
               animate={{ rotate: profileOpen ? 90 : 0 }}
               transition={{ duration: 0.25, ease: 'easeInOut' }}
@@ -275,8 +358,11 @@ export function AppSidebar() {
                 <div className="px-4 pb-4 space-y-2">
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50">
                     <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="text-xs text-muted-foreground truncate">{user?.email || ''}</span>
+                    <span className="text-xs text-muted-foreground truncate">
+                      {user?.email || ''}
+                    </span>
                   </div>
+
                   <Button
                     variant="ghost"
                     className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
