@@ -479,9 +479,9 @@ export default function Map() {
 
   return (
     <div
-      className="fixed inset-0 z-[5] overflow-hidden"
+      className="fixed left-[-16px] right-0 top-0 bottom-0 z-[5] overflow-hidden"
       style={{
-        width: "100vw",
+        width: "calc(100% + 32px)",
         height: "100dvh",
         touchAction: "none",
       }}
@@ -556,9 +556,14 @@ export default function Map() {
             })}
           </GoogleMap>
         </div>
-
+{/* MAP PAGE HEADING */}
+<div className="pointer-events-none absolute left-5 right-5 top-3 z-[20]">
+  <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+    Explore Nearby
+  </h1>
+</div>
         {/* SEARCH + FILTERS */}
-        <div className="pointer-events-none absolute left-0 right-0 top-0 z-[20] px-5 pt-5">
+        <div className="pointer-events-none absolute left-0 right-0 top-0 z-[20] px-5 pt-8">
           {/* SEARCH BOX */}
           <div className="pointer-events-auto relative mb-3 w-full">
             <div
