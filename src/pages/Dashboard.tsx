@@ -169,7 +169,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-white animate-fade-in pb-4">
+    <div className="min-h-screen w-full bg-white animate-fade-in pb-4 pt-16 lg:pt-0">
 
       {/* =========================================================
           SEARCH BAR
