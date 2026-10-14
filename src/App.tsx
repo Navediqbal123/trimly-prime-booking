@@ -37,6 +37,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminBarbers from "./pages/admin/AdminBarbers";
 
 import NotFound from "./pages/NotFound";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 // Create QueryClient outside component to prevent recreation
 const queryClient = new QueryClient({
@@ -110,12 +111,14 @@ function AppRoutes() {
 function App() {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Sonner />
-          <AppRoutes />
-        </TooltipProvider>
-      </QueryClientProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Sonner />
+            <AppRoutes />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

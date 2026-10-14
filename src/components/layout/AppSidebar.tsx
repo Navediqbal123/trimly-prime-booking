@@ -18,7 +18,10 @@ import {
   Clock,
   Mail,
   Heart,
+  Sun,
+  Moon,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/NotificationBell';
@@ -50,6 +53,8 @@ const adminNavItems: NavItemType[] = [
 export function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
+  const { theme, setTheme } = useTheme();
 
   const {
     user,
@@ -325,6 +330,7 @@ export function AppSidebar() {
           <button
             onClick={() => setProfileOpen(!profileOpen)}
             className="w-full p-4 flex items-center gap-3 hover:bg-secondary/50 transition-colors duration-200"
+            aria-expanded={profileOpen}
           >
             <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
               <span className="text-sm font-bold text-primary">
@@ -362,6 +368,41 @@ export function AppSidebar() {
                       {user?.email || ''}
                     </span>
                   </div>
+
+                  {/* Light / Dark Theme Toggle */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setTheme(theme === 'dark' ? 'light' : 'dark')
+                    }
+                    className="w-full flex items-center justify-between gap-3 rounded-lg border border-border bg-secondary/40 px-3 py-3 text-foreground transition-colors hover:bg-secondary"
+                    aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                  >
+                    <span className="flex items-center gap-3">
+                      {theme === 'dark' ? (
+                        <Sun className="h-5 w-5 text-[#ff7417]" />
+                      ) : (
+                        <Moon className="h-5 w-5 text-[#ff7417]" />
+                      )}
+                      <span className="text-sm font-medium">
+                        {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                      </span>
+                    </span>
+
+                    <span
+                      className={cn(
+                        'relative h-6 w-11 rounded-full transition-colors duration-200',
+                        theme === 'dark' ? 'bg-[#ff7417]' : 'bg-muted-foreground/30'
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200',
+                          theme === 'dark' ? 'translate-x-[22px]' : 'translate-x-0.5'
+                        )}
+                      />
+                    </span>
+                  </button>
 
                   <Button
                     variant="ghost"
