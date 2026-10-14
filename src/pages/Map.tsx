@@ -479,7 +479,7 @@ export default function Map() {
 
   return (
     <div
-      className="fixed left-[-12px] right-0 top-0 bottom-0 z-[5] overflow-hidden"
+      className="fixed inset-0 z-[5] overflow-hidden"
       style={{
         width: "100vw",
         height: "100dvh",
@@ -501,7 +501,7 @@ export default function Map() {
           className="absolute left-0 top-0"
           style={{
             width: "100%",
-            height: "calc(100dvh - 95px)",
+            height: "100%",
           }}
         >
           <GoogleMap
