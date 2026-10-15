@@ -30,61 +30,54 @@ export function BarberBottomNav() {
         bottom-0
         z-[900]
         w-full
-        px-2
-        pb-[calc(8px+env(safe-area-inset-bottom))]
-        pt-2
+        bg-background border-t border-border
+        shadow-[0_-6px_20px_rgba(0,0,0,0.08)]
+        pb-[env(safe-area-inset-bottom)]
       "
     >
-      <div
-        className="
-          w-full
-          rounded-[22px]
-          border border-orange-200/70
-          bg-white/95
-          backdrop-blur-2xl
-          shadow-[0_-6px_30px_rgba(249,115,22,0.15)]
-        "
-      >
-        <div className="flex w-full items-stretch px-1.5 py-1.5">
-          {items.map((item) => {
-            const active = pathname === item.href;
-            const Icon = item.icon;
+      <div className="flex w-full items-stretch px-1 py-1">
+        {items.map((item) => {
+          const active = pathname === item.href;
+          const Icon = item.icon;
 
-            return (
-              <NavLink
-                key={item.href}
-                to={item.href}
+          return (
+            <NavLink
+              key={item.href}
+              to={item.href}
+              className={cn(
+                'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 py-2.5 transition-colors duration-200',
+                active ? 'text-orange-500' : 'text-muted-foreground'
+              )}
+            >
+              <div
                 className={cn(
-                  'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-[17px] px-1 py-2.5 transition-all duration-200',
-                  active
-                    ? 'bg-orange-50 text-orange-500'
-                    : 'text-slate-400'
+                  'flex h-[44px] w-[72px] flex-col items-center justify-center rounded-[20px] transition-colors duration-200',
+                  active && 'bg-orange-50 dark:bg-muted/60'
                 )}
               >
                 <Icon
                   className={cn(
-                    'h-5 w-5 shrink-0',
-                    active &&
-                      'stroke-[2.5] drop-shadow-[0_2px_6px_rgba(249,115,22,0.3)]'
+                    'h-6 w-6 shrink-0',
+                    active && 'stroke-[2.5]'
                   )}
                 />
 
                 <span
                   className={cn(
-                    'w-full truncate text-center text-[10px] font-semibold leading-none',
-                    active ? 'text-orange-500' : 'text-slate-400'
+                    'mt-1 text-[11px] font-semibold leading-none',
+                    active ? 'text-orange-500' : 'text-muted-foreground'
                   )}
                 >
                   {item.title}
                 </span>
+              </div>
 
-                {active && (
-                  <span className="absolute bottom-0.5 h-1 w-1 rounded-full bg-orange-500" />
-                )}
-              </NavLink>
-            );
-          })}
-        </div>
+              {active && (
+                <span className="absolute bottom-0.5 h-1.5 w-1.5 rounded-full bg-orange-500" />
+              )}
+            </NavLink>
+          );
+        })}
       </div>
     </nav>
   );

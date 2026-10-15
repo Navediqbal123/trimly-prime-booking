@@ -162,7 +162,7 @@ export default function BarberEarnings() {
     return (
       <div className="flex min-h-[60vh] w-full items-center justify-center bg-background text-foreground">
         <div className="flex flex-col items-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-primary/10 shadow-[5px_6px_12px_rgba(0,0,0,0.10)]">
+          <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-primary/10 shadow-none">
             <Loader2 className="h-7 w-7 animate-spin text-primary" />
           </div>
 
@@ -203,7 +203,7 @@ export default function BarberEarnings() {
           type="button"
           onClick={fetchData}
           disabled={loading}
-          className="flex h-11 w-full rounded-[18px] bg-primary font-bold text-primary-foreground shadow-[6px_7px_14px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(190,70,0,0.25)] hover:bg-primary/90"
+          className="flex h-11 w-full rounded-[18px] bg-primary font-bold text-primary-foreground shadow-none hover:bg-primary/90"
         >
           <RefreshCw
             className={`mr-2 h-5 w-5 ${
@@ -217,10 +217,10 @@ export default function BarberEarnings() {
         {/* ================= STATS ================= */}
         <div className="grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-3">
           {/* TOTAL EARNINGS */}
-          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-sm dark:shadow-black/20">
+          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-none">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-[4px_5px_11px_rgba(24,174,120,0.14),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-none">
                   <IndianRupee className="h-7 w-7" />
                 </div>
 
@@ -238,10 +238,10 @@ export default function BarberEarnings() {
           </Card>
 
           {/* THIS WEEK */}
-          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-sm dark:shadow-black/20">
+          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-none">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-violet-500/15 text-violet-700 dark:text-violet-300 shadow-[4px_5px_11px_rgba(152,85,232,0.14),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-violet-500/15 text-violet-700 dark:text-violet-300 shadow-none">
                   <TrendingUp className="h-7 w-7" />
                 </div>
 
@@ -259,10 +259,10 @@ export default function BarberEarnings() {
           </Card>
 
           {/* COMPLETED JOBS */}
-          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-sm dark:shadow-black/20">
+          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-none">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-blue-500/15 text-blue-700 dark:text-blue-300 shadow-[4px_5px_11px_rgba(57,130,231,0.14),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-blue-500/15 text-blue-700 dark:text-blue-300 shadow-none">
                   <Calendar className="h-7 w-7" />
                 </div>
 
@@ -281,11 +281,11 @@ export default function BarberEarnings() {
         </div>
 
         {/* ================= EARNINGS OVERVIEW ================= */}
-        <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-sm dark:shadow-black/20">
+        <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-none">
           <CardHeader className="flex w-full min-w-0 flex-row items-center justify-between gap-3 p-5 pb-2 sm:p-6">
             <div className="min-w-0">
               <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[17px] bg-primary/10 text-primary shadow-[4px_5px_10px_rgba(255,116,23,0.13),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[17px] bg-[#ff7417]/15 text-[#ff7417] shadow-none">
                   <TrendingUp className="h-5 w-5" />
                 </div>
 
@@ -294,14 +294,11 @@ export default function BarberEarnings() {
                     Earnings Overview
                   </CardTitle>
 
-                  <p className="truncate text-xs font-semibold text-muted-foreground sm:text-sm">
-                    Your recent completed earnings
-                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="shrink-0 rounded-[18px] bg-primary/10 px-3 py-2.5 text-xs font-bold text-primary shadow-[4px_5px_9px_rgba(255,116,23,0.12),inset_1px_1px_4px_rgba(255,255,255,0.9)] sm:px-4 sm:text-sm">
+            <div className="shrink-0 rounded-[18px] bg-primary/10 px-3 py-2.5 text-xs font-bold text-primary shadow-none sm:px-4 sm:text-sm">
               This Week⌄
             </div>
           </CardHeader>
@@ -362,8 +359,7 @@ export default function BarberEarnings() {
                         background: 'hsl(var(--card))',
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '18px',
-                        boxShadow:
-                          '0 8px 24px rgba(0,0,0,0.16)',
+                        boxShadow: 'none',
                         padding: '10px 14px',
                       }}
                       labelStyle={{
@@ -411,7 +407,7 @@ export default function BarberEarnings() {
               </div>
             ) : (
               <div className="flex min-h-[260px] w-full flex-col items-center justify-center rounded-[22px] bg-secondary">
-                <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-primary/10 text-primary shadow-[4px_5px_10px_rgba(0,0,0,0.08)]">
+                <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#ff7417]/15 text-[#ff7417] shadow-none">
                   <IndianRupee className="h-7 w-7" />
                 </div>
 
@@ -426,7 +422,7 @@ export default function BarberEarnings() {
             )}
 
             {/* TOTAL EARNINGS FOOTER */}
-            <div className="mt-3 flex w-full items-center justify-between gap-3 rounded-[22px] bg-secondary p-4 shadow-[4px_5px_10px_rgba(255,116,23,0.08),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
+            <div className="mt-3 flex w-full items-center justify-between gap-3 rounded-[22px] bg-secondary p-4 shadow-none">
               <div className="min-w-0">
                 <p className="text-xs font-bold text-muted-foreground">
                   Total Earnings
@@ -437,7 +433,7 @@ export default function BarberEarnings() {
                 </p>
               </div>
 
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-primary/10 text-primary shadow-[4px_5px_9px_rgba(255,116,23,0.12),inset_1px_1px_4px_rgba(255,255,255,0.9)]">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-[#ff7417]/15 text-[#ff7417] shadow-none">
                 <TrendingUp className="h-5 w-5" />
               </div>
             </div>
@@ -445,7 +441,7 @@ export default function BarberEarnings() {
         </Card>
 
         {/* ================= RECENT COMPLETED ================= */}
-        <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-sm dark:shadow-black/20">
+        <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-none">
           <CardHeader className="p-5 pb-3 sm:p-6">
             <CardTitle className="text-xl font-black text-foreground sm:text-2xl">
               Recent Completed Bookings
@@ -481,7 +477,7 @@ export default function BarberEarnings() {
                           ₹{amountOf(b)}
                         </span>
 
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary shadow-[3px_4px_7px_rgba(0,0,0,0.08)]">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ff7417]/15 text-[#ff7417] shadow-none">
                           <ChevronRight className="h-4 w-4" />
                         </div>
                       </div>

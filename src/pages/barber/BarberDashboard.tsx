@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import {
-  AlertCircle,
-  RefreshCw,
-  Scissors,
-  LayoutDashboard,
-} from 'lucide-react';
+import { AlertCircle, RefreshCw, Scissors } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,25 +20,16 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
   },
 };
 
 const itemVariants = {
-  hidden: {
-    opacity: 0,
-    y: 20,
-  },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.4,
-      ease: 'easeOut' as const,
-    },
+    transition: { duration: 0.4, ease: 'easeOut' as const },
   },
 };
 
@@ -51,33 +37,24 @@ const clayButton =
   'border border-border bg-card text-foreground shadow-sm hover:bg-secondary hover:text-primary';
 
 const refreshButton =
-  'border-0 bg-primary text-primary-foreground shadow-[5px_6px_12px_rgba(255,116,23,0.24),inset_2px_2px_4px_rgba(255,255,255,0.18)] hover:bg-primary/90 hover:text-primary-foreground';
+  'border-0 !bg-[#ff7417] !text-white shadow-none hover:!bg-[#e9650b] hover:!text-white focus-visible:ring-2 focus-visible:ring-[#ff7417] focus-visible:ring-offset-2';
 
 export default function BarberDashboard() {
   const [bookings, setBookings] = useState<BookingData[]>([]);
   const [services, setServices] = useState<ServiceData[]>([]);
-  const [stats, setStats] =
-    useState<BarberDashboardStats | null>(null);
+  const [stats, setStats] = useState<BarberDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] =
-    useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const fetchAllData = async (
-    showRefreshState = false,
-  ) => {
-    if (showRefreshState) {
-      setIsRefreshing(true);
-    } else {
-      setLoading(true);
-    }
+  const fetchAllData = async (showRefreshState = false) => {
+    if (showRefreshState) setIsRefreshing(true);
+    else setLoading(true);
 
     setError(null);
 
-    // Resolve internal barber_id (never the auth user id) to scope bookings
-    const profileResponse =
-      await getMyBarberProfile();
-
+    // Resolve internal barber_id (never the auth user id) to scope bookings.
+    const profileResponse = await getMyBarberProfile();
     const barberId = profileResponse.success
       ? profileResponse.data?.id
       : undefined;
@@ -89,12 +66,7 @@ export default function BarberDashboard() {
       );
     }
 
-    // Fetch bookings and services in parallel
-    const [
-      bookingsRes,
-      servicesRes,
-      statsRes,
-    ] = await Promise.all([
+    const [bookingsRes, servicesRes, statsRes] = await Promise.all([
       getBarberBookings(),
       getMyServices(),
       getBarberDashboardStats(),
@@ -111,19 +83,10 @@ export default function BarberDashboard() {
     }
 
     if (bookingsRes.success && bookingsRes.data) {
-      const list = Array.isArray(
-        bookingsRes.data,
-      )
-        ? bookingsRes.data
-        : [];
-
+      const list = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
       setBookings(
         barberId
-          ? list.filter(
-              (b) =>
-                !b.barber_id ||
-                b.barber_id === barberId,
-            )
+          ? list.filter((b) => !b.barber_id || b.barber_id === barberId)
           : list,
       );
     }
@@ -131,32 +94,20 @@ export default function BarberDashboard() {
     if (servicesRes.success && servicesRes.data) {
       setServices(servicesRes.data);
     } else if (!servicesRes.success) {
-      console.error(
-        'Services fetch failed:',
-        servicesRes.error,
-      );
-
-      toast.error(
-        servicesRes.error ||
-          'Failed to load services',
-      );
+      console.error('Services fetch failed:', servicesRes.error);
+      toast.error(servicesRes.error || 'Failed to load services');
     }
 
     setLoading(false);
     setIsRefreshing(false);
-
-    if (showRefreshState) {
-      toast.success('Dashboard refreshed');
-    }
+    if (showRefreshState) toast.success('Dashboard refreshed');
   };
 
   useEffect(() => {
     fetchAllData();
   }, []);
 
-  if (loading) {
-    return <DashboardSkeleton />;
-  }
+  if (loading) return <DashboardSkeleton />;
 
   if (error) {
     return (
@@ -168,15 +119,10 @@ export default function BarberDashboard() {
         <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-destructive/10 text-destructive shadow-sm">
           <AlertCircle className="h-9 w-9" />
         </div>
-
         <h3 className="mb-2 text-xl font-bold text-foreground">
           Error Loading Dashboard
         </h3>
-
-        <p className="max-w-md text-sm text-muted-foreground">
-          {error}
-        </p>
-
+        <p className="max-w-md text-sm text-muted-foreground">{error}</p>
         <Button
           variant="outline"
           className={`${clayButton} mt-5 h-11 rounded-[18px] px-5 transition-all duration-200 hover:scale-105 active:scale-95`}
@@ -196,60 +142,30 @@ export default function BarberDashboard() {
       animate="visible"
       className="min-h-full space-y-6 bg-background pb-28 text-foreground"
     >
-      {/* Dashboard Header */}
-      <motion.div
-        variants={itemVariants}
-        className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary shadow-sm">
-            <LayoutDashboard className="h-7 w-7" />
-          </div>
-
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl lg:text-4xl">
-              Barber{' '}
-              <span className="text-primary">Hub</span>
-            </h1>
-
-            <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
-              Manage your shop, services, and appointments
-            </p>
-          </div>
-        </div>
-
-        {/* Refresh */}
+      {/* Orange refresh button. The duplicate in-page Barber Hub heading,
+          icon, and description have been removed. */}
+      <motion.div variants={itemVariants} className="flex justify-end">
         <Button
           variant="outline"
           onClick={() => fetchAllData(true)}
           disabled={isRefreshing}
-          className={`${refreshButton} h-11 w-full rounded-[18px] px-5 font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] active:translate-y-[2px] active:scale-[0.97] sm:w-auto`}
+          className={`${refreshButton} h-11 w-full rounded-[18px] px-5 font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] active:translate-y-[2px] active:scale-[0.97]`}
         >
           <RefreshCw
-            className={`mr-2 h-4 w-4 stroke-[2.8] drop-shadow-[0_1px_1px_rgba(0,0,0,0.15)] ${isRefreshing ? 'animate-spin' : ''}`}
+            className={`mr-2 h-4 w-4 stroke-[2.8] ${isRefreshing ? 'animate-spin' : ''}`}
           />
           {isRefreshing ? 'Refreshing...' : 'Refresh'}
         </Button>
       </motion.div>
 
-      {/* Stats */}
       <motion.div variants={itemVariants}>
-        <StatsCards
-          services={services}
-          bookings={bookings}
-          stats={stats}
-        />
+        <StatsCards services={services} bookings={bookings} stats={stats} />
       </motion.div>
 
-      {/* Earnings */}
       <motion.div variants={itemVariants}>
-        <EarningsChart
-          bookings={bookings}
-          services={services}
-        />
+        <EarningsChart bookings={bookings} services={services} />
       </motion.div>
 
-      {/* Small Dashboard Footer Accent */}
       <motion.div
         variants={itemVariants}
         className="flex items-center justify-center gap-2 pt-2 text-xs font-medium text-muted-foreground"

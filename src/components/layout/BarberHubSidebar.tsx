@@ -6,7 +6,6 @@ import {
   Store,
   Settings,
   Calendar,
-  User,
   Scissors,
   ChevronRight,
   ChevronLeft,
@@ -45,8 +44,13 @@ export function BarberHubSidebar({ isOpen, onOpenChange }: BarberHubSidebarProps
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex h-screen w-64 bg-card border-r border-border flex-col sticky top-0">
-        <SidebarContent user={user} signOut={signOut} location={location} onNavigate={() => {}} />
+      <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-border bg-card lg:flex">
+        <SidebarContent
+          user={user}
+          signOut={signOut}
+          location={location}
+          onNavigate={() => {}}
+        />
       </aside>
 
       {/* Mobile overlay */}
@@ -57,7 +61,7 @@ export function BarberHubSidebar({ isOpen, onOpenChange }: BarberHubSidebarProps
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
             onClick={() => onOpenChange(false)}
           />
         )}
@@ -71,9 +75,14 @@ export function BarberHubSidebar({ isOpen, onOpenChange }: BarberHubSidebarProps
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed top-0 left-0 h-screen w-64 bg-card border-r border-border z-50 flex flex-col lg:hidden"
+            className="fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r border-border bg-card lg:hidden"
           >
-            <SidebarContent user={user} signOut={signOut} location={location} onNavigate={() => onOpenChange(false)} />
+            <SidebarContent
+              user={user}
+              signOut={signOut}
+              location={location}
+              onNavigate={() => onOpenChange(false)}
+            />
           </motion.aside>
         )}
       </AnimatePresence>
@@ -81,14 +90,24 @@ export function BarberHubSidebar({ isOpen, onOpenChange }: BarberHubSidebarProps
   );
 }
 
-function SidebarContent({ user, signOut, location, onNavigate }: {
+function SidebarContent({
+  user,
+  signOut,
+  location,
+  onNavigate,
+}: {
   user: any;
   signOut: () => void;
   location: { pathname: string };
   onNavigate: () => void;
 }) {
   const [profileOpen, setProfileOpen] = useState(false);
-  const userInitials = (user?.full_name || 'B').split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+  const userInitials = (user?.full_name || 'B')
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <>
@@ -97,20 +116,29 @@ function SidebarContent({ user, signOut, location, onNavigate }: {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.3 }}
-        className="p-6 border-b border-border"
+        className="border-b border-border p-6"
       >
-        <Link to="/barber-hub" className="flex items-center gap-3" onClick={onNavigate}>
-          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-            <Scissors className="w-6 h-6 text-primary" />
+        <Link
+          to="/barber-hub"
+          className="flex items-center gap-3"
+          onClick={onNavigate}
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ff7417]">
+            <Scissors className="h-5 w-5 text-white" />
           </div>
-          <span className="text-2xl font-display font-bold gradient-text">Barber Hub</span>
+          <span className="font-display text-2xl font-bold tracking-tight">
+            <span className="text-foreground">Barber </span>
+            <span className="text-[#ff7417]">Hub</span>
+          </span>
         </Link>
       </motion.div>
 
       {/* Nav items */}
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 space-y-1 overflow-y-auto p-4">
         {barberNavItems.map((item, i) => {
           const isActive = location.pathname === item.href;
+          const Icon = item.icon;
+
           return (
             <motion.div
               key={item.href}
@@ -122,22 +150,32 @@ function SidebarContent({ user, signOut, location, onNavigate }: {
                 to={item.href}
                 onClick={onNavigate}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
-                  'hover:bg-secondary/80 group',
-                  isActive && 'bg-primary/10 text-primary'
+                  'group flex items-center gap-3 rounded-lg px-4 py-3 transition-all duration-200',
+                  'hover:bg-secondary/80',
+                  isActive && 'bg-primary/10 text-primary',
                 )}
               >
-                <item.icon className={cn(
-                  'w-5 h-5 transition-colors',
-                  isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
-                )} />
-                <span className={cn(
-                  'font-medium text-sm transition-colors',
-                  isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
-                )}>
+                <Icon
+                  className={cn(
+                    'h-5 w-5 transition-colors',
+                    isActive
+                      ? 'text-primary'
+                      : 'text-muted-foreground group-hover:text-foreground',
+                  )}
+                />
+                <span
+                  className={cn(
+                    'text-sm font-medium transition-colors',
+                    isActive
+                      ? 'text-primary'
+                      : 'text-muted-foreground group-hover:text-foreground',
+                  )}
+                >
                   {item.title}
                 </span>
-                {isActive && <ChevronRight className="w-4 h-4 ml-auto text-primary" />}
+                {isActive && (
+                  <ChevronRight className="ml-auto h-4 w-4 text-primary" />
+                )}
               </Link>
             </motion.div>
           );
@@ -147,9 +185,9 @@ function SidebarContent({ user, signOut, location, onNavigate }: {
         <Link
           to="/dashboard"
           onClick={onNavigate}
-          className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-secondary/80 hover:text-foreground transition-all"
+          className="flex items-center gap-3 rounded-lg px-4 py-3 text-muted-foreground transition-all hover:bg-secondary/80 hover:text-foreground"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="h-5 w-5" />
           <span className="font-medium">Back to Main App</span>
         </Link>
       </nav>
@@ -158,20 +196,22 @@ function SidebarContent({ user, signOut, location, onNavigate }: {
       <div className="border-t border-border">
         <button
           onClick={() => setProfileOpen(!profileOpen)}
-          className="w-full p-4 flex items-center gap-3 hover:bg-secondary/50 transition-colors duration-200"
+          className="flex w-full items-center gap-3 p-4 transition-colors duration-200 hover:bg-secondary/50"
         >
-          <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/20">
             <span className="text-sm font-bold text-primary">{userInitials}</span>
           </div>
-          <div className="flex-1 min-w-0 text-left">
-            <p className="font-medium text-sm truncate">{user?.full_name || 'Barber'}</p>
+          <div className="min-w-0 flex-1 text-left">
+            <p className="truncate text-sm font-medium">
+              {user?.full_name || 'Barber'}
+            </p>
             <p className="text-xs text-muted-foreground">Approved Barber</p>
           </div>
           <motion.div
             animate={{ rotate: profileOpen ? 180 : 0 }}
             transition={{ duration: 0.2 }}
           >
-            <ChevronDown className="w-4 h-4 text-muted-foreground" />
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </motion.div>
         </button>
 
@@ -184,17 +224,19 @@ function SidebarContent({ user, signOut, location, onNavigate }: {
               transition={{ duration: 0.25, ease: 'easeInOut' }}
               className="overflow-hidden"
             >
-              <div className="px-4 pb-4 space-y-2">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50">
-                  <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <span className="text-xs text-muted-foreground truncate">{user?.email || ''}</span>
+              <div className="space-y-2 px-4 pb-4">
+                <div className="flex items-center gap-2 rounded-lg bg-secondary/50 px-3 py-2">
+                  <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <span className="truncate text-xs text-muted-foreground">
+                    {user?.email || ''}
+                  </span>
                 </div>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  className="w-full justify-start gap-3 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                   onClick={signOut}
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="h-4 w-4" />
                   <span className="text-sm">Log Out</span>
                 </Button>
               </div>
