@@ -76,10 +76,10 @@ export function ShopCard({
         bg-card
         p-2
         text-left
-        shadow-[6px_7px_16px_rgba(0,0,0,0.09),-5px_-5px_13px_rgba(255,255,255,0.95)]
+        shadow-none
         transition-all
         hover:-translate-y-0.5
-        hover:shadow-[8px_10px_20px_rgba(0,0,0,0.12),-5px_-5px_13px_rgba(255,255,255,0.95)]
+        hover:shadow-none
         focus-visible:outline-none
         focus-visible:ring-2
         focus-visible:ring-[#ff7417]

@@ -337,19 +337,19 @@ export default function DiscoverBarbers() {
   // ==========================================
 
   return (
-    <div className="min-h-screen w-full animate-fade-in bg-white pb-28 pt-1 text-black lg:pt-0">
+    <div className="min-h-screen w-full animate-fade-in bg-background pb-28 pt-1 text-foreground lg:pt-0">
 
       {/* Header */}
       <div className="mb-3">
 
-        <h1 className="font-display text-[32px] font-bold leading-[1] tracking-[-1.4px] text-[#111111] sm:text-5xl">
+        <h1 className="font-display text-[32px] font-bold leading-[1] tracking-[-1.4px] text-foreground sm:text-5xl">
           Find a{' '}
           <span className="text-[#ff7417]">
             Barber
           </span>
         </h1>
 
-        <p className="mt-1.5 text-[14px] font-medium leading-tight text-slate-500 sm:text-base">
+        <p className="mt-1.5 text-[14px] font-medium leading-tight text-muted-foreground sm:text-base">
           Discover best barber shops near you
         </p>
 
@@ -363,10 +363,10 @@ export default function DiscoverBarbers() {
           className="
             flex h-[54px] w-full items-center
             rounded-[21px]
-            border border-orange-100
-            bg-white
+            border border-border
+            bg-card
             p-1.5
-            shadow-[6px_7px_15px_rgba(0,0,0,0.09),-4px_-4px_11px_rgba(255,255,255,0.95)]
+            shadow-none
           "
         >
 
@@ -375,8 +375,7 @@ export default function DiscoverBarbers() {
             className="
               flex h-[41px] w-[41px] shrink-0 items-center justify-center
               rounded-[15px]
-              bg-[#fff0df]
-              shadow-[3px_4px_8px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-2px_-2px_4px_rgba(230,110,20,0.10)]
+              bg-[#ff7417]/10
             "
           >
             <Search className="h-[21px] w-[21px] text-[#ff7417]" />
@@ -397,10 +396,10 @@ export default function DiscoverBarbers() {
               px-3
               text-[15px]
               font-medium
-              text-slate-800
+              text-foreground
               shadow-none
               outline-none
-              placeholder:text-slate-400
+              placeholder:text-muted-foreground
               focus-visible:border-0
               focus-visible:ring-0
               focus-visible:ring-offset-0
@@ -409,7 +408,7 @@ export default function DiscoverBarbers() {
 
 
           {/* Filter Icon */}
-          <div className="mr-0.5 hidden h-[38px] w-[45px] shrink-0 items-center justify-center border-l border-orange-100 pl-1 sm:flex">
+          <div className="mr-0.5 hidden h-[38px] w-[45px] shrink-0 items-center justify-center border-l border-border pl-1 sm:flex">
             <SlidersHorizontal className="h-[19px] w-[19px] text-[#ff7417]" />
           </div>
 
@@ -468,10 +467,10 @@ export default function DiscoverBarbers() {
                     shadow-[5px_6px_12px_rgba(255,116,23,0.28),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.22)]
                   `
                   : `
-                    border-orange-100
-                    bg-[#fff3e5]
-                    text-slate-800
-                    shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95),inset_1px_1px_3px_rgba(255,255,255,0.8)]
+                    border-border
+                    bg-secondary
+                    text-foreground
+                    shadow-none
                   `
               )}
             >
@@ -481,7 +480,7 @@ export default function DiscoverBarbers() {
                   'h-[15px] w-[15px] shrink-0',
                   active
                     ? 'text-white'
-                    : 'text-slate-800'
+                    : 'text-foreground'
                 )}
               />
 
@@ -505,8 +504,8 @@ export default function DiscoverBarbers() {
             className="
               flex h-14 w-14 items-center justify-center
               rounded-[19px]
-              bg-white
-              shadow-[5px_6px_12px_rgba(0,0,0,0.09),-4px_-4px_10px_rgba(255,255,255,0.95)]
+              bg-card
+              shadow-none
             "
           >
             <Loader2 className="h-6 w-6 animate-spin text-[#ff7417]" />
@@ -524,8 +523,8 @@ export default function DiscoverBarbers() {
             className="
               flex h-14 w-14 items-center justify-center
               rounded-[19px]
-              bg-white
-              shadow-[5px_6px_12px_rgba(0,0,0,0.09),-4px_-4px_10px_rgba(255,255,255,0.95)]
+              bg-card
+              shadow-none
             "
           >
             <Loader2 className="h-6 w-6 animate-spin text-[#ff7417]" />
@@ -540,11 +539,11 @@ export default function DiscoverBarbers() {
         <div
           className="
             rounded-[24px]
-            border border-orange-100
-            bg-white
+            border border-border
+            bg-card
             p-8
             text-center
-            shadow-[6px_7px_14px_rgba(0,0,0,0.08),-4px_-4px_11px_rgba(255,255,255,0.95)]
+            shadow-none
           "
         >
 
@@ -560,7 +559,7 @@ export default function DiscoverBarbers() {
             <Scissors className="h-7 w-7 text-[#ff7417]" />
           </div>
 
-          <p className="text-sm font-semibold text-slate-600">
+          <p className="text-sm font-semibold text-muted-foreground">
             {filter === 'near'
               ? 'No nearby barbershops found.'
               : 'No barbershops match your search.'}
@@ -615,11 +614,11 @@ export default function DiscoverBarbers() {
                   items-center
                   gap-2.5
                   rounded-[23px]
-                  border border-orange-100
-                  bg-white
+                  border border-border
+                  bg-card
                   p-2
                   text-left
-                  shadow-[6px_7px_14px_rgba(0,0,0,0.09),-4px_-4px_11px_rgba(255,255,255,0.95)]
+                  shadow-none
                   transition-all
                   duration-200
                   active:scale-[0.995]
@@ -659,7 +658,7 @@ export default function DiscoverBarbers() {
                 {/* Shop Information */}
                 <div className="min-w-0 flex-1">
 
-                  <h3 className="truncate pr-1 font-display text-[16px] font-bold leading-tight tracking-[-0.25px] text-[#111111]">
+                  <h3 className="truncate pr-1 font-display text-[16px] font-bold leading-tight tracking-[-0.25px] text-foreground">
                     {b.shop_name}
                   </h3>
 
@@ -669,7 +668,7 @@ export default function DiscoverBarbers() {
 
                     <MapPin className="h-[13px] w-[13px] shrink-0 text-[#ff7417]" />
 
-                    <span className="min-w-0 truncate text-[12px] font-medium text-slate-500">
+                    <span className="min-w-0 truncate text-[12px] font-medium text-muted-foreground">
                       {b.location}
                     </span>
 
@@ -681,11 +680,11 @@ export default function DiscoverBarbers() {
 
                     <Star className="h-[15px] w-[15px] shrink-0 fill-[#ffb300] text-[#ffb300]" />
 
-                    <span className="text-[12px] font-bold text-[#111111]">
+                    <span className="text-[12px] font-bold text-foreground">
                       {rating.toFixed(1)}
                     </span>
 
-                    <span className="text-[11px] font-medium text-slate-500">
+                    <span className="text-[11px] font-medium text-muted-foreground">
                       ({reviews})
                     </span>
 
@@ -701,10 +700,9 @@ export default function DiscoverBarbers() {
                           items-center
                           gap-1
                           rounded-full
-                          bg-[#fff0df]
+                          bg-[#ff7417]/10
                           px-2
                           py-1
-                          shadow-[2px_3px_6px_rgba(0,0,0,0.06),inset_1px_1px_2px_rgba(255,255,255,0.9)]
                         "
                       >
 
@@ -732,12 +730,12 @@ export default function DiscoverBarbers() {
                       flex h-[35px] w-[35px]
                       items-center justify-center
                       rounded-[14px]
-                      bg-white
-                      shadow-[4px_5px_9px_rgba(0,0,0,0.08),-3px_-3px_7px_rgba(255,255,255,0.95)]
+                      bg-secondary
+                      shadow-none
                     "
                   >
 
-                    <Heart className="h-[18px] w-[18px] text-slate-700 transition-transform duration-200 group-hover:scale-110" />
+                    <Heart className="h-[18px] w-[18px] text-muted-foreground transition-transform duration-200 group-hover:scale-110" />
 
                   </div>
 
