@@ -175,6 +175,34 @@ export default function Profile() {
           <div className="absolute -bottom-20 -left-16 w-44 h-44 rounded-full bg-secondary" />
           <div className="absolute top-20 -right-10 w-24 h-24 rounded-full bg-secondary/80" />
 
+          {/* Camera button: fixed at the profile card's top-right corner */}
+          <button
+            type="button"
+            disabled={uploading}
+            onClick={() => fileInputRef.current?.click()}
+            aria-label="Change profile photo"
+            className="
+              absolute top-4 right-4 z-20
+              w-12 h-12
+              rounded-full
+              bg-orange-500
+              text-white
+              flex items-center justify-center
+              border border-orange-300/70
+              shadow-[0_6px_18px_rgba(249,115,22,0.45)]
+              hover:bg-orange-600
+              active:scale-95
+              transition-all
+              disabled:opacity-60
+            "
+          >
+            {uploading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Camera className="w-5 h-5" />
+            )}
+          </button>
+
           <div className="relative flex flex-col sm:flex-row items-center gap-5 sm:gap-7">
 
             {/* Avatar */}
@@ -203,31 +231,6 @@ export default function Profile() {
 
                 </div>
               </div>
-
-              {/* Camera */}
-              <button
-                type="button"
-                disabled={uploading}
-                onClick={() => fileInputRef.current?.click()}
-                className="
-                  absolute -right-1 bottom-1
-                  w-12 h-12
-                  rounded-full
-                  bg-secondary0
-                  text-white
-                  flex items-center justify-center
-                  shadow-[0_6px_15px_rgba(249,115,22,0.40)]
-                  hover:bg-orange-600
-                  transition-all
-                  disabled:opacity-60
-                "
-              >
-                {uploading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Camera className="w-5 h-5" />
-                )}
-              </button>
 
               <input
                 ref={fileInputRef}
@@ -553,8 +556,8 @@ export default function Profile() {
           transition={{ delay: 0.2 }}
           className="
             w-full
-            rounded-[18px]
-            bg-secondary0
+            rounded-full
+            bg-orange-500
             text-white
             font-semibold
             py-3

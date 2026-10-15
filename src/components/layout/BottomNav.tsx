@@ -37,22 +37,20 @@ export function BottomNav() {
               key={item.href}
               to={item.href}
               className={cn(
-                'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 py-2.5 transition-all duration-200',
+                'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 py-2.5 transition-colors duration-200',
                 active ? 'text-orange-500' : 'text-muted-foreground'
               )}
             >
               <div
                 className={cn(
-                  'flex h-[44px] w-[72px] flex-col items-center justify-center rounded-[20px] transition-all duration-200',
-                  active &&
-                    'bg-orange-50 shadow-[3px_4px_10px_rgba(249,115,22,0.10),-2px_-2px_7px_rgba(255,255,255,0.95)]'
+                  'flex h-[44px] w-[72px] flex-col items-center justify-center rounded-[20px] transition-colors duration-200',
+                  active && 'bg-orange-50 dark:bg-muted/60'
                 )}
               >
                 <Icon
                   className={cn(
                     'h-6 w-6 shrink-0',
-                    active &&
-                      'stroke-[2.5] drop-shadow-[0_2px_6px_rgba(249,115,22,0.3)]'
+                    active && 'stroke-[2.5]'
                   )}
                 />
 

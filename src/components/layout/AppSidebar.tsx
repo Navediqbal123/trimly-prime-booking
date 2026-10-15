@@ -155,44 +155,45 @@ export function AppSidebar() {
             willChange: 'transform',
           }}
         >
-          <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-3 bg-white">
-            {/* Orange 3D Menu Button + TrimlyHub */}
-            <div className="flex min-w-0 items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setIsOpen(!isOpen)}
-                aria-label={isOpen ? 'Close menu' : 'Open menu'}
-                aria-expanded={isOpen}
-                className="
-                  flex h-12 w-12 shrink-0 items-center justify-center
-                  rounded-full
-                  bg-gradient-to-b from-[#ff963f] to-[#ff7417]
-                  text-white
-                  shadow-[inset_0_2px_3px_rgba(255,255,255,0.35),inset_0_-3px_4px_rgba(190,65,0,0.18),0_5px_10px_rgba(255,116,23,0.20)]
-                  transition-transform duration-150
-                  active:scale-95
-                "
-              >
-                {isOpen ? (
-                  <X className="h-6 w-6" strokeWidth={2.5} />
-                ) : (
-                  <Menu className="h-6 w-6" strokeWidth={2.5} />
-                )}
-              </button>
+          <div className="relative flex items-center justify-between gap-3 px-4 pt-3 pb-3 bg-background border-b border-border">
+            {/* Orange 3D Menu Button */}
+            <button
+              type="button"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isOpen}
+              className="
+                relative z-10 flex h-12 w-12 shrink-0 items-center justify-center
+                rounded-full
+                bg-gradient-to-b from-[#ff963f] to-[#ff7417]
+                text-white
+                shadow-[inset_0_2px_3px_rgba(255,255,255,0.35),inset_0_-3px_4px_rgba(190,65,0,0.18),0_5px_10px_rgba(255,116,23,0.20)]
+                transition-transform duration-150
+                active:scale-95
+              "
+            >
+              {isOpen ? (
+                <X className="h-6 w-6" strokeWidth={2.5} />
+              ) : (
+                <Menu className="h-6 w-6" strokeWidth={2.5} />
+              )}
+            </button>
 
-              <Link
-                to="/dashboard"
-                aria-label="TrimlyHub home"
-                className="flex min-w-0 items-center whitespace-nowrap"
-              >
-                <span className="text-[25px] font-display font-extrabold leading-none tracking-tight text-foreground sm:text-3xl">
-                  Trimly<span className="text-[#ff7417]">Hub</span>
-                </span>
-              </Link>
-            </div>
+            {/* Centered TrimlyHub Logo */}
+            <Link
+              to="/dashboard"
+              aria-label="TrimlyHub home"
+              className="absolute left-1/2 top-1/2 z-0 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center whitespace-nowrap"
+            >
+              <span className="text-[25px] font-display font-extrabold leading-none tracking-tight text-foreground sm:text-3xl">
+                Trimly<span className="text-[#ff7417]">Hub</span>
+              </span>
+            </Link>
 
             {/* Orange 3D Notification Bell */}
-            <NotificationBell />
+            <div className="relative z-10 shrink-0">
+              <NotificationBell />
+            </div>
           </div>
         </motion.div>
       )}
