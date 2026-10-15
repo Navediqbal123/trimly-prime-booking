@@ -72,8 +72,8 @@ export function ShopCard({
         gap-2.5
         overflow-hidden
         rounded-[25px]
-        border border-orange-100
-        bg-white
+        border border-border
+        bg-card
         p-2
         text-left
         shadow-[6px_7px_16px_rgba(0,0,0,0.09),-5px_-5px_13px_rgba(255,255,255,0.95)]
@@ -110,7 +110,7 @@ export function ShopCard({
 
       <div className="flex min-w-0 flex-1 self-stretch flex-col pt-0 pr-1 pb-0">
         <div className="flex min-w-0 items-center gap-1.5">
-          <h3 className="min-w-0 flex-1 truncate font-display text-[16px] font-bold leading-[1.05] tracking-[-0.2px] text-black line-clamp-2 break-words">
+          <h3 className="min-w-0 flex-1 truncate font-display text-[16px] font-bold leading-[1.05] tracking-[-0.2px] text-foreground line-clamp-2 break-words">
             {shop.shop_name}
           </h3>
           <button
@@ -129,7 +129,7 @@ export function ShopCard({
           </button>
         </div>
 
-        <p className="mt-0.5 flex min-w-0 items-start gap-1 text-[10px] font-medium leading-tight text-slate-500">
+        <p className="mt-0.5 flex min-w-0 items-start gap-1 text-[10px] font-medium leading-tigtext-muted-foreground">
           <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ff7417]" />
           <span className="min-w-0 line-clamp-2 break-words">{shop.location}</span>
         </p>
@@ -140,7 +140,7 @@ export function ShopCard({
             event.stopPropagation();
             openShop();
           }}
-          className="mt-0.5 flex min-w-0 items-center gap-1.5 text-left text-[10px] font-medium leading-tight text-slate-500 transition-colors hover:text-[#ff7417]"
+          className="mt-0.5 flex min-w-0 items-center gap-1.5 text-left text-[10px] font-medium leading-tight text-muted-foreground transition-colors hover:text-[#ff7417]"
         >
           <MessageCircle className="h-3 w-3 shrink-0 text-slate-400" />
           <span className="line-clamp-1">
