@@ -191,15 +191,15 @@ export default function BarberSchedule() {
       {/* Page Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-50 border border-orange-200/70 flex items-center justify-center shadow-sm">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-500/20 dark:to-orange-400/10 border border-orange-200/70 dark:border-orange-400/20 flex items-center justify-center shadow-sm">
             <Clock className="w-5 h-5 text-orange-500" />
           </div>
 
           <div>
-            <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-tight text-foreground">
               My Schedule
             </h1>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               Set your working hours and availability
             </p>
           </div>
@@ -207,22 +207,22 @@ export default function BarberSchedule() {
       </div>
 
       {/* Weekly Availability */}
-      <Card className="relative overflow-hidden border border-orange-100/80 bg-white/75 backdrop-blur-xl shadow-[0_12px_40px_rgba(249,115,22,0.08)] rounded-[24px]">
+      <Card className="relative overflow-hidden border border-border bg-card/90 backdrop-blur-xl shadow-[0_12px_40px_rgba(249,115,22,0.08)] rounded-[24px]">
         {/* Soft ambient glow */}
         <div className="pointer-events-none absolute -top-24 -right-24 w-56 h-56 rounded-full bg-orange-200/20 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 -left-20 w-48 h-48 rounded-full bg-orange-100/20 blur-3xl" />
 
-        <CardHeader className="relative pb-4 border-b border-orange-100/70">
+        <CardHeader className="relative pb-4 border-b border-border">
           <CardTitle className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-400/20 flex items-center justify-center">
               <Clock className="w-5 h-5 text-orange-500" />
             </div>
 
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+              <h2 className="text-lg sm:text-xl font-bold text-foreground">
                 Weekly Availability
               </h2>
-              <p className="text-xs sm:text-sm font-normal text-slate-500 mt-0.5">
+              <p className="text-xs sm:text-sm font-normal text-muted-foreground mt-0.5">
                 Manage your working hours for each day
               </p>
             </div>
@@ -241,8 +241,8 @@ export default function BarberSchedule() {
                 transition={{ delay: index * 0.035 }}
                 className={`relative overflow-hidden rounded-2xl border transition-all duration-300 ${
                   dayData.enabled
-                    ? 'border-orange-100 bg-gradient-to-br from-white via-white to-orange-50/35 shadow-[0_5px_20px_rgba(249,115,22,0.06)]'
-                    : 'border-slate-200/80 bg-slate-50/70'
+                    ? 'border-orange-200/70 dark:border-orange-400/20 bg-gradient-to-br from-background via-card to-orange-50/50 dark:from-card dark:via-card dark:to-orange-500/5 shadow-[0_5px_20px_rgba(249,115,22,0.06)]'
+                    : 'border-border bg-muted/40'
                 }`}
               >
                 {/* Day ambient glow */}
@@ -259,16 +259,16 @@ export default function BarberSchedule() {
                         onCheckedChange={(checked) =>
                           updateDay(day, 'enabled', checked)
                         }
-                        className="data-[state=checked]:bg-[#8B5CF6] data-[state=unchecked]:bg-slate-300"
+                        className="data-[state=checked]:bg-[#8B5CF6] data-[state=unchecked]:bg-muted-foreground/40"
                       />
 
                       <div>
-                        <Label className="font-bold text-[15px] sm:text-base text-slate-900 cursor-pointer">
+                        <Label className="font-bold text-[15px] sm:text-base text-foreground cursor-pointer">
                           {day}
                         </Label>
 
                         {!dayData.enabled && (
-                          <p className="text-xs text-slate-400 mt-0.5">
+                          <p className="text-xs text-muted-foreground mt-0.5">
                             Day off
                           </p>
                         )}
@@ -278,8 +278,8 @@ export default function BarberSchedule() {
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center ${
                         dayData.enabled
-                          ? 'bg-orange-50 text-orange-400'
-                          : 'bg-slate-100 text-slate-300'
+                          ? 'bg-orange-50 dark:bg-orange-500/10 text-orange-500 dark:text-orange-400'
+                          : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       <ChevronRight className="w-4 h-4" />
@@ -291,7 +291,7 @@ export default function BarberSchedule() {
                     <div className="grid grid-cols-2 gap-3">
                       {/* Open */}
                       <div className="space-y-1.5">
-                        <Label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                        <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                           Open
                         </Label>
 
@@ -311,7 +311,7 @@ export default function BarberSchedule() {
 
                       {/* Close */}
                       <div className="space-y-1.5">
-                        <Label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                        <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                           Close
                         </Label>
 
@@ -331,7 +331,7 @@ export default function BarberSchedule() {
 
                       {/* Break Start */}
                       <div className="space-y-1.5">
-                        <Label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                        <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                           Break Start
                         </Label>
 
@@ -351,7 +351,7 @@ export default function BarberSchedule() {
 
                       {/* Break End */}
                       <div className="space-y-1.5">
-                        <Label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                        <Label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                           Break End
                         </Label>
 

@@ -141,16 +141,16 @@ export default function Profile() {
   };
 
   return (
-    <div className="animate-fade-in max-w-4xl mx-auto px-3 sm:px-4 pb-8">
+    <div className="animate-fade-in max-w-4xl mx-auto px-3 sm:px-4 pb-8 bg-background text-foreground">
 
       {/* PAGE HEADER */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight">
-          <span className="text-black">My </span>
+          <span className="text-foreground">My </span>
           <span className="text-orange-500">Profile</span>
         </h1>
 
-        <p className="text-gray-500 text-base sm:text-lg mt-1">
+        <p className="text-muted-foreground text-base sm:text-lg mt-1">
           Manage your account settings
         </p>
       </div>
@@ -164,16 +164,16 @@ export default function Profile() {
           className="
             relative overflow-hidden
             rounded-[28px]
-            bg-white
-            border border-orange-100
-            shadow-[0_12px_35px_rgba(0,0,0,0.10)]
+            bg-card
+            border border-border
+            shadow-sm
             p-5 sm:p-7
           "
         >
           {/* Decorative graphics */}
-          <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full bg-orange-100/80" />
-          <div className="absolute -bottom-20 -left-16 w-44 h-44 rounded-full bg-orange-50" />
-          <div className="absolute top-20 -right-10 w-24 h-24 rounded-full bg-orange-50/80" />
+          <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full bg-secondary/80" />
+          <div className="absolute -bottom-20 -left-16 w-44 h-44 rounded-full bg-secondary" />
+          <div className="absolute top-20 -right-10 w-24 h-24 rounded-full bg-secondary/80" />
 
           <div className="relative flex flex-col sm:flex-row items-center gap-5 sm:gap-7">
 
@@ -185,11 +185,11 @@ export default function Profile() {
                   w-28 h-28 sm:w-32 sm:h-32
                   rounded-full
                   p-2
-                  bg-white
-                  shadow-[0_8px_20px_rgba(0,0,0,0.16)]
+                  bg-card
+                  shadow-md
                 "
               >
-                <div className="w-full h-full rounded-full overflow-hidden bg-orange-50 flex items-center justify-center">
+                <div className="w-full h-full rounded-full overflow-hidden bg-secondary flex items-center justify-center">
 
                   {formData.avatar_url ? (
                     <img
@@ -213,7 +213,7 @@ export default function Profile() {
                   absolute -right-1 bottom-1
                   w-12 h-12
                   rounded-full
-                  bg-orange-500
+                  bg-secondary0
                   text-white
                   flex items-center justify-center
                   shadow-[0_6px_15px_rgba(249,115,22,0.40)]
@@ -241,13 +241,13 @@ export default function Profile() {
             {/* Profile information */}
             <div className="min-w-0 flex-1 text-center sm:text-left">
 
-              <h2 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 break-words">
+              <h2 className="text-2xl sm:text-3xl font-display font-bold text-foreground break-words">
                 {formData.full_name ||
                   user?.full_name ||
                   'User'}
               </h2>
 
-              <p className="text-gray-500 text-base sm:text-lg mt-1 break-all">
+              <p className="text-muted-foreground text-base sm:text-lg mt-1 break-all">
                 {user?.email}
               </p>
 
@@ -257,9 +257,9 @@ export default function Profile() {
                   mt-3
                   px-5 py-2
                   rounded-full
-                  bg-orange-50
+                  bg-secondary
                   text-orange-500
-                  border border-orange-100
+                  border border-border
                   font-semibold
                 "
               >
@@ -282,9 +282,9 @@ export default function Profile() {
           transition={{ delay: 0.05 }}
           className="
             rounded-[22px]
-            bg-white
-            border border-green-100
-            shadow-[0_8px_22px_rgba(0,0,0,0.07)]
+            bg-card
+            border border-border
+            shadow-sm
             px-3.5 py-3
             sm:px-4 sm:py-3.5
           "
@@ -298,13 +298,9 @@ export default function Profile() {
                 w-12 h-12
                 rounded-[16px]
                 bg-gradient-to-br from-green-50 to-green-100/70
-                border border-green-100
+                border border-border
                 flex items-center justify-center
-                shadow-[
-                  inset_2px_2px_6px_rgba(255,255,255,0.95),
-                  inset_-2px_-2px_6px_rgba(34,197,94,0.08),
-                  3px_3px_8px_rgba(34,197,94,0.08)
-                ]
+                shadow-sm
               "
             >
               <User className="w-5 h-5 text-green-500" />
@@ -319,7 +315,7 @@ export default function Profile() {
                   text-base
                   sm:text-[17px]
                   font-bold
-                  text-gray-900
+                  text-foreground
                   mb-1.5
                 "
               >
@@ -333,10 +329,10 @@ export default function Profile() {
                   min-h-[42px]
                   rounded-xl
                   border
-                  border-green-100
-                  bg-green-50/20
+                  border-border
+                  bg-secondary/50
                   px-3
-                  shadow-[inset_1px_1px_4px_rgba(255,255,255,0.8)]
+                  shadow-inner
                   focus-within:border-green-300
                   transition-colors
                 "
@@ -357,11 +353,11 @@ export default function Profile() {
                     text-sm
                     sm:text-[15px]
                     font-medium
-                    text-gray-900
+                    text-foreground
                   "
                 />
 
-                <Pencil className="absolute right-3 w-4 h-4 text-gray-400" />
+                <Pencil className="absolute right-3 w-4 h-4 text-muted-foreground" />
               </div>
 
             </div>
@@ -376,9 +372,9 @@ export default function Profile() {
           transition={{ delay: 0.1 }}
           className="
             rounded-[22px]
-            bg-white
-            border border-blue-100
-            shadow-[0_8px_22px_rgba(0,0,0,0.07)]
+            bg-card
+            border border-border
+            shadow-sm
             px-3.5 py-3
             sm:px-4 sm:py-3.5
           "
@@ -392,13 +388,9 @@ export default function Profile() {
                 w-12 h-12
                 rounded-[16px]
                 bg-gradient-to-br from-blue-50 to-blue-100/70
-                border border-blue-100
+                border border-border
                 flex items-center justify-center
-                shadow-[
-                  inset_2px_2px_6px_rgba(255,255,255,0.95),
-                  inset_-2px_-2px_6px_rgba(59,130,246,0.08),
-                  3px_3px_8px_rgba(59,130,246,0.08)
-                ]
+                shadow-sm
               "
             >
               <Mail className="w-5 h-5 text-blue-500" />
@@ -413,7 +405,7 @@ export default function Profile() {
                   text-base
                   sm:text-[17px]
                   font-bold
-                  text-gray-900
+                  text-foreground
                   mb-1.5
                 "
               >
@@ -427,10 +419,10 @@ export default function Profile() {
                   min-h-[42px]
                   rounded-xl
                   border
-                  border-blue-100
-                  bg-blue-50/20
+                  border-border
+                  bg-secondary/50
                   px-3
-                  shadow-[inset_1px_1px_4px_rgba(255,255,255,0.8)]
+                  shadow-inner
                 "
               >
                 <input
@@ -446,15 +438,15 @@ export default function Profile() {
                     pr-8
                     text-sm
                     sm:text-[15px]
-                    text-gray-500
+                    text-muted-foreground
                     disabled:opacity-100
                   "
                 />
 
-                <Lock className="absolute right-3 w-4 h-4 text-gray-400" />
+                <Lock className="absolute right-3 w-4 h-4 text-muted-foreground" />
               </div>
 
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Email cannot be changed
               </p>
 
@@ -470,9 +462,9 @@ export default function Profile() {
           transition={{ delay: 0.15 }}
           className="
             rounded-[22px]
-            bg-white
-            border border-orange-100
-            shadow-[0_8px_22px_rgba(0,0,0,0.07)]
+            bg-card
+            border border-border
+            shadow-sm
             px-3.5 py-3
             sm:px-4 sm:py-3.5
           "
@@ -486,13 +478,9 @@ export default function Profile() {
                 w-12 h-12
                 rounded-[16px]
                 bg-gradient-to-br from-orange-50 to-orange-100/70
-                border border-orange-100
+                border border-border
                 flex items-center justify-center
-                shadow-[
-                  inset_2px_2px_6px_rgba(255,255,255,0.95),
-                  inset_-2px_-2px_6px_rgba(249,115,22,0.08),
-                  3px_3px_8px_rgba(249,115,22,0.08)
-                ]
+                shadow-sm
               "
             >
               <Phone className="w-5 h-5 text-orange-500" />
@@ -507,7 +495,7 @@ export default function Profile() {
                   text-base
                   sm:text-[17px]
                   font-bold
-                  text-gray-900
+                  text-foreground
                   mb-1.5
                 "
               >
@@ -521,10 +509,10 @@ export default function Profile() {
                   min-h-[42px]
                   rounded-xl
                   border
-                  border-orange-100
-                  bg-orange-50/20
+                  border-border
+                  bg-secondary/20
                   px-3
-                  shadow-[inset_1px_1px_4px_rgba(255,255,255,0.8)]
+                  shadow-inner
                   focus-within:border-orange-300
                   transition-colors
                 "
@@ -545,11 +533,11 @@ export default function Profile() {
                     text-sm
                      sm:text-[15px]
                      font-medium
-                     text-gray-900
+                     text-foreground
                   "
                 />
 
-                <Pencil className="absolute right-3 w-4 h-4 text-gray-400" />
+                <Pencil className="absolute right-3 w-4 h-4 text-muted-foreground" />
               </div>
 
             </div>
@@ -566,7 +554,7 @@ export default function Profile() {
           className="
             w-full
             rounded-[18px]
-            bg-orange-500
+            bg-secondary0
             text-white
             font-semibold
             py-3

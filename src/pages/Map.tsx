@@ -459,9 +459,9 @@ export default function Map() {
 
   if (!GOOGLE_MAPS_API_KEY) {
     return (
-      <div className="fixed inset-0 z-[5] overflow-hidden bg-white">
+      <div className="fixed inset-0 z-[5] overflow-hidden bg-background text-foreground">
         <div className="px-5 pt-5">
-          <h1 className="text-2xl font-bold text-slate-800">
+          <h1 className="text-2xl font-bold text-foreground">
             Trimly Map
           </h1>
 
@@ -565,10 +565,10 @@ style={{
               className="
                 flex h-[54px] w-full items-center
                 rounded-[21px]
-                border border-orange-100
-                bg-white
+                border border-border
+                bg-card
                 p-1.5
-                shadow-[6px_7px_15px_rgba(0,0,0,0.09),-4px_-4px_11px_rgba(255,255,255,0.95)]
+                shadow-none
               "
             >
               {/* Search Icon */}
@@ -576,8 +576,8 @@ style={{
                 className="
                   flex h-[41px] w-[41px] shrink-0 items-center justify-center
                   rounded-[15px]
-                  bg-[#fff0df]
-                  shadow-[3px_4px_8px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-2px_-2px_4px_rgba(230,110,20,0.10)]
+                  bg-secondary
+                  shadow-none
                 "
               >
                 <svg
@@ -621,9 +621,9 @@ style={{
                   px-3
                   text-[15px]
                   font-medium
-                  text-slate-800
+                  text-foreground
                   outline-none
-                  placeholder:text-slate-400
+                  placeholder:text-muted-foreground
                 "
                 autoComplete="off"
               />
@@ -635,7 +635,7 @@ style={{
                   flex h-[38px] w-[45px]
                   shrink-0
                   items-center justify-center
-                  border-l border-orange-100
+                  border-l border-border
                   pl-1
                 "
               >
@@ -656,16 +656,16 @@ style={{
             </div>
 
             {placeSuggestions.length > 0 && (
-              <div className="absolute left-0 right-0 top-[60px] z-[1000] max-h-[260px] overflow-y-auto rounded-2xl border border-orange-100 bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.18)]">
+              <div className="absolute left-0 right-0 top-[60px] z-[1000] max-h-[260px] overflow-y-auto rounded-2xl border border-border bg-card py-1 shadow-[0_8px_24px_rgba(0,0,0,0.18)]">
                 {placeSuggestions.map((suggestion, index) => (
                   <button
                     key={`${suggestion.text}-${index}`}
                     type="button"
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => void handleSuggestionSelect(suggestion)}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-slate-700 hover:bg-orange-50 active:bg-orange-100"
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-foreground hover:bg-secondary active:bg-orange-100"
                   >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-50 text-orange-500">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary text-orange-500">
                       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
                         <circle cx="12" cy="10" r="2.5" />
@@ -702,7 +702,7 @@ style={{
                 ${
                   filter === "all"
                     ? "bg-[#ff7417] text-white"
-                    : "bg-[#fff3e5] text-slate-800"
+                    : "bg-secondary text-foreground"
                 }
               `}
             >
@@ -736,7 +736,7 @@ style={{
                 items-center justify-center
                 gap-1.5
                 rounded-full
-                border border-orange-100
+                border border-border
                 px-3.5
                 text-[13px]
                 font-semibold
@@ -746,7 +746,7 @@ style={{
                 ${
                   filter === "near"
                     ? "bg-[#ff7417] text-white border-orange-300"
-                    : "bg-[#fff3e5] text-slate-800"
+                    : "bg-secondary text-foreground"
                 }
                 ${
                   nearbyLoading
@@ -788,7 +788,7 @@ style={{
                 items-center justify-center
                 gap-1.5
                 rounded-full
-                border border-orange-100
+                border border-border
                 px-3.5
                 text-[13px]
                 font-semibold
@@ -798,7 +798,7 @@ style={{
                 ${
                   filter === "top"
                     ? "bg-[#ff7417] text-white border-orange-300"
-                    : "bg-[#fff3e5] text-slate-800"
+                    : "bg-secondary text-foreground"
                 }
               `}
             >
@@ -827,7 +827,7 @@ style={{
                 items-center justify-center
                 gap-1.5
                 rounded-full
-                border border-orange-100
+                border border-border
                 px-3.5
                 text-[13px]
                 font-semibold
@@ -837,7 +837,7 @@ style={{
                 ${
                   filter === "home"
                     ? "bg-[#ff7417] text-white border-orange-300"
-                    : "bg-[#fff3e5] text-slate-800"
+                    : "bg-secondary text-foreground"
                 }
               `}
             >
@@ -865,7 +865,7 @@ style={{
           type="button"
           onClick={loadNearbyBarbers}
           disabled={nearbyLoading}
-          className="absolute right-5 top-[235px] z-[20] flex h-[60px] w-[60px] items-center justify-center rounded-[20px] bg-white shadow-[0_7px_20px_rgba(0,0,0,0.15)] disabled:opacity-70"
+          className="absolute right-5 top-[235px] z-[20] flex h-[60px] w-[60px] items-center justify-center rounded-[20px] bg-card shadow-[0_7px_20px_rgba(0,0,0,0.15)] disabled:opacity-70"
           aria-label="Current location"
         >
           <svg

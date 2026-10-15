@@ -222,13 +222,13 @@ export default function Services() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] w-full items-center justify-center bg-white">
+      <div className="flex min-h-[60vh] w-full items-center justify-center bg-background text-foreground">
         <div className="flex flex-col items-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-[#fff0e5] shadow-[5px_6px_12px_rgba(0,0,0,0.10),-4px_-4px_10px_rgba(255,255,255,0.95)]">
+          <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-orange-500/10 shadow-[5px_6px_12px_rgba(0,0,0,0.10),-4px_-4px_10px_rgba(255,255,255,0.95)]">
             <Loader2 className="h-7 w-7 animate-spin text-[#ff7417]" />
           </div>
 
-          <p className="mt-4 text-sm font-semibold text-gray-500">
+          <p className="mt-4 text-sm font-semibold text-muted-foreground">
             Loading services...
           </p>
         </div>
@@ -246,14 +246,14 @@ export default function Services() {
         opacity: 1,
         y: 0,
       }}
-      className="w-full min-w-0 bg-white pb-10"
+      className="w-full min-w-0 bg-background text-foreground pb-10"
     >
       <div className="w-full min-w-0 space-y-5">
 
         {/* ================= HEADER ================= */}
 
         <div className="w-full min-w-0">
-          <h1 className="flex items-center gap-2 text-[36px] font-black leading-tight tracking-[-1.5px] text-black sm:text-4xl lg:text-5xl">
+          <h1 className="flex items-center gap-2 text-[36px] font-black leading-tight tracking-[-1.5px] text-foreground sm:text-4xl lg:text-5xl">
             <span>My</span>
 
             <span className="text-[#ff7417]">
@@ -261,7 +261,7 @@ export default function Services() {
             </span>
           </h1>
 
-          <p className="mt-2 w-full whitespace-nowrap text-[13px] font-semibold text-gray-500 sm:text-base">
+          <p className="mt-2 w-full whitespace-nowrap text-[13px] font-semibold text-muted-foreground sm:text-base">
             Manage your service offerings
           </p>
         </div>
@@ -311,10 +311,10 @@ export default function Services() {
 
           {/* ================= DIALOG ================= */}
 
-          <DialogContent className="w-[calc(100%-24px)] max-w-md rounded-[28px] border-0 bg-white p-5 shadow-[10px_12px_25px_rgba(0,0,0,0.12),-8px_-8px_18px_rgba(255,255,255,0.95)] sm:p-6">
+          <DialogContent className="w-[calc(100%-24px)] max-w-md rounded-[28px] border border-border bg-card p-5 shadow-[10px_12px_25px_rgba(0,0,0,0.12),-8px_-8px_18px_rgba(255,255,255,0.95)] sm:p-6">
 
             <DialogHeader>
-              <DialogTitle className="text-xl font-black text-black">
+              <DialogTitle className="text-xl font-black text-foreground">
                 {editingService
                   ? 'Edit Service'
                   : 'Add New Service'}
@@ -331,7 +331,7 @@ export default function Services() {
               <div className="space-y-2">
                 <Label
                   htmlFor="name"
-                  className="text-sm font-bold text-gray-700"
+                  className="text-sm font-bold text-foreground"
                 >
                   Service Name
                 </Label>
@@ -342,7 +342,7 @@ export default function Services() {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="e.g., Classic Haircut"
-                  className="h-11 rounded-[16px] border-0 bg-white shadow-[inset_3px_3px_7px_rgba(0,0,0,0.06),inset_-3px_-3px_7px_rgba(255,255,255,0.95)] focus-visible:ring-2 focus-visible:ring-[#ff7417]"
+                  className="h-11 rounded-[16px] border border-border bg-card shadow-[inset_3px_3px_7px_rgba(0,0,0,0.06),inset_-3px_-3px_7px_rgba(255,255,255,0.95)] focus-visible:ring-2 focus-visible:ring-[#ff7417]"
                 />
               </div>
 
@@ -351,7 +351,7 @@ export default function Services() {
               <div className="space-y-2">
                 <Label
                   htmlFor="duration"
-                  className="text-sm font-bold text-gray-700"
+                  className="text-sm font-bold text-foreground"
                 >
                   Duration (minutes)
                 </Label>
@@ -363,7 +363,7 @@ export default function Services() {
                   value={formData.duration}
                   onChange={handleChange}
                   placeholder="30"
-                  className="h-11 rounded-[16px] border-0 bg-white shadow-[inset_3px_3px_7px_rgba(0,0,0,0.06),inset_-3px_-3px_7px_rgba(255,255,255,0.95)] focus-visible:ring-2 focus-visible:ring-[#ff7417]"
+                  className="h-11 rounded-[16px] border border-border bg-card shadow-[inset_3px_3px_7px_rgba(0,0,0,0.06),inset_-3px_-3px_7px_rgba(255,255,255,0.95)] focus-visible:ring-2 focus-visible:ring-[#ff7417]"
                 />
               </div>
 
@@ -372,7 +372,7 @@ export default function Services() {
               <div className="space-y-2">
                 <Label
                   htmlFor="price"
-                  className="text-sm font-bold text-gray-700"
+                  className="text-sm font-bold text-foreground"
                 >
                   Price (₹)
                 </Label>
@@ -385,28 +385,28 @@ export default function Services() {
                   value={formData.price}
                   onChange={handleChange}
                   placeholder="250"
-                  className="h-11 rounded-[16px] border-0 bg-white shadow-[inset_3px_3px_7px_rgba(0,0,0,0.06),inset_-3px_-3px_7px_rgba(255,255,255,0.95)] focus-visible:ring-2 focus-visible:ring-[#ff7417]"
+                  className="h-11 rounded-[16px] border border-border bg-card shadow-[inset_3px_3px_7px_rgba(0,0,0,0.06),inset_-3px_-3px_7px_rgba(255,255,255,0.95)] focus-visible:ring-2 focus-visible:ring-[#ff7417]"
                 />
               </div>
 
               {/* HOME SERVICE */}
 
-              <div className="flex items-center justify-between rounded-[22px] bg-[#fff8f2] p-4 shadow-[5px_6px_12px_rgba(0,0,0,0.08),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
+              <div className="flex items-center justify-between rounded-[22px] bg-orange-500/10 p-4 shadow-[5px_6px_12px_rgba(0,0,0,0.08),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
 
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-[#ffe4d1] text-[#ff7417] shadow-[4px_5px_9px_rgba(0,0,0,0.08),inset_2px_2px_4px_rgba(255,255,255,0.8)]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-orange-500/15 text-[#ff7417] shadow-[4px_5px_9px_rgba(0,0,0,0.08),inset_2px_2px_4px_rgba(255,255,255,0.8)]">
                     <Home className="h-5 w-5" />
                   </div>
 
                   <div>
                     <Label
                       htmlFor="home_service"
-                      className="cursor-pointer text-sm font-bold text-black"
+                      className="cursor-pointer text-sm font-bold text-foreground"
                     >
                       Home Service Available
                     </Label>
 
-                    <p className="mt-0.5 text-xs text-gray-500">
+                    <p className="mt-0.5 text-xs text-muted-foreground">
                       Offer this service at customer's location
                     </p>
                   </div>
@@ -452,15 +452,15 @@ export default function Services() {
         {services.length > 0 && (
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#fff0e5] text-[#ff7417] shadow-[4px_5px_9px_rgba(0,0,0,0.08),inset_2px_2px_4px_rgba(255,255,255,0.9)]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-orange-500/10 text-[#ff7417] shadow-[4px_5px_9px_rgba(0,0,0,0.08),inset_2px_2px_4px_rgba(255,255,255,0.9)]">
                 <Sparkles className="h-4 w-4" />
               </div>
 
-              <span className="text-sm font-bold text-gray-700">
+              <span className="text-sm font-bold text-foreground">
                 Your Services
               </span>
 
-              <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-[#ffe1ce] px-2 text-xs font-black text-[#ff7417] shadow-[3px_4px_7px_rgba(0,0,0,0.07)]">
+              <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-orange-500/15 px-2 text-xs font-black text-[#ff7417] shadow-[3px_4px_7px_rgba(0,0,0,0.07)]">
                 {services.length}
               </span>
             </div>
@@ -491,13 +491,13 @@ export default function Services() {
                     duration: 0.3,
                     delay: index * 0.04,
                   }}
-                  className="w-full min-w-0 overflow-hidden rounded-[28px] border-0 bg-white p-5 shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)] transition-transform duration-300 hover:-translate-y-1"
+                  className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card p-5 shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)] transition-transform duration-300 hover:-translate-y-1"
                 >
                   {/* TOP */}
 
                   <div className="flex items-start justify-between gap-3">
 
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-[#ffe1ce] text-[#ff7417] shadow-[5px_6px_11px_rgba(255,116,23,0.16),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-orange-500/15 text-[#ff7417] shadow-[5px_6px_11px_rgba(255,116,23,0.16),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
                       <Scissors className="h-6 w-6" />
                     </div>
 
@@ -538,7 +538,7 @@ export default function Services() {
 
                   <div className="mt-5 flex min-h-[34px] items-center gap-2">
 
-                    <h3 className="min-w-0 flex-1 truncate text-lg font-black text-black">
+                    <h3 className="min-w-0 flex-1 truncate text-lg font-black text-foreground">
                       {service.name}
                     </h3>
 
@@ -557,19 +557,19 @@ export default function Services() {
 
                     {/* DURATION */}
 
-                    <div className="rounded-[20px] bg-[#f4f7fa] p-3.5 shadow-[inset_3px_3px_7px_rgba(0,0,0,0.05),inset_-3px_-3px_7px_rgba(255,255,255,0.95)]">
+                    <div className="rounded-[20px] bg-muted p-3.5 shadow-[inset_3px_3px_7px_rgba(0,0,0,0.05),inset_-3px_-3px_7px_rgba(255,255,255,0.95)]">
 
                       <div className="mb-1.5 flex items-center gap-1.5">
                         <div className="flex h-7 w-7 items-center justify-center rounded-[10px] bg-[#e0edff] text-[#3c82e5] shadow-[3px_4px_7px_rgba(0,0,0,0.07)]">
                           <Clock className="h-3.5 w-3.5" />
                         </div>
 
-                        <span className="text-[11px] font-bold text-gray-500">
+                        <span className="text-[11px] font-bold text-muted-foreground">
                           Duration
                         </span>
                       </div>
 
-                      <p className="text-sm font-black text-black">
+                      <p className="text-sm font-black text-foreground">
                         {service.duration} min
                       </p>
 
@@ -577,14 +577,14 @@ export default function Services() {
 
                     {/* PRICE */}
 
-                    <div className="rounded-[20px] bg-[#fff4eb] p-3.5 shadow-[inset_3px_3px_7px_rgba(0,0,0,0.05),inset_-3px_-3px_7px_rgba(255,255,255,0.95)]">
+                    <div className="rounded-[20px] bg-orange-500/10 p-3.5 shadow-[inset_3px_3px_7px_rgba(0,0,0,0.05),inset_-3px_-3px_7px_rgba(255,255,255,0.95)]">
 
                       <div className="mb-1.5 flex items-center gap-1.5">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-[10px] bg-[#ffe0cb] text-[#ff7417] shadow-[3px_4px_7px_rgba(0,0,0,0.07)]">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-[10px] bg-orange-500/15 text-[#ff7417] shadow-[3px_4px_7px_rgba(0,0,0,0.07)]">
                           <IndianRupee className="h-3.5 w-3.5" />
                         </div>
 
-                        <span className="text-[11px] font-bold text-gray-500">
+                        <span className="text-[11px] font-bold text-muted-foreground">
                           Price
                         </span>
                       </div>
@@ -612,17 +612,17 @@ export default function Services() {
               opacity: 1,
               y: 0,
             }}
-            className="w-full rounded-[28px] bg-white px-5 py-14 text-center shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]"
+            className="w-full rounded-[28px] bg-card px-5 py-14 text-center shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]"
           >
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#fff0e5] text-[#ff7417] shadow-[5px_6px_12px_rgba(0,0,0,0.10),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[22px] bg-orange-500/10 text-[#ff7417] shadow-[5px_6px_12px_rgba(0,0,0,0.10),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
               <AlertCircle className="h-7 w-7" />
             </div>
 
-            <h3 className="mt-5 text-xl font-black text-black">
+            <h3 className="mt-5 text-xl font-black text-foreground">
               No Services Yet
             </h3>
 
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
               Add your first service to start accepting bookings.
               Click the "Add Service" button above.
             </p>

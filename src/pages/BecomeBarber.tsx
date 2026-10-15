@@ -37,7 +37,7 @@ const STATES = [
 type Coordinates = { latitude: number; longitude: number };
 
 const inputCls =
-  'h-12 min-w-0 rounded-xl border border-[#D7D9E0] bg-white text-[15px] text-[#151827] shadow-none placeholder:text-[#7C8295] focus-visible:ring-1 focus-visible:ring-[#FF7417]/40';
+  'h-12 min-w-0 rounded-xl border border-border bg-background text-[15px] text-foreground shadow-none placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-[#FF7417]/40';
 
 function IconTile({ children, tone = 'orange' }: { children: React.ReactNode; tone?: 'orange' | 'purple' | 'blue' | 'green' | 'pink' }) {
   const tones = {
@@ -64,7 +64,7 @@ function FieldRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-w-0 items-center gap-2.5 rounded-2xl border border-[#ECECF1] bg-white p-2.5 shadow-[0_2px_5px_rgba(22,25,45,0.035)]">
+    <div className="flex min-w-0 items-center gap-2.5 rounded-2xl border border-border bg-card p-2.5 shadow-none">
       <IconTile tone={tone}>{icon}</IconTile>
       <div className="min-w-0 flex-1">{children}</div>
     </div>
@@ -180,11 +180,11 @@ export default function BecomeBarber() {
 
   if (isBarberPending) {
     return (
-      <div className="min-h-screen bg-[#FAFAFC] px-4 py-8">
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-md rounded-3xl border border-[#ECECF1] bg-white p-7 text-center shadow-sm">
+      <div className="min-h-screen bg-background px-4 py-8 text-foreground">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-md rounded-3xl border border-border bg-card p-7 text-center shadow-none">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#FFF0DE] text-[#E96A12]"><Clock className="h-8 w-8" /></div>
-          <h2 className="mb-2 text-2xl font-bold text-[#151827]">Application Pending</h2>
-          <p className="mb-6 text-sm text-[#73798B]">Your barber application is under review. We'll notify you once it's approved.</p>
+          <h2 className="mb-2 text-2xl font-bold text-foreground">Application Pending</h2>
+          <p className="mb-6 text-sm text-muted-foreground">Your barber application is under review. We'll notify you once it's approved.</p>
           <Button variant="outline" onClick={() => navigate('/dashboard')}>Back to Dashboard</Button>
         </motion.div>
       </div>
@@ -192,15 +192,15 @@ export default function BecomeBarber() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#FAFAFC] px-3 pb-5 pt-3 text-[#151827] sm:px-5">
+    <div className="min-h-screen overflow-x-hidden bg-background px-3 pb-5 pt-3 text-foreground sm:px-5">
       <motion.main initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mx-auto w-full max-w-lg">
         <header className="relative mb-5 px-10 text-center">
-          <button type="button" onClick={() => navigate(-1)} aria-label="Go back" className="absolute left-0 top-0 flex h-9 w-9 items-center justify-center rounded-xl border border-[#ECECF1] bg-white text-[#70778D] shadow-sm">
+          <button type="button" onClick={() => navigate(-1)} aria-label="Go back" className="absolute left-0 top-0 flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-none">
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <h1 className="font-display text-[25px] font-bold leading-tight tracking-[-0.04em] text-[#11152A]">Become a <span className="text-[#F36F16]">Barber</span></h1>
+          <h1 className="font-display text-[25px] font-bold leading-tight tracking-[-0.04em] text-foreground">Become a <span className="text-[#F36F16]">Barber</span></h1>
           <div className="mx-auto mt-1.5 h-1 w-10 rounded-full bg-[#F36F16]" />
-          <p className="mx-auto mt-2 max-w-xs text-xs leading-relaxed text-[#73798B]">Fill in the details below to get your shop approved on Trimly.</p>
+          <p className="mx-auto mt-2 max-w-xs text-xs leading-relaxed text-muted-foreground">Fill in the details below to get your shop approved on Trimly.</p>
         </header>
 
         <form onSubmit={handleSubmit} className="space-y-2.5">
@@ -227,7 +227,7 @@ export default function BecomeBarber() {
           </FieldRow>
           <FieldRow icon={<MapIcon className="h-6 w-6" />} tone="blue">
             <div className="relative">
-              <select aria-label="State" value={form.state} onChange={set('state')} required className="h-12 w-full appearance-none rounded-xl border border-[#D7D9E0] bg-white px-3 pr-9 text-[15px] text-[#151827] outline-none focus:ring-1 focus:ring-[#FF7417]/40">
+              <select aria-label="State" value={form.state} onChange={set('state')} required className="h-12 w-full appearance-none rounded-xl border border-border bg-background px-3 pr-9 text-[15px] text-foreground outline-none focus:ring-1 focus:ring-[#FF7417]/40">
                 <option value="">Select your state</option>
                 {STATES.map((state) => <option key={state} value={state}>{state}</option>)}
               </select>
@@ -247,7 +247,7 @@ export default function BecomeBarber() {
             <div className="grid grid-cols-3 gap-1.5">
               {shopPhotos.map((src, index) => (
                 <button key={index} type="button" onClick={() => pick(`shop-${index}`)} className={`relative flex h-[76px] min-w-0 flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed ${index < 2 ? 'border-[#F08AB5] bg-[#FFF5F9]' : 'border-[#B8BED0] bg-[#F8F9FC]'}`}>
-                  {src ? <img src={src} alt={`Shop photo ${index + 1}`} className="absolute inset-0 h-full w-full object-cover" /> : <><Camera className={`mb-1 h-5 w-5 ${index < 2 ? 'text-[#D92E72]' : 'text-[#75809B]'}`} /><span className="text-center text-[10px] font-semibold leading-tight text-[#424A60]">Add Photo</span><span className="text-[9px] text-[#73798B]">{index < 2 ? 'Required' : 'Optional'}</span></>}
+                  {src ? <img src={src} alt={`Shop photo ${index + 1}`} className="absolute inset-0 h-full w-full object-cover" /> : <><Camera className={`mb-1 h-5 w-5 ${index < 2 ? 'text-[#D92E72]' : 'text-[#75809B]'}`} /><span className="text-center text-[10px] font-semibold leading-tight text-foreground">Add Photo</span><span className="text-[9px] text-muted-foreground">{index < 2 ? 'Required' : 'Optional'}</span></>}
                   <input ref={(element) => { fileRefs.current[`shop-${index}`] = element; }} type="file" accept="image/*" className="hidden" onChange={onFile((url) => setShopPhotos((previous) => previous.map((value, i) => i === index ? url : value)))} />
                 </button>
               ))}
@@ -257,7 +257,7 @@ export default function BecomeBarber() {
           <FieldRow icon={<Scissors className="h-6 w-6" />} tone="purple">
             <button type="button" onClick={() => pick('chairs')} className="relative flex min-h-[96px] w-full items-center gap-3 overflow-hidden rounded-xl border border-dashed border-[#C8A4FF] bg-[#FBF8FF] px-3 py-3 text-left">
               {chairPhoto && <img src={chairPhoto} alt="Chair photo preview" className="absolute inset-0 h-full w-full object-cover" />}
-              {!chairPhoto && <><Camera className="h-7 w-7 shrink-0 text-[#7540D8]" /><span className="h-10 w-px shrink-0 bg-[#D8C5F5]" /><span className="min-w-0"><span className="block text-sm font-bold text-[#7540D8]">Add Chair Photo</span><span className="mt-0.5 block text-xs leading-snug text-[#73798B]">Show the number of chairs / seats inside your shop</span></span></>}
+              {!chairPhoto && <><Camera className="h-7 w-7 shrink-0 text-[#7540D8]" /><span className="h-10 w-px shrink-0 bg-[#D8C5F5]" /><span className="min-w-0"><span className="block text-sm font-bold text-[#7540D8]">Add Chair Photo</span><span className="mt-0.5 block text-xs leading-snug text-muted-foreground">Show the number of chairs / seats inside your shop</span></span></>}
               <input ref={(element) => { fileRefs.current.chairs = element; }} type="file" accept="image/*" className="hidden" onChange={onFile(setChairPhoto)} />
             </button>
           </FieldRow>
@@ -265,12 +265,12 @@ export default function BecomeBarber() {
           <FieldRow icon={<User className="h-6 w-6" />} tone="orange">
             <button type="button" onClick={() => pick('profile')} className="relative flex min-h-[96px] w-full items-center gap-3 overflow-hidden rounded-xl border border-dashed border-[#F5B17E] bg-[#FFF9F3] px-3 py-3 text-left">
               {profilePhoto && <img src={profilePhoto} alt="Profile photo preview" className="absolute inset-0 h-full w-full object-cover" />}
-              {!profilePhoto && <><Camera className="h-7 w-7 shrink-0 text-[#E96A12]" /><span className="h-10 w-px shrink-0 bg-[#F5D0B3]" /><span className="min-w-0"><span className="block text-sm font-bold text-[#E96A12]">Add Profile Photo</span><span className="mt-0.5 block text-xs leading-snug text-[#73798B]">Upload your professional profile photo</span></span></>}
+              {!profilePhoto && <><Camera className="h-7 w-7 shrink-0 text-[#E96A12]" /><span className="h-10 w-px shrink-0 bg-[#F5D0B3]" /><span className="min-w-0"><span className="block text-sm font-bold text-[#E96A12]">Add Profile Photo</span><span className="mt-0.5 block text-xs leading-snug text-muted-foreground">Upload your professional profile photo</span></span></>}
               <input ref={(element) => { fileRefs.current.profile = element; }} type="file" accept="image/*" className="hidden" onChange={onFile(setProfilePhoto)} />
             </button>
           </FieldRow>
 
-          <div className="flex items-start gap-2 rounded-xl border border-[#ECECF1] bg-white p-3 text-xs leading-relaxed text-[#73798B]">
+          <div className="flex items-start gap-2 rounded-xl border border-border bg-card p-3 text-xs leading-relaxed text-muted-foreground">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#7540D8]" />
             <p>We verify all details to ensure trust and safety for our customers. You will be notified once your shop is approved.</p>
           </div>

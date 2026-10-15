@@ -24,38 +24,41 @@ export default function ForgotPassword() {
       setError(parsed.error.errors[0].message);
       return;
     }
+
     setError('');
     setLoading(true);
     const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
+
     if (err) {
       toast.error(err.message);
       return;
     }
+
     setSent(true);
     toast.success('Password reset link sent to your email');
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-6">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="w-full max-w-md bg-card border border-border rounded-2xl p-8"
+        className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl shadow-black/5 sm:p-8"
       >
         <Link
           to="/auth"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="h-4 w-4" />
           Back to sign in
         </Link>
 
-        <h1 className="text-2xl font-display font-bold mb-2">Forgot Password</h1>
-        <p className="text-muted-foreground mb-6 text-sm">
+        <h1 className="mb-2 font-display text-2xl font-bold text-foreground">Forgot Password</h1>
+        <p className="mb-6 text-sm text-muted-foreground">
           Enter your email and we'll send you a link to reset your password.
         </p>
 
@@ -65,18 +68,18 @@ export default function ForgotPassword() {
             animate={{ opacity: 1, scale: 1 }}
             className="rounded-xl border border-primary/40 bg-primary/10 p-5 text-center"
           >
-            <CheckCircle className="w-8 h-8 text-primary mx-auto mb-3" />
-            <p className="font-medium">Password reset link sent to your email</p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <CheckCircle className="mx-auto mb-3 h-8 w-8 text-primary" />
+            <p className="font-medium text-foreground">Password reset link sent to your email</p>
+            <p className="mt-1 text-sm text-muted-foreground">
               Check your inbox and follow the link to set a new password.
             </p>
           </motion.div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-foreground">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
@@ -86,13 +89,14 @@ export default function ForgotPassword() {
                     setEmail(e.target.value);
                     setError('');
                   }}
-                  className="pl-10"
+                  aria-invalid={Boolean(error)}
+                  className="h-11 border-border bg-background pl-10 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                 />
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send Reset Link'}
+            <Button type="submit" className="h-11 w-full" disabled={loading}>
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send Reset Link'}
             </Button>
           </form>
         )}

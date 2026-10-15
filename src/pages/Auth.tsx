@@ -162,37 +162,37 @@ setPrivacyAcknowledged(false);
   };
 
   return (
-    <main className="min-h-screen w-full bg-white px-4 py-6 text-black sm:px-6 sm:py-10">
+    <main className="min-h-screen w-full bg-background px-4 py-6 text-foreground sm:px-6 sm:py-10">
       <div className="mx-auto flex w-full max-w-md flex-col">
         <header className="mb-7 text-center">
           <div className="inline-flex items-baseline justify-center text-[34px] font-extrabold leading-none tracking-[-1.4px]">
-            <span className="text-black">Trimly</span><span className="text-[#ff7417]">Hub</span>
+            <span className="text-foreground">Trimly</span><span className="text-[#ff7417]">Hub</span>
           </div>
-          <p className="mt-2 text-sm font-medium text-slate-500">Your style, your way.</p>
+          <p className="mt-2 text-sm font-medium text-muted-foreground">Your style, your way.</p>
         </header>
 
-        <section className="rounded-[28px] border border-slate-100 bg-white p-5 shadow-[6px_7px_16px_rgba(0,0,0,0.08),-5px_-5px_13px_rgba(255,255,255,0.95)] sm:p-7">
-          <div className="mb-6 flex h-12 w-full rounded-full border border-slate-100 bg-white p-1 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.04),inset_-2px_-2px_5px_rgba(255,255,255,0.95)]">
-            <button type="button" onClick={() => { if (isSignUp) toggleMode(); }} className={`h-full flex-1 rounded-full text-sm font-bold transition-colors duration-150 ${!isSignUp ? 'bg-[#f97316] text-white shadow-[5px_6px_12px_rgba(194,65,12,0.24),inset_1px_1px_3px_rgba(255,255,255,0.28),inset_-2px_-2px_4px_rgba(154,52,18,0.20)]' : 'text-slate-500 hover:text-black'}`}>
+        <section className="rounded-[28px] border border-border bg-card p-5 shadow-[6px_7px_16px_rgba(0,0,0,0.08),-5px_-5px_13px_rgba(255,255,255,0.95)] sm:p-7">
+          <div className="mb-6 flex h-12 w-full rounded-full border border-border bg-muted p-1 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.04),inset_-2px_-2px_5px_rgba(255,255,255,0.95)]">
+            <button type="button" onClick={() => { if (isSignUp) toggleMode(); }} className={`h-full flex-1 rounded-full text-sm font-bold transition-colors duration-150 ${!isSignUp ? 'bg-[#f97316] text-white shadow-[5px_6px_12px_rgba(194,65,12,0.24),inset_1px_1px_3px_rgba(255,255,255,0.28),inset_-2px_-2px_4px_rgba(154,52,18,0.20)]' : 'text-muted-foreground hover:text-foreground'}`}>
               Sign In
             </button>
-            <button type="button" onClick={() => { if (!isSignUp) toggleMode(); }} className={`h-full flex-1 rounded-full text-sm font-bold transition-colors duration-150 ${isSignUp ? 'bg-[#f97316] text-white shadow-[5px_6px_12px_rgba(194,65,12,0.24),inset_1px_1px_3px_rgba(255,255,255,0.28),inset_-2px_-2px_4px_rgba(154,52,18,0.20)]' : 'text-slate-500 hover:text-black'}`}>
+            <button type="button" onClick={() => { if (!isSignUp) toggleMode(); }} className={`h-full flex-1 rounded-full text-sm font-bold transition-colors duration-150 ${isSignUp ? 'bg-[#f97316] text-white shadow-[5px_6px_12px_rgba(194,65,12,0.24),inset_1px_1px_3px_rgba(255,255,255,0.28),inset_-2px_-2px_4px_rgba(154,52,18,0.20)]' : 'text-muted-foreground hover:text-foreground'}`}>
               Sign Up
             </button>
           </div>
 
           <div className="mb-6">
-            <h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.7px] text-black">{isSignUp ? 'Create your account' : 'Welcome back'}</h1>
-            <p className="mt-1 text-sm text-slate-500">{isSignUp ? 'Enter your details to get started.' : 'Sign in to continue to TrimlyHub.'}</p>
+            <h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.7px] text-foreground">{isSignUp ? 'Create your account' : 'Welcome back'}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">{isSignUp ? 'Enter your details to get started.' : 'Sign in to continue to TrimlyHub.'}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
               <div className="space-y-1.5">
-                <Label htmlFor="name" className="text-sm font-semibold text-slate-700">Full Name</Label>
-                <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-orange-100 bg-white px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
+                <Label htmlFor="name" className="text-sm font-semibold text-foreground">Full Name</Label>
+                <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#fff0e5] text-[#e85d04] shadow-[2px_3px_6px_rgba(0,0,0,0.07),inset_1px_1px_3px_rgba(255,255,255,0.9)]"><User className="h-[18px] w-[18px]" /></span>
-                  <Input id="name" name="name" type="text" autoComplete="name" placeholder="Your full name" value={formData.name} onChange={handleChange} className="h-11 border-0 bg-transparent px-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
+                  <Input id="name" name="name" type="text" autoComplete="name" placeholder="Your full name" value={formData.name} onChange={handleChange} className="h-11 border-0 bg-transparent px-0 text-foreground text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
                 </div>
                 {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
               </div>
@@ -200,29 +200,29 @@ setPrivacyAcknowledged(false);
 
             {isSignUp && (
               <div className="space-y-1.5">
-                <Label htmlFor="phone" className="text-sm font-semibold text-slate-700">Phone Number <span className="font-normal text-slate-400">(optional)</span></Label>
-                <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-orange-100 bg-white px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
+                <Label htmlFor="phone" className="text-sm font-semibold text-foreground">Phone Number <span className="font-normal text-muted-foreground">(optional)</span></Label>
+                <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#f0eaff] text-[#7c3aed] shadow-[2px_3px_6px_rgba(0,0,0,0.07),inset_1px_1px_3px_rgba(255,255,255,0.9)]"><Phone className="h-[18px] w-[18px]" /></span>
-                  <Input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="Phone number" value={formData.phone} onChange={handleChange} className="h-11 border-0 bg-transparent px-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
+                  <Input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="Phone number" value={formData.phone} onChange={handleChange} className="h-11 border-0 bg-transparent px-0 text-foreground text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
                 </div>
               </div>
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-semibold text-slate-700">Email Address</Label>
-              <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-orange-100 bg-white px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
+              <Label htmlFor="email" className="text-sm font-semibold text-foreground">Email Address</Label>
+              <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#e8f3ff] text-[#1971c2] shadow-[2px_3px_6px_rgba(0,0,0,0.07),inset_1px_1px_3px_rgba(255,255,255,0.9)]"><Mail className="h-[18px] w-[18px]" /></span>
-                <Input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" value={formData.email} onChange={handleChange} className="h-11 border-0 bg-transparent px-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
+                <Input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" value={formData.email} onChange={handleChange} className="h-11 border-0 bg-transparent px-0 text-foreground text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
               </div>
               {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm font-semibold text-slate-700">Password</Label>
-              <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-orange-100 bg-white px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
+              <Label htmlFor="password" className="text-sm font-semibold text-foreground">Password</Label>
+              <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#ffe8ee] text-[#e11d48] shadow-[2px_3px_6px_rgba(0,0,0,0.07),inset_1px_1px_3px_rgba(255,255,255,0.9)]"><Lock className="h-[18px] w-[18px]" /></span>
-                <Input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete={isSignUp ? 'new-password' : 'current-password'} placeholder="Enter your password" value={formData.password} onChange={handleChange} className="h-11 min-w-0 border-0 bg-transparent px-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'} className="shrink-0 rounded-lg p-1 text-slate-500 transition-colors hover:text-[#f97316]">{showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}</button>
+                <Input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete={isSignUp ? 'new-password' : 'current-password'} placeholder="Enter your password" value={formData.password} onChange={handleChange} className="h-11 min-w-0 border-0 bg-transparent px-0 text-foreground text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'} className="shrink-0 rounded-lg p-1 text-muted-foreground transition-colors hover:text-[#f97316]">{showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}</button>
               </div>
               {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
               {!isSignUp && <div className="text-right"><Link to="/forgot-password" className="text-sm font-semibold text-[#f97316] hover:underline">Forgot Password?</Link></div>}
@@ -230,12 +230,12 @@ setPrivacyAcknowledged(false);
 
             {isSignUp && (
               <div className="space-y-3 pt-1">
-                <label className="flex items-start gap-2.5 text-xs leading-relaxed text-slate-600">
+                <label className="flex items-start gap-2.5 text-xs leading-relaxed text-muted-foreground">
                   <input type="checkbox" checked={termsAccepted} onChange={(e) => { setTermsAccepted(e.target.checked); setErrors((prev) => ({ ...prev, terms: '' })); }} className="mt-0.5 h-4 w-4 shrink-0 accent-[#f97316]" />
                   <span>I agree to the <a href="/terms-of-use.html" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#f97316] hover:underline">Terms of Use</a>.</span>
                 </label>
                 {errors.terms && <p className="text-sm text-red-500">{errors.terms}</p>}
-                <label className="flex items-start gap-2.5 text-xs leading-relaxed text-slate-600">
+                <label className="flex items-start gap-2.5 text-xs leading-relaxed text-muted-foreground">
                   <input type="checkbox" checked={privacyAcknowledged} onChange={(e) => { setPrivacyAcknowledged(e.target.checked); setErrors((prev) => ({ ...prev, privacy: '' })); }} className="mt-0.5 h-4 w-4 shrink-0 accent-[#f97316]" />
                   <span>I acknowledge the <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#f97316] hover:underline">Privacy Policy</a>.</span>
                 </label>
@@ -248,27 +248,27 @@ setPrivacyAcknowledged(false);
             </Button>
 
             {isSignUp && emailExists && (
-              <div className="rounded-2xl border border-red-200 bg-red-50 p-3.5">
+              <div className="rounded-2xl border border-red-300/40 bg-red-50/70 p-3.5 dark:bg-red-950/30">
                 <p className="text-sm font-medium text-red-600">This email is already registered. Please login instead.</p>
-                <Button type="button" variant="outline" onClick={switchToLogin} className="mt-3 h-10 w-full rounded-full border-orange-200 font-bold text-[#f97316] hover:bg-orange-50">Sign In Instead</Button>
+                <Button type="button" variant="outline" onClick={switchToLogin} className="mt-3 h-10 w-full rounded-full border-orange-300/50 font-bold text-[#f97316] hover:bg-orange-50 dark:hover:bg-orange-950/30">Sign In Instead</Button>
               </div>
             )}
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
             <button type="button" onClick={toggleMode} className="font-bold text-[#f97316] hover:underline">{isSignUp ? 'Sign In' : 'Sign Up'}</button>
           </p>
         </section>
 
-        <footer className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs text-slate-400">
+        <footer className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
           <a href="/terms-of-use.html" target="_blank" rel="noopener noreferrer" className="hover:text-[#f97316]">Terms</a><span>·</span>
           <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-[#f97316]">Privacy</a><span>·</span>
           <a href="/refund-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-[#f97316]">Refund Policy</a><span>·</span>
           <a href="/contact-us.html" target="_blank" rel="noopener noreferrer" className="hover:text-[#f97316]">Contact</a><span>·</span>
           <a href="/delete-account.html" target="_blank" rel="noopener noreferrer" className="hover:text-[#f97316]">Delete Account</a>
         </footer>
-        <p className="mt-3 text-center text-[11px] text-slate-400">© 2026 TrimlyHub. All rights reserved.</p>
+        <p className="mt-3 text-center text-[11px] text-muted-foreground">© 2026 TrimlyHub. All rights reserved.</p>
       </div>
     </main>
   );

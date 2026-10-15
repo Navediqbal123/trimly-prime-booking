@@ -173,7 +173,7 @@ export default function MyShop() {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <Loader2 className="w-7 h-7 animate-spin text-orange-500 mb-3" />
-        <p className="text-gray-500 text-sm">
+        <p className="text-muted-foreground text-sm">
           Loading shop details...
         </p>
       </div>
@@ -181,16 +181,16 @@ export default function MyShop() {
   }
 
   return (
-    <div className="animate-fade-in w-full max-w-4xl mx-auto px-2 sm:px-4 pb-8">
+    <div className="animate-fade-in w-full max-w-4xl mx-auto px-2 sm:px-4 pb-8 text-foreground">
 
       {/* ================= HEADER ================= */}
       <div className="mb-5 sm:mb-7">
         <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight">
-          <span className="text-black">My </span>
+          <span className="text-foreground">My </span>
           <span className="text-orange-500">Shop</span>
         </h1>
 
-        <p className="text-gray-500 text-sm sm:text-base mt-1">
+        <p className="text-muted-foreground text-sm sm:text-base mt-1">
           Manage your shop details and info
         </p>
       </div>
@@ -206,8 +206,8 @@ export default function MyShop() {
             w-full
             h-[140px]
             rounded-[24px]
-            bg-white
-            border border-orange-100
+            bg-card
+            border border-orange-200/70 dark:border-orange-900/60
             shadow-[0_7px_22px_rgba(0,0,0,0.07)]
             p-4 sm:p-5
             flex items-center
@@ -219,8 +219,8 @@ export default function MyShop() {
               shrink-0
               w-12 h-12 sm:w-14 sm:h-14
               rounded-[18px]
-              bg-orange-50
-              border border-orange-100
+              bg-orange-50 dark:bg-orange-950/30
+              border border-orange-200/70 dark:border-orange-900/60
               flex items-center justify-center
             ">
               <Store className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500" />
@@ -233,7 +233,7 @@ export default function MyShop() {
                   block
                   text-base sm:text-lg
                   font-bold
-                  text-gray-900
+                  text-foreground
                   mb-2
                 "
               >
@@ -244,8 +244,8 @@ export default function MyShop() {
                 relative
                 h-11 sm:h-12
                 rounded-xl
-                border-2 border-orange-100
-                bg-orange-50/20
+                border-2 border-orange-200/70 dark:border-orange-900/60
+                bg-orange-50/50 dark:bg-orange-950/20
                 flex items-center
               ">
                 <Input
@@ -263,7 +263,7 @@ export default function MyShop() {
                     px-3
                     pr-10
                     text-sm sm:text-base
-                    text-gray-700
+                    text-foreground
                   "
                 />
 
@@ -271,7 +271,7 @@ export default function MyShop() {
                   absolute
                   right-3
                   w-4 h-4
-                  text-gray-400
+                  text-muted-foreground
                 " />
               </div>
             </div>
@@ -289,8 +289,8 @@ export default function MyShop() {
             w-full
             h-[140px]
             rounded-[24px]
-            bg-white
-            border border-green-100
+            bg-card
+            border border-green-200/70 dark:border-green-900/60
             shadow-[0_7px_22px_rgba(0,0,0,0.07)]
             p-4 sm:p-5
             flex items-center
@@ -302,8 +302,8 @@ export default function MyShop() {
               shrink-0
               w-12 h-12 sm:w-14 sm:h-14
               rounded-[18px]
-              bg-green-50
-              border border-green-100
+              bg-green-50 dark:bg-green-950/30
+              border border-green-200/70 dark:border-green-900/60
               flex items-center justify-center
             ">
               <MapPin className="w-6 h-6 sm:w-7 sm:h-7 text-green-500" />
@@ -316,7 +316,7 @@ export default function MyShop() {
                   block
                   text-base sm:text-lg
                   font-bold
-                  text-gray-900
+                  text-foreground
                   mb-2
                 "
               >
@@ -327,8 +327,8 @@ export default function MyShop() {
                 relative
                 h-11 sm:h-12
                 rounded-xl
-                border-2 border-green-100
-                bg-green-50/20
+                border-2 border-green-200/70 dark:border-green-900/60
+                bg-green-50/50 dark:bg-green-950/20
                 flex items-center
               ">
                 <Input
@@ -347,7 +347,7 @@ export default function MyShop() {
                     px-3
                     pr-10
                     text-sm sm:text-base
-                    text-gray-500
+                    text-muted-foreground
                     disabled:opacity-100
                   "
                 />
@@ -356,13 +356,13 @@ export default function MyShop() {
                   absolute
                   right-3
                   w-4 h-4
-                  text-gray-400
+                  text-muted-foreground
                 " />
               </div>
 
               <p className="
                 text-xs sm:text-sm
-                text-gray-500
+                text-muted-foreground
                 mt-1.5
                 truncate
               ">
@@ -383,8 +383,8 @@ export default function MyShop() {
             w-full
             h-[140px]
             rounded-[24px]
-            bg-white
-            border border-blue-100
+            bg-card
+            border border-blue-200/70 dark:border-blue-900/60
             shadow-[0_7px_22px_rgba(0,0,0,0.07)]
             p-4 sm:p-5
             flex items-center
@@ -396,8 +396,8 @@ export default function MyShop() {
               shrink-0
               w-12 h-12 sm:w-14 sm:h-14
               rounded-[18px]
-              bg-blue-50
-              border border-blue-100
+              bg-blue-50 dark:bg-blue-950/30
+              border border-blue-200/70 dark:border-blue-900/60
               flex items-center justify-center
             ">
               <FileText className="w-6 h-6 sm:w-7 sm:h-7 text-blue-500" />
@@ -410,7 +410,7 @@ export default function MyShop() {
                   block
                   text-base sm:text-lg
                   font-bold
-                  text-gray-900
+                  text-foreground
                   mb-2
                 "
               >
@@ -421,8 +421,8 @@ export default function MyShop() {
                 relative
                 h-[76px]
                 rounded-xl
-                border-2 border-blue-100
-                bg-blue-50/20
+                border-2 border-blue-200/70 dark:border-blue-900/60
+                bg-blue-50/50 dark:bg-blue-950/20
                 overflow-hidden
               ">
                 <Textarea
@@ -443,7 +443,7 @@ export default function MyShop() {
                     py-2.5
                     pr-9
                     text-sm sm:text-base
-                    text-gray-600
+                    text-muted-foreground
                   "
                 />
 
@@ -452,7 +452,7 @@ export default function MyShop() {
                   right-3
                   bottom-3
                   w-4 h-4
-                  text-gray-400
+                  text-muted-foreground
                   pointer-events-none
                 " />
               </div>
@@ -471,8 +471,8 @@ export default function MyShop() {
             w-full
             h-[140px]
             rounded-[24px]
-            bg-white
-            border border-purple-100
+            bg-card
+            border border-purple-200/70 dark:border-purple-900/60
             shadow-[0_7px_22px_rgba(0,0,0,0.07)]
             p-4 sm:p-5
             flex items-center
@@ -484,8 +484,8 @@ export default function MyShop() {
               shrink-0
               w-12 h-12 sm:w-14 sm:h-14
               rounded-[18px]
-              bg-purple-50
-              border border-purple-100
+              bg-purple-50 dark:bg-purple-950/30
+              border border-purple-200/70 dark:border-purple-900/60
               flex items-center justify-center
             ">
               <Phone className="w-6 h-6 sm:w-7 sm:h-7 text-purple-500" />
@@ -498,7 +498,7 @@ export default function MyShop() {
                   block
                   text-base sm:text-lg
                   font-bold
-                  text-gray-900
+                  text-foreground
                   mb-2
                 "
               >
@@ -509,8 +509,8 @@ export default function MyShop() {
                 relative
                 h-11 sm:h-12
                 rounded-xl
-                border-2 border-purple-100
-                bg-purple-50/20
+                border-2 border-purple-200/70 dark:border-purple-900/60
+                bg-purple-50/50 dark:bg-purple-950/20
                 flex items-center
               ">
                 <Input
@@ -528,7 +528,7 @@ export default function MyShop() {
                     px-3
                     pr-10
                     text-sm sm:text-base
-                    text-gray-700
+                    text-foreground
                   "
                 />
 
@@ -536,7 +536,7 @@ export default function MyShop() {
                   absolute
                   right-3
                   w-4 h-4
-                  text-gray-400
+                  text-muted-foreground
                 " />
               </div>
             </div>
@@ -585,20 +585,20 @@ export default function MyShop() {
           className="
             mt-7
             rounded-[24px]
-            bg-white
-            border border-gray-100
+            bg-card
+            border border-border
             shadow-[0_7px_22px_rgba(0,0,0,0.07)]
             p-5
           "
         >
-          <h2 className="text-lg font-bold text-gray-900 mb-4">
+          <h2 className="text-lg font-bold text-foreground mb-4">
             Shop Status
           </h2>
 
           <div className="grid grid-cols-2 gap-4 text-sm">
 
             <div>
-              <p className="text-gray-500 mb-1">
+              <p className="text-muted-foreground mb-1">
                 Status
               </p>
 
@@ -608,11 +608,11 @@ export default function MyShop() {
             </div>
 
             <div>
-              <p className="text-gray-500 mb-1">
+              <p className="text-muted-foreground mb-1">
                 Barber ID
               </p>
 
-              <p className="font-mono text-xs text-gray-600">
+              <p className="font-mono text-xs text-muted-foreground">
                 {profile.id.slice(0, 12)}...
               </p>
             </div>
@@ -630,8 +630,8 @@ export default function MyShop() {
           className="
             mt-4
             rounded-[24px]
-            bg-white
-            border border-gray-100
+            bg-card
+            border border-border
             shadow-[0_7px_22px_rgba(0,0,0,0.07)]
             p-5
           "
@@ -641,23 +641,23 @@ export default function MyShop() {
             <div className="
               w-11 h-11
               rounded-2xl
-              bg-blue-50
+              bg-blue-50 dark:bg-blue-950/30
               flex items-center justify-center
             ">
               <Camera className="w-5 h-5 text-blue-500" />
             </div>
 
-            <h2 className="text-lg font-bold text-gray-900">
+            <h2 className="text-lg font-bold text-foreground">
               Shop Photos
             </h2>
 
-            <span className="ml-auto text-xs text-gray-500">
+            <span className="ml-auto text-xs text-muted-foreground">
               {images.length}/{MAX_IMAGES}
             </span>
 
           </div>
 
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             Upload up to {MAX_IMAGES} photos. They'll appear as
             an auto-sliding gallery on your shop card.
           </p>
@@ -680,7 +680,7 @@ export default function MyShop() {
                     overflow-hidden
                     group
                     border
-                    border-gray-100
+                    border-border
                     shadow-sm
                   "
                 >
@@ -719,12 +719,12 @@ export default function MyShop() {
                   rounded-2xl
                   border-2
                   border-dashed
-                  border-gray-200
+                  border-border
                   hover:border-orange-400
                   flex flex-col
                   items-center justify-center
                   gap-1
-                  text-gray-400
+                  text-muted-foreground
                   hover:text-orange-500
                   transition-colors
                   disabled:opacity-50
@@ -764,8 +764,8 @@ export default function MyShop() {
         className="
           mt-4
           rounded-[24px]
-          border border-red-100
-          bg-white
+          border border-red-200/70 dark:border-red-900/60
+          bg-card
           shadow-[0_7px_22px_rgba(0,0,0,0.06)]
           p-5
         "
@@ -774,7 +774,7 @@ export default function MyShop() {
           Delete Shop Permanently
         </h2>
 
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-muted-foreground mb-4">
           Permanently delete your shop and its related data.
           This action cannot be undone.
         </p>
@@ -813,7 +813,7 @@ export default function MyShop() {
               className="
                 w-full max-w-md
                 rounded-[24px]
-                bg-white
+                bg-card
                 p-6
                 shadow-2xl
               "
@@ -822,7 +822,7 @@ export default function MyShop() {
                 Delete Shop Permanently?
               </h2>
 
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-sm text-muted-foreground mb-6">
                 This will permanently delete your shop and its related
                 data. This action cannot be undone.
               </p>

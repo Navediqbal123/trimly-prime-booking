@@ -67,18 +67,18 @@ export default function BarberProfile() {
 
   if (loadingShop || loadingServices) {
     return (
-      <div className="flex flex-col items-center justify-center bg-white py-20">
+      <div className="flex flex-col items-center justify-center bg-background py-20">
         <Loader2 className="mb-3 h-8 w-8 animate-spin text-orange-500" />
-        <p className="text-slate-500">Loading profile…</p>
+        <p className="text-muted-foreground">Loading profile…</p>
       </div>
     );
   }
 
   if (!shop) {
     return (
-      <div className="bg-white py-16 text-center">
+      <div className="bg-background py-16 text-center">
         <AlertCircle className="mx-auto mb-4 h-14 w-14 text-orange-400" />
-        <h3 className="mb-4 text-xl font-semibold text-black">Barber not found</h3>
+        <h3 className="mb-4 text-xl font-semibold text-foreground">Barber not found</h3>
         <Button
           onClick={() => navigate('/discover')}
           className="rounded-full bg-[#ff7417] text-white shadow-[5px_6px_12px_rgba(255,116,23,0.25),inset_1px_1px_3px_rgba(255,255,255,0.3)] hover:bg-[#ff7417]"
@@ -117,7 +117,7 @@ export default function BarberProfile() {
   };
 
   return (
-    <div className="min-h-full w-full bg-white pb-32">
+    <div className="min-h-full w-full bg-background text-foreground pb-32">
       {/* Back button */}
       <div className="mb-3 pt-1">
         <Button
@@ -125,9 +125,9 @@ export default function BarberProfile() {
           onClick={() => navigate(-1)}
           className="
             h-11 w-11 rounded-full p-0
-            bg-white text-black
+            bg-white text-foreground
             shadow-[5px_6px_12px_rgba(0,0,0,0.10),-4px_-4px_9px_rgba(255,255,255,0.95)]
-            hover:bg-white hover:text-black
+            hover:bg-white hover:text-foreground
           "
           aria-label="Go back"
         >
@@ -142,7 +142,7 @@ export default function BarberProfile() {
         transition={{ duration: 0.35 }}
         className="
           relative w-full overflow-hidden rounded-[30px]
-          border border-orange-100 bg-white
+          border border-border bg-card
           shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]
         "
       >
@@ -156,7 +156,7 @@ export default function BarberProfile() {
       {/* Shop name + like */}
       <section className="relative mt-5">
         <div className="pr-20">
-          <h1 className="font-display text-[36px] font-bold leading-[1.02] tracking-[-1.4px] text-black sm:text-4xl">
+          <h1 className="font-display text-[36px] font-bold leading-[1.02] tracking-[-1.4px] text-foreground sm:text-4xl">
             {shop.shop_name}
           </h1>
 
@@ -169,14 +169,14 @@ export default function BarberProfile() {
                   'h-7 w-7',
                   i <= Math.round(rating)
                     ? 'fill-[#ffc107] text-[#ffc107]'
-                    : 'text-slate-400',
+                    : 'text-muted-foreground',
                 )}
               />
             ))}
-            <span className="ml-2 text-[22px] font-bold text-black">
+            <span className="ml-2 text-[22px] font-bold text-foreground">
               {rating.toFixed(1)}
             </span>
-            <span className="text-[17px] font-medium text-slate-500">
+            <span className="text-[17px] font-medium text-muted-foreground">
               ({reviews} reviews)
             </span>
           </div>
@@ -213,7 +213,7 @@ export default function BarberProfile() {
         animate={{ opacity: 1, y: 0 }}
         className="
           mt-6 w-full rounded-[25px]
-          border border-orange-200 bg-[#fff2e4]
+          border border-orange-200/70 bg-orange-50 dark:bg-orange-950/25
           shadow-[6px_7px_15px_rgba(255,116,23,0.16),inset_2px_2px_5px_rgba(255,255,255,0.75),inset_-3px_-3px_7px_rgba(214,93,0,0.10)]
         "
       >
@@ -222,7 +222,7 @@ export default function BarberProfile() {
             <MapPin className="h-7 w-7 text-[#e85d00]" />
           </div>
 
-          <p className="min-w-0 flex-1 break-words text-[17px] font-medium leading-[1.35] text-black sm:text-lg">
+          <p className="min-w-0 flex-1 break-words text-[17px] font-medium leading-[1.35] text-foreground sm:text-lg">
             {fullAddress || 'Address not available'}
           </p>
 
@@ -232,10 +232,10 @@ export default function BarberProfile() {
 
       {/* About */}
       <section className="mt-8">
-        <h2 className="font-display text-[30px] font-bold leading-none tracking-[-0.8px] text-black">
+        <h2 className="font-display text-[30px] font-bold leading-none tracking-[-0.8px] text-foreground">
           About
         </h2>
-        <p className="mt-3 text-[16px] font-medium leading-[1.55] text-slate-500 sm:text-lg">
+        <p className="mt-3 text-[16px] font-medium leading-[1.55] text-muted-foreground sm:text-lg">
           {description}
         </p>
       </section>
@@ -243,7 +243,7 @@ export default function BarberProfile() {
       {/* Services */}
       <section className="mt-8">
         <div className="mb-4 flex items-end justify-between gap-3">
-          <h2 className="font-display text-[30px] font-bold leading-none tracking-[-0.8px] text-black">
+          <h2 className="font-display text-[30px] font-bold leading-none tracking-[-0.8px] text-foreground">
             Services
           </h2>
 
@@ -255,12 +255,12 @@ export default function BarberProfile() {
         {services.length === 0 ? (
           <div
             className="
-              rounded-[25px] border border-slate-100 bg-white p-8 text-center
+              rounded-[25px] border border-border bg-card p-8 text-center
               shadow-[6px_7px_15px_rgba(0,0,0,0.08),-5px_-5px_13px_rgba(255,255,255,0.95)]
             "
           >
             <Scissors className="mx-auto mb-2 h-9 w-9 text-orange-400" />
-            <p className="text-sm font-medium text-slate-500">
+            <p className="text-sm font-medium text-muted-foreground">
               No services listed yet.
             </p>
           </div>
@@ -279,13 +279,13 @@ export default function BarberProfile() {
                   className={cn(
                     `
                       flex w-full items-center gap-3 rounded-[22px] border
-                      bg-white p-3.5 text-left transition-all duration-200
+                      bg-card p-3.5 text-left transition-all duration-200
                       shadow-[5px_6px_13px_rgba(0,0,0,0.08),-4px_-4px_10px_rgba(255,255,255,0.95)]
                       active:scale-[0.99]
                     `,
                     active
                       ? 'border-orange-200 shadow-[6px_7px_15px_rgba(255,116,23,0.14),-4px_-4px_10px_rgba(255,255,255,0.95)]'
-                      : 'border-slate-100',
+                      : 'border-border',
                   )}
                 >
                   {/* Service icon */}
@@ -298,7 +298,7 @@ export default function BarberProfile() {
                     <Scissors
                       className={cn(
                         'h-7 w-7',
-                        active ? 'text-[#ff7417]' : 'text-slate-500',
+                        active ? 'text-[#ff7417]' : 'text-muted-foreground',
                       )}
                     />
                   </div>
@@ -306,7 +306,7 @@ export default function BarberProfile() {
                   {/* Service info */}
                   <div className="min-w-0 flex-1">
                     <div className="flex min-w-0 items-center gap-2">
-                      <span className="min-w-0 truncate font-display text-[17px] font-bold text-black">
+                      <span className="min-w-0 truncate font-display text-[17px] font-bold text-foreground">
                         {s.name}
                       </span>
 
@@ -315,7 +315,7 @@ export default function BarberProfile() {
                       )}
                     </div>
 
-                    <div className="mt-1 flex items-center gap-1 text-sm font-medium text-slate-500">
+                    <div className="mt-1 flex items-center gap-1 text-sm font-medium text-muted-foreground">
                       <Clock className="h-4 w-4" />
                       {s.duration} min
                     </div>
@@ -332,7 +332,7 @@ export default function BarberProfile() {
                         'flex h-10 w-10 items-center justify-center rounded-[13px] border-2 transition-all',
                         active
                           ? 'border-[#ff7417] bg-[#fff0e3] shadow-[3px_4px_8px_rgba(255,116,23,0.15),inset_1px_1px_3px_rgba(255,255,255,0.7)]'
-                          : 'border-orange-200 bg-white',
+                          : 'border-orange-200/70 bg-card',
                       )}
                     >
                       {active ? (

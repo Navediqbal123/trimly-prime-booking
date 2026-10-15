@@ -49,14 +49,14 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-6">
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-6 transition-colors duration-300">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="w-full max-w-md bg-card border border-border rounded-2xl p-8"
+        className="w-full max-w-md bg-card text-card-foreground border border-border rounded-2xl p-8 shadow-sm"
       >
-        <h1 className="text-2xl font-display font-bold mb-2">Set New Password</h1>
+        <h1 className="text-2xl font-display font-bold mb-2 text-foreground">Set New Password</h1>
         <p className="text-muted-foreground mb-6 text-sm">
           {ready
             ? 'Enter a new password for your account.'
@@ -79,6 +79,7 @@ export default function ResetPassword() {
               <button
                 type="button"
                 onClick={() => setShow(!show)}
+                aria-label={show ? 'Hide password' : 'Show password'}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

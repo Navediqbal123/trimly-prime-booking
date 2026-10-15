@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Users, Phone, User } from 'lucide-react';
+import { Users, Phone } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,52 +33,64 @@ export default function BarberClients() {
   });
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="page-black space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="min-w-0 space-y-6 bg-background text-foreground"
+    >
       <div>
-        <h1 className="text-3xl font-display font-bold mb-2">
+        <h1 className="mb-2 text-3xl font-display font-bold text-foreground">
           My <span className="gradient-text">Clients</span>
         </h1>
         <p className="text-muted-foreground">View and manage your client base</p>
       </div>
 
       {isLoading ? (
-        <Card><CardContent className="p-6 space-y-4">
-          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-12 w-full" />)}
-        </CardContent></Card>
+        <Card className="border-border bg-card text-card-foreground">
+          <CardContent className="space-y-4 p-6">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </CardContent>
+        </Card>
       ) : !clients?.length ? (
-        <Card>
+        <Card className="border-border bg-card text-card-foreground">
           <CardContent className="p-12 text-center">
-            <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+            <Users className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
             <p className="text-lg font-medium text-muted-foreground">No clients yet</p>
-            <p className="text-sm text-muted-foreground/70 mt-1">Clients who book with you will appear here</p>
+            <p className="mt-1 text-sm text-muted-foreground/70">
+              Clients who book with you will appear here
+            </p>
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardContent className="p-0">
+        <Card className="overflow-hidden border-border bg-card text-card-foreground">
+          <CardContent className="overflow-x-auto p-0">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Phone</TableHead>
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-muted-foreground">Client</TableHead>
+                  <TableHead className="text-muted-foreground">Phone</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {clients.map((client) => (
-                  <TableRow key={client.id}>
+                  <TableRow key={client.id} className="border-border">
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                          <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
                             {client.full_name?.charAt(0)?.toUpperCase() || '?'}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="font-medium text-sm">{client.full_name}</span>
+                        <span className="text-sm font-medium text-foreground">
+                          {client.full_name}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Phone className="w-3.5 h-3.5" />
+                        <Phone className="h-3.5 w-3.5 shrink-0" />
                         {client.phone || 'N/A'}
                       </div>
                     </TableCell>

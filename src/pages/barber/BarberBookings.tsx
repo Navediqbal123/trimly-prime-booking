@@ -43,37 +43,37 @@ const statusConfig: Record<
     icon: AlertCircle,
     label: 'Pending',
     className:
-      'bg-[#fff4c7] text-[#a87500] shadow-[3px_4px_9px_rgba(168,117,0,0.12),inset_1px_1px_3px_rgba(255,255,255,0.8)]',
+      'bg-amber-500/15 text-amber-700 dark:text-amber-300 shadow-[3px_4px_9px_rgba(168,117,0,0.12),inset_1px_1px_3px_rgba(255,255,255,0.8)]',
   },
   approved: {
     icon: CheckCircle,
     label: 'Approved',
     className:
-      'bg-[#d8f8e9] text-[#12945f] shadow-[4px_5px_11px_rgba(18,148,95,0.13),inset_1px_1px_4px_rgba(255,255,255,0.9)]',
+      'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-[4px_5px_11px_rgba(18,148,95,0.13),inset_1px_1px_4px_rgba(255,255,255,0.9)]',
   },
   confirmed: {
     icon: CheckCircle,
     label: 'Confirmed',
     className:
-      'bg-[#d8f8e9] text-[#12945f] shadow-[4px_5px_11px_rgba(18,148,95,0.13),inset_1px_1px_4px_rgba(255,255,255,0.9)]',
+      'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-[4px_5px_11px_rgba(18,148,95,0.13),inset_1px_1px_4px_rgba(255,255,255,0.9)]',
   },
   completed: {
     icon: CheckCircle,
     label: 'Completed',
     className:
-      'bg-[#dcecff] text-[#3679d8] shadow-[4px_5px_11px_rgba(54,121,216,0.13),inset_1px_1px_4px_rgba(255,255,255,0.9)]',
+      'bg-blue-500/15 text-blue-700 dark:text-blue-300 shadow-[4px_5px_11px_rgba(54,121,216,0.13),inset_1px_1px_4px_rgba(255,255,255,0.9)]',
   },
   rejected: {
     icon: XCircle,
     label: 'Rejected',
     className:
-      'bg-[#ffe0e7] text-[#d84d68] shadow-[4px_5px_11px_rgba(216,77,104,0.13),inset_1px_1px_4px_rgba(255,255,255,0.9)]',
+      'bg-rose-500/15 text-rose-700 dark:text-rose-300 shadow-[4px_5px_11px_rgba(216,77,104,0.13),inset_1px_1px_4px_rgba(255,255,255,0.9)]',
   },
   cancelled: {
     icon: XCircle,
     label: 'Cancelled',
     className:
-      'bg-[#ffe0e7] text-[#d84d68] shadow-[4px_5px_11px_rgba(216,77,104,0.13),inset_1px_1px_4px_rgba(255,255,255,0.9)]',
+      'bg-rose-500/15 text-rose-700 dark:text-rose-300 shadow-[4px_5px_11px_rgba(216,77,104,0.13),inset_1px_1px_4px_rgba(255,255,255,0.9)]',
   },
 };
 
@@ -158,8 +158,8 @@ function BookingCard({
       className={cn(
   "w-full min-w-0 overflow-hidden rounded-[28px] border p-4 sm:p-5 transition-all duration-300",
   isExpired
-    ? "border-gray-300 bg-gray-200 opacity-70 shadow-[5px_6px_12px_rgba(0,0,0,0.10)]"
-    : "border-[#eeeeee] bg-white shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]"
+    ? "border-border bg-muted opacity-70 shadow-sm"
+    : "border-border bg-card text-card-foreground shadow-sm dark:shadow-black/20"
 )}
     >
       {/* Customer + Status */}
@@ -174,10 +174,10 @@ function BookingCard({
                   : 'Customer profile photo'
               }
               loading="lazy"
-              className="h-12 w-12 shrink-0 rounded-full object-cover border-[5px] border-white shadow-[3px_4px_9px_rgba(0,0,0,0.10)]"
+              className="h-12 w-12 shrink-0 rounded-full object-cover border-[5px] border-background shadow-sm"
             />
           ) : (
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#fff0e5] text-[#ff7417] shadow-[4px_5px_10px_rgba(0,0,0,0.10),inset_2px_2px_5px_rgba(255,255,255,0.8)]">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary shadow-[4px_5px_10px_rgba(0,0,0,0.10),inset_2px_2px_5px_rgba(255,255,255,0.8)]">
               {customerName ? (
                 <span className="text-lg font-bold">
                   {customerName.trim().charAt(0).toUpperCase()}
@@ -189,11 +189,11 @@ function BookingCard({
           )}
 
           <div className="min-w-0 flex-1">
-            <p className="truncate text-base font-bold text-black sm:text-lg">
+            <p className="truncate text-base font-bold text-foreground sm:text-lg">
               {customerName || `Booking #${booking.id.slice(0, 8)}`}
             </p>
 
-            <p className="truncate text-xs font-medium text-gray-500">
+            <p className="truncate text-xs font-medium text-muted-foreground">
               #{booking.id.slice(0, 8)}
               {booking.created_at
                 ? ` · ${timeAgo(booking.created_at)}`
@@ -224,34 +224,34 @@ function BookingCard({
 
       {/* Date + Time */}
       <div className="mt-4 grid w-full min-w-0 grid-cols-2 gap-3">
-        <div className="min-w-0 rounded-[22px] bg-[#f3f6ff] p-3 shadow-[4px_5px_11px_rgba(70,100,180,0.10),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
+        <div className="min-w-0 rounded-[22px] bg-secondary p-3 shadow-[4px_5px_11px_rgba(70,100,180,0.10),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
           <div className="flex min-w-0 items-center gap-2">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-[#a6b6dc] shadow-[3px_4px_8px_rgba(70,100,180,0.18)]">
-              <Calendar className="h-4 w-4 text-black" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-muted shadow-[3px_4px_8px_rgba(70,100,180,0.18)]">
+              <Calendar className="h-4 w-4 text-foreground" />
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
+              <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
                 Date
               </p>
-              <p className="whitespace-nowrap text-xs font-bold tracking-tight text-black sm:text-base">
+              <p className="whitespace-nowrap text-xs font-bold tracking-tight text-foreground sm:text-base">
                 {new Date(booking.date).toLocaleDateString('en-IN')}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="min-w-0 rounded-[22px] bg-[#fff4e7] p-3 shadow-[4px_5px_11px_rgba(255,116,23,0.10),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
+        <div className="min-w-0 rounded-[22px] bg-secondary p-3 shadow-[4px_5px_11px_rgba(255,116,23,0.10),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
           <div className="flex min-w-0 items-center gap-2">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-[#d6aa77] shadow-[3px_4px_8px_rgba(255,116,23,0.18)]">
-              <Clock className="h-4 w-4 text-black" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-primary/20 shadow-[3px_4px_8px_rgba(255,116,23,0.18)]">
+              <Clock className="h-4 w-4 text-foreground" />
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
+              <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
                 Time
               </p>
-              <p className="whitespace-nowrap text-xs font-bold tracking-tight text-black sm:text-base">
+              <p className="whitespace-nowrap text-xs font-bold tracking-tight text-foreground sm:text-base">
                 {booking.time_slot}
               </p>
             </div>
@@ -260,19 +260,19 @@ function BookingCard({
       </div>
 
       {/* Services */}
-      <div className="mt-4 w-full min-w-0 overflow-hidden rounded-[24px] bg-[#f7f9fc] p-3.5 shadow-[5px_6px_13px_rgba(0,0,0,0.08),inset_2px_2px_6px_rgba(255,255,255,0.95)]">
+      <div className="mt-4 w-full min-w-0 overflow-hidden rounded-[24px] bg-secondary p-3.5 shadow-[5px_6px_13px_rgba(0,0,0,0.08),inset_2px_2px_6px_rgba(255,255,255,0.95)]">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-[#fff0e5] text-[#ff7417] shadow-[3px_4px_8px_rgba(255,116,23,0.13)]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-primary/10 text-primary shadow-[3px_4px_8px_rgba(255,116,23,0.13)]">
               <Scissors className="h-5 w-5" />
             </div>
 
-            <p className="truncate text-sm font-bold uppercase tracking-wide text-black">
+            <p className="truncate text-sm font-bold uppercase tracking-wide text-foreground">
               Services
             </p>
           </div>
 
-          <span className="shrink-0 rounded-[15px] bg-white px-3 py-2 text-xs font-bold text-black shadow-[3px_4px_8px_rgba(0,0,0,0.08)]">
+          <span className="shrink-0 rounded-[15px] bg-card px-3 py-2 text-xs font-bold text-foreground shadow-[3px_4px_8px_rgba(0,0,0,0.08)]">
             {serviceList.length} items
           </span>
         </div>
@@ -281,33 +281,33 @@ function BookingCard({
           {serviceList.map((s, i) => (
             <div
               key={s.id || `${s.name}-${i}`}
-              className="flex min-w-0 items-center justify-between gap-3 rounded-[18px] bg-white px-3.5 py-3 shadow-[3px_4px_9px_rgba(0,0,0,0.07)]"
+              className="flex min-w-0 items-center justify-between gap-3 rounded-[18px] bg-card px-3.5 py-3 shadow-[3px_4px_9px_rgba(0,0,0,0.07)]"
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold text-black">
+                <p className="truncate text-sm font-bold text-foreground">
                   {s.name}
                 </p>
 
                 {s.duration ? (
-                  <p className="mt-0.5 text-xs font-medium text-gray-500">
+                  <p className="mt-0.5 text-xs font-medium text-muted-foreground">
                     {s.duration} min
                   </p>
                 ) : null}
               </div>
 
-              <span className="shrink-0 text-sm font-bold text-black">
+              <span className="shrink-0 text-sm font-bold text-foreground">
                 ₹{Number(s.price ?? 0)}
               </span>
             </div>
           ))}
 
           {booking.home_service && (
-            <div className="flex items-center justify-between gap-3 rounded-[18px] bg-[#e5f9ef] px-3.5 py-3 shadow-[3px_4px_9px_rgba(18,148,95,0.10)]">
-              <span className="truncate text-xs font-bold text-[#12945f]">
+            <div className="flex items-center justify-between gap-3 rounded-[18px] bg-emerald-500/10 px-3.5 py-3 shadow-[3px_4px_9px_rgba(18,148,95,0.10)]">
+              <span className="truncate text-xs font-bold text-emerald-700 dark:text-emerald-300">
                 🏠 Home Service
               </span>
 
-              <span className="shrink-0 text-sm font-bold text-[#12945f]">
+              <span className="shrink-0 text-sm font-bold text-emerald-700 dark:text-emerald-300">
                 {homeCharge > 0 ? `₹${homeCharge}` : 'Included'}
               </span>
             </div>
@@ -316,13 +316,13 @@ function BookingCard({
       </div>
 
       {/* Total + Actions */}
-      <div className="mt-4 flex min-w-0 items-center justify-between gap-3 rounded-[22px] bg-[#fff8f2] p-4 shadow-[4px_5px_11px_rgba(255,116,23,0.08),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
+      <div className="mt-4 flex min-w-0 items-center justify-between gap-3 rounded-[22px] bg-secondary p-4 shadow-[4px_5px_11px_rgba(255,116,23,0.08),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
         <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
             Grand Total
           </p>
 
-          <span className="text-xl font-black text-black sm:text-2xl">
+          <span className="text-xl font-black text-foreground sm:text-2xl">
             ₹{grandTotal}
           </span>
         </div>
@@ -336,7 +336,7 @@ function BookingCard({
               onClick={(e) =>
                 onStatus(e, booking.ids, 'rejected')
               }
-              className="h-10 rounded-[16px] bg-[#ffe1e7] px-3 font-bold text-[#d84d68] shadow-[4px_5px_9px_rgba(216,77,104,0.14),inset_1px_1px_4px_rgba(255,255,255,0.9)] hover:bg-[#ffd7df]"
+              className="h-10 rounded-[16px] bg-rose-500/15 px-3 font-bold text-rose-700 dark:text-rose-300 shadow-[4px_5px_9px_rgba(216,77,104,0.14),inset_1px_1px_4px_rgba(255,255,255,0.9)] hover:bg-[#ffd7df]"
             >
               {isRejecting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -355,7 +355,7 @@ function BookingCard({
               onClick={(e) =>
                 onStatus(e, booking.ids, 'approved')
               }
-              className="h-10 rounded-[16px] bg-[#d9f8e9] px-3 font-bold text-[#12945f] shadow-[4px_5px_9px_rgba(18,148,95,0.14),inset_1px_1px_4px_rgba(255,255,255,0.9)] hover:bg-[#cef4e2]"
+              className="h-10 rounded-[16px] bg-emerald-500/15 px-3 font-bold text-emerald-700 dark:text-emerald-300 shadow-[4px_5px_9px_rgba(18,148,95,0.14),inset_1px_1px_4px_rgba(255,255,255,0.9)] hover:bg-[#cef4e2]"
             >
               {isApproving ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -372,9 +372,9 @@ function BookingCard({
 
       {/* OTP */}
       {booking.status === 'approved' && (
-        <div className="mt-4 w-full rounded-[22px] bg-[#f5f7fb] p-4 shadow-[4px_5px_11px_rgba(0,0,0,0.07),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
-          <label className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600">
-            <KeyRound className="h-4 w-4 text-[#ff7417]" />
+        <div className="mt-4 w-full rounded-[22px] bg-secondary p-4 shadow-[4px_5px_11px_rgba(0,0,0,0.07),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
+          <label className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <KeyRound className="h-4 w-4 text-primary" />
             Verify Customer OTP
           </label>
 
@@ -388,7 +388,7 @@ function BookingCard({
                   e.target.value.replace(/\D/g, '').slice(0, 8)
                 )
               }
-              className="h-11 min-w-0 flex-1 rounded-[16px] border-none bg-white text-center font-mono text-base tracking-[0.3em] shadow-[3px_4px_8px_rgba(0,0,0,0.08)]"
+              className="h-11 min-w-0 flex-1 rounded-[16px] border border-border bg-background text-center font-mono text-base tracking-[0.3em] shadow-[3px_4px_8px_rgba(0,0,0,0.08)]"
               disabled={verifying}
             />
 
@@ -396,7 +396,7 @@ function BookingCard({
               type="button"
               onClick={onVerify}
               disabled={verifying}
-              className="h-11 shrink-0 rounded-[16px] bg-[#ff7417] px-5 font-bold text-white shadow-[5px_6px_12px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(190,70,0,0.25)] hover:bg-[#f56d10]"
+              className="h-11 shrink-0 rounded-[16px] bg-primary px-5 font-bold text-white shadow-[5px_6px_12px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(190,70,0,0.25)] hover:bg-primary"
             >
               {verifying ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -891,13 +891,13 @@ export default function BarberBookings() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] w-full items-center justify-center bg-white">
+      <div className="flex min-h-[60vh] w-full items-center justify-center bg-background text-foreground">
         <div className="flex flex-col items-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-[#fff0e5] shadow-[5px_6px_12px_rgba(0,0,0,0.10)]">
-            <Loader2 className="h-7 w-7 animate-spin text-[#ff7417]" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-primary/10 shadow-[5px_6px_12px_rgba(0,0,0,0.10)]">
+            <Loader2 className="h-7 w-7 animate-spin text-primary" />
           </div>
 
-          <p className="mt-4 font-semibold text-gray-500">
+          <p className="mt-4 font-semibold text-muted-foreground">
             Loading bookings...
           </p>
         </div>
@@ -906,27 +906,27 @@ export default function BarberBookings() {
   }
 
   return (
-    <div className="w-full min-w-0 bg-white animate-fade-in">
+    <div className="w-full min-w-0 bg-background text-foreground animate-fade-in">
       {/* Header */}
       <div className="w-full min-w-0 pb-5">
         <div className="w-full min-w-0">
-          <h1 className="flex min-w-0 flex-wrap items-center gap-x-2 text-[36px] font-black leading-tight tracking-[-1.5px] text-black sm:text-4xl lg:text-5xl">
+          <h1 className="flex min-w-0 flex-wrap items-center gap-x-2 text-[36px] font-black leading-tight tracking-[-1.5px] text-foreground sm:text-4xl lg:text-5xl">
             <span>Customer</span>
 
-            <span className="text-[#ff7417]">
+            <span className="text-primary">
               Bookings
             </span>
 
             {pendingBookings.length >
               0 && (
-              <span className="inline-flex h-7 items-center rounded-full bg-[#ffe1d0] px-3 text-xs font-bold text-[#ff7417] shadow-[3px_4px_8px_rgba(255,116,23,0.12)]">
+              <span className="inline-flex h-7 items-center rounded-full bg-primary/10 px-3 text-xs font-bold text-primary shadow-[3px_4px_8px_rgba(255,116,23,0.12)]">
                 {pendingBookings.length}{' '}
                 new
               </span>
             )}
           </h1>
 
-          <p className="mt-2 truncate text-sm font-semibold text-gray-500 sm:text-base">
+          <p className="mt-2 truncate text-sm font-semibold text-muted-foreground sm:text-base">
             Manage your customer appointments
           </p>
         </div>
@@ -936,7 +936,7 @@ export default function BarberBookings() {
           type="button"
           onClick={() => refetch()}
           disabled={isFetching}
-          className="mt-5 flex h-11 w-full rounded-[18px] bg-[#ff7417] font-bold text-white shadow-[6px_7px_14px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(190,70,0,0.25)] hover:bg-[#f56d10]"
+          className="mt-5 flex h-11 w-full rounded-[18px] bg-primary font-bold text-white shadow-[6px_7px_14px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(190,70,0,0.25)] hover:bg-primary"
         >
           <RefreshCw
             className={cn(
@@ -956,17 +956,17 @@ export default function BarberBookings() {
         onValueChange={setActiveTab}
         className="w-full min-w-0"
       >
-        <TabsList className="mb-5 flex h-[70px] w-full min-w-0 rounded-[30px] bg-white p-2 shadow-[6px_7px_15px_rgba(0,0,0,0.10),-5px_-5px_13px_rgba(255,255,255,0.95)]">
+        <TabsList className="mb-5 flex h-[70px] w-full min-w-0 rounded-[30px] border border-border bg-card p-2 shadow-sm">
           <TabsTrigger
             value="upcoming"
-            className="h-full min-w-0 flex-1 rounded-[23px] px-2 text-sm font-bold text-gray-500 data-[state=active]:bg-[#ff7417] data-[state=active]:text-white data-[state=active]:shadow-[5px_6px_12px_rgba(255,116,23,0.25),inset_2px_2px_5px_rgba(255,255,255,0.25)] sm:text-base"
+            className="h-full min-w-0 flex-1 rounded-[23px] px-2 text-sm font-bold text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-[5px_6px_12px_rgba(255,116,23,0.25),inset_2px_2px_5px_rgba(255,255,255,0.25)] sm:text-base"
           >
             Upcoming ({upcomingBookings.length})
           </TabsTrigger>
 
           <TabsTrigger
             value="past"
-            className="h-full min-w-0 flex-1 rounded-[23px] px-2 text-sm font-bold text-gray-500 data-[state=active]:bg-[#ff7417] data-[state=active]:text-white data-[state=active]:shadow-[5px_6px_12px_rgba(255,116,23,0.25),inset_2px_2px_5px_rgba(255,255,255,0.25)] sm:text-base"
+            className="h-full min-w-0 flex-1 rounded-[23px] px-2 text-sm font-bold text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-[5px_6px_12px_rgba(255,116,23,0.25),inset_2px_2px_5px_rgba(255,255,255,0.25)] sm:text-base"
           >
             Past ({pastBookings.length})
           </TabsTrigger>
@@ -988,12 +988,12 @@ export default function BarberBookings() {
               )}
             </div>
           ) : (
-            <div className="flex min-h-[220px] w-full flex-col items-center justify-center rounded-[28px] bg-white p-6 shadow-[6px_7px_15px_rgba(0,0,0,0.09),-5px_-5px_13px_rgba(255,255,255,0.95)]">
-              <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#fff0e5] text-[#ff7417] shadow-[4px_5px_10px_rgba(255,116,23,0.12)]">
+            <div className="flex min-h-[220px] w-full flex-col items-center justify-center rounded-[28px] border border-border bg-card p-6 shadow-sm">
+              <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-primary/10 text-primary shadow-[4px_5px_10px_rgba(255,116,23,0.12)]">
                 <Calendar className="h-8 w-8" />
               </div>
 
-              <p className="mt-4 font-bold text-gray-500">
+              <p className="mt-4 font-bold text-muted-foreground">
                 No upcoming bookings
               </p>
             </div>
@@ -1016,12 +1016,12 @@ export default function BarberBookings() {
               )}
             </div>
           ) : (
-            <div className="flex min-h-[220px] w-full flex-col items-center justify-center rounded-[28px] bg-white p-6 shadow-[6px_7px_15px_rgba(0,0,0,0.09),-5px_-5px_13px_rgba(255,255,255,0.95)]">
-              <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#f1f4fa] text-gray-500 shadow-[4px_5px_10px_rgba(0,0,0,0.08)]">
+            <div className="flex min-h-[220px] w-full flex-col items-center justify-center rounded-[28px] border border-border bg-card p-6 shadow-sm">
+              <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-secondary text-muted-foreground shadow-[4px_5px_10px_rgba(0,0,0,0.08)]">
                 <Calendar className="h-8 w-8" />
               </div>
 
-              <p className="mt-4 font-bold text-gray-500">
+              <p className="mt-4 font-bold text-muted-foreground">
                 No past bookings
               </p>
             </div>

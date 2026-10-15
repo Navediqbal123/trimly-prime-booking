@@ -260,8 +260,8 @@ return (
         whileHover={{ y: -2 }}
         className="
           w-full overflow-hidden rounded-[26px]
-          border border-slate-100 bg-white
-          shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]
+          border border-border bg-card
+          shadow-none
           transition-all duration-300
         "
       >
@@ -270,7 +270,7 @@ return (
           <div className="flex min-w-0 items-start justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               {photo && (
-                <div className="shrink-0 rounded-[18px] bg-white p-1 shadow-[3px_4px_9px_rgba(0,0,0,0.10),-2px_-2px_6px_rgba(255,255,255,0.95)]">
+                <div className="shrink-0 rounded-[18px] bg-card p-1 shadow-none">
                   <img
                     src={photo}
                     alt={shopName ? `${shopName} barber shop` : 'Barber shop'}
@@ -282,7 +282,7 @@ return (
 
               <div className="min-w-0 flex-1">
                 {shopName && (
-                  <h3 className="line-clamp-2 break-words font-display text-[20px] font-bold leading-[1.08] tracking-[-0.3px] text-black sm:text-[22px]">
+                  <h3 className="line-clamp-2 break-words font-display text-[20px] font-bold leading-[1.08] tracking-[-0.3px] text-foreground sm:text-[22px]">
                     {shopName}
                   </h3>
                 )}
@@ -307,7 +307,7 @@ return (
               </span>
 
               {booking.created_at && (
-                <span className="whitespace-nowrap text-[11px] font-medium text-slate-500">
+                <span className="whitespace-nowrap text-[11px] font-medium text-muted-foreground">
                   {timeAgo(booking.created_at)}
                 </span>
               )}
@@ -316,16 +316,16 @@ return (
 
           {/* Multiple services */}
           {services.length > 1 && (
-            <div className="mt-4 overflow-hidden rounded-[18px] border border-slate-100 bg-white shadow-[3px_4px_9px_rgba(0,0,0,0.07),-2px_-2px_7px_rgba(255,255,255,0.95)]">
+            <div className="mt-4 overflow-hidden rounded-[18px] border border-border bg-card shadow-none">
               {services.filter((s) => s.name).map((s, i) => (
                 <div
                   key={s.id || `${s.name}-${i}`}
-                  className="flex items-center justify-between gap-3 border-b border-slate-100 px-3 py-2.5 text-sm last:border-b-0"
+                  className="flex items-center justify-between gap-3 border-b border-border px-3 py-2.5 text-sm last:border-b-0"
                 >
-                  <span className="min-w-0 truncate font-medium text-slate-700">
+                  <span className="min-w-0 truncate font-medium text-foreground">
                     {s.name}
                   </span>
-                  <span className="shrink-0 font-bold text-black">
+                  <span className="shrink-0 font-bold text-foreground">
                     ₹{Number(s.price ?? 0)}
                   </span>
                 </div>
@@ -335,20 +335,20 @@ return (
 
           {/* Date + time clay boxes */}
           <div className="mt-4 grid grid-cols-2 gap-2.5 sm:gap-3">
-            <div className="flex min-w-0 items-center gap-2 rounded-[17px] border border-orange-100 bg-[#fff5ed] px-3 py-2.5 shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95)]">
+            <div className="flex min-w-0 items-center gap-2 rounded-[17px] border border-border bg-secondary px-3 py-2.5 shadow-none">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[11px] bg-[#ffb27f] shadow-[2px_3px_6px_rgba(0,0,0,0.10),inset_1px_1px_3px_rgba(255,255,255,0.55)]">
                 <Calendar className="h-4 w-4 text-[#d94f00]" />
               </div>
-              <span className="min-w-0 whitespace-nowrap text-[12px] font-semibold text-slate-700 sm:text-sm">
+              <span className="min-w-0 whitespace-nowrap text-[12px] font-semibold text-foreground sm:text-sm">
                 {new Date(booking.date).toLocaleDateString('en-IN')}
               </span>
             </div>
 
-            <div className="flex min-w-0 items-center gap-2 rounded-[17px] border border-orange-100 bg-[#fff5ed] px-3 py-2.5 shadow-[4px_5px_10px_rgba(0,0,0,0.08),-3px_-3px_8px_rgba(255,255,255,0.95)]">
+            <div className="flex min-w-0 items-center gap-2 rounded-[17px] border border-border bg-secondary px-3 py-2.5 shadow-none">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[11px] bg-[#ffb27f] shadow-[2px_3px_6px_rgba(0,0,0,0.10),inset_1px_1px_3px_rgba(255,255,255,0.55)]">
                 <Clock className="h-4 w-4 text-[#d94f00]" />
               </div>
-              <span className="min-w-0 whitespace-nowrap text-[12px] font-semibold text-slate-700 sm:text-sm">
+              <span className="min-w-0 whitespace-nowrap text-[12px] font-semibold text-foreground sm:text-sm">
                 {booking.time_slot}
               </span>
             </div>
@@ -356,7 +356,7 @@ return (
 
           {/* Total */}
           <div className="mt-4">
-            <span className="text-[18px] font-bold text-black sm:text-[20px]">
+            <span className="text-[18px] font-bold text-foreground sm:text-[20px]">
               Total <span className="text-[#ef4444]">₹{total}</span>
             </span>
           </div>
@@ -371,11 +371,11 @@ return (
                 size="sm"
                 className="
                   h-11 w-full rounded-full border-0
-                  bg-[#fca5a5] text-black
+                  bg-[#fca5a5] text-foreground
                   font-bold
                   shadow-[5px_6px_12px_rgba(239,68,68,0.22),inset_2px_2px_5px_rgba(255,255,255,0.55),inset_-3px_-3px_6px_rgba(185,28,28,0.18)]
                   transition-all duration-200
-                  hover:bg-[#fca5a5] hover:text-black
+                  hover:bg-[#fca5a5] hover:text-foreground
                   active:translate-y-[1px] active:shadow-[2px_3px_7px_rgba(239,68,68,0.18)]
                 "
                 onClick={() => handleCancelGroup(group)}
@@ -383,7 +383,7 @@ return (
               >
                 {cancellingId === booking.id ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin text-black" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin text-foreground" />
                     Cancelling...
                   </>
                 ) : (
@@ -400,9 +400,9 @@ return (
 
           {/* Completed booking rating */}
           {isCompleted && (
-            <div className="mt-4 rounded-[20px] border border-slate-100 bg-white p-3.5 shadow-[4px_5px_11px_rgba(0,0,0,0.07),-3px_-3px_9px_rgba(255,255,255,0.95)]">
+            <div className="mt-4 rounded-[20px] border border-border bg-card p-3.5 shadow-none">
               {hasRated ? (
-                <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                   <div className="flex items-center gap-1">
                     {Array.from({ length: 5 }).map((_, index) => {
                       const review = existingReviews.find(
@@ -426,7 +426,7 @@ return (
                 </div>
               ) : (
                 <div>
-                  <p className="mb-2 text-sm font-bold text-black">
+                  <p className="mb-2 text-sm font-bold text-foreground">
                     Rate this Barber
                   </p>
 
@@ -483,23 +483,23 @@ return (
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-16">
+      <div className="flex flex-col items-center justify-center py-16 text-foreground">
         <Loader2 className="mb-4 h-8 w-8 animate-spin text-orange-500" />
-        <p className="text-slate-500">Loading your bookings...</p>
+        <p className="text-muted-foreground">Loading your bookings...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-full w-full bg-white animate-fade-in">
+    <div className="min-h-full w-full bg-background text-foreground animate-fade-in">
       {/* Header */}
       <div className="mb-4 flex w-full flex-col gap-3">
         <div className="min-w-0">
-          <h1 className="whitespace-nowrap font-display text-[31px] font-bold leading-none tracking-[-1.2px] text-black sm:text-4xl">
+          <h1 className="whitespace-nowrap font-display text-[31px] font-bold leading-none tracking-[-1.2px] text-foreground sm:text-4xl">
             My <span className="text-[#ff7417]">Bookings</span>
           </h1>
 
-          <p className="mt-2 whitespace-nowrap text-[15px] font-medium text-slate-500 sm:text-base">
+          <p className="mt-2 whitespace-nowrap text-[15px] font-medium text-muted-foreground sm:text-base">
             Manage your appointments
           </p>
         </div>
@@ -530,15 +530,15 @@ return (
         <TabsList
           className="
             mb-4 flex h-12 w-full rounded-full
-            border border-slate-100 bg-white p-1
-            shadow-[5px_6px_13px_rgba(0,0,0,0.08),-4px_-4px_11px_rgba(255,255,255,0.95)]
+            border border-border bg-card p-1
+            shadow-none
           "
         >
           <TabsTrigger
             value="upcoming"
             className="
               h-full flex-1 rounded-full
-              text-sm font-bold text-slate-500
+              text-sm font-bold text-muted-foreground
               transition-all duration-200
               data-[state=active]:bg-[#f97316]
               data-[state=active]:text-white
@@ -552,7 +552,7 @@ return (
             value="past"
             className="
               h-full flex-1 rounded-full
-              text-sm font-bold text-slate-500
+              text-sm font-bold text-muted-foreground
               transition-all duration-200
               data-[state=active]:bg-[#f97316]
               data-[state=active]:text-white
@@ -569,9 +569,9 @@ return (
               <BookingCard key={g[0].id} group={g} />
             ))
           ) : (
-            <div className="rounded-[26px] border border-slate-100 bg-white py-12 text-center shadow-[6px_7px_15px_rgba(0,0,0,0.08),-5px_-5px_13px_rgba(255,255,255,0.95)]">
+            <div className="rounded-[26px] border border-border bg-card py-12 text-center shadow-none">
               <Calendar className="mx-auto mb-4 h-12 w-12 text-slate-300" />
-              <p className="font-medium text-slate-500">No upcoming bookings</p>
+              <p className="font-medium text-muted-foreground">No upcoming bookings</p>
               <Button
                 className="
                   mt-4 rounded-full bg-[#f97316] text-white
@@ -592,9 +592,9 @@ return (
               <BookingCard key={g[0].id} group={g} />
             ))
           ) : (
-            <div className="rounded-[26px] border border-slate-100 bg-white py-12 text-center shadow-[6px_7px_15px_rgba(0,0,0,0.08),-5px_-5px_13px_rgba(255,255,255,0.95)]">
+            <div className="rounded-[26px] border border-border bg-card py-12 text-center shadow-none">
               <Calendar className="mx-auto mb-4 h-12 w-12 text-slate-300" />
-              <p className="font-medium text-slate-500">No past bookings</p>
+              <p className="font-medium text-muted-foreground">No past bookings</p>
             </div>
           )}
         </TabsContent>

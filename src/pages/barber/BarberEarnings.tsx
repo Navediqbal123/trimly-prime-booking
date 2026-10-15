@@ -160,13 +160,13 @@ export default function BarberEarnings() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] w-full items-center justify-center bg-white">
+      <div className="flex min-h-[60vh] w-full items-center justify-center bg-background text-foreground">
         <div className="flex flex-col items-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-[#fff0e5] shadow-[5px_6px_12px_rgba(0,0,0,0.10)]">
-            <Loader2 className="h-7 w-7 animate-spin text-[#ff7417]" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-primary/10 shadow-[5px_6px_12px_rgba(0,0,0,0.10)]">
+            <Loader2 className="h-7 w-7 animate-spin text-primary" />
           </div>
 
-          <p className="mt-4 font-semibold text-gray-500">
+          <p className="mt-4 font-semibold text-muted-foreground">
             Loading earnings...
           </p>
         </div>
@@ -178,22 +178,22 @@ export default function BarberEarnings() {
     <motion.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full min-w-0 bg-white pb-10"
+      className="w-full min-w-0 bg-background pb-10 text-foreground"
     >
       <div className="w-full min-w-0 space-y-5">
         {/* ================= HEADER ================= */}
         <div className="w-full min-w-0">
-          <h1 className="flex min-w-0 items-center gap-2 text-[36px] font-black leading-tight tracking-[-1.5px] text-black sm:text-4xl lg:text-5xl">
+          <h1 className="flex min-w-0 items-center gap-2 text-[36px] font-black leading-tight tracking-[-1.5px] text-foreground sm:text-4xl lg:text-5xl">
             <span className="shrink-0">
               My
             </span>
 
-            <span className="shrink-0 text-[#ff7417]">
+            <span className="shrink-0 text-primary">
               Earnings
             </span>
           </h1>
 
-          <p className="mt-2 w-full whitespace-nowrap text-[13px] font-semibold text-gray-500 sm:text-base">
+          <p className="mt-2 w-full whitespace-nowrap text-[13px] font-semibold text-muted-foreground sm:text-base">
             Track your revenue from completed bookings
           </p>
         </div>
@@ -203,7 +203,7 @@ export default function BarberEarnings() {
           type="button"
           onClick={fetchData}
           disabled={loading}
-          className="flex h-11 w-full rounded-[18px] bg-[#ff7417] font-bold text-white shadow-[6px_7px_14px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(190,70,0,0.25)] hover:bg-[#f56d10]"
+          className="flex h-11 w-full rounded-[18px] bg-primary font-bold text-primary-foreground shadow-[6px_7px_14px_rgba(255,116,23,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(190,70,0,0.25)] hover:bg-primary/90"
         >
           <RefreshCw
             className={`mr-2 h-5 w-5 ${
@@ -217,19 +217,19 @@ export default function BarberEarnings() {
         {/* ================= STATS ================= */}
         <div className="grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-3">
           {/* TOTAL EARNINGS */}
-          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-[#eeeeee] bg-white shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]">
+          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-sm dark:shadow-black/20">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-[#dff8ee] text-[#18ae78] shadow-[4px_5px_11px_rgba(24,174,120,0.14),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-[4px_5px_11px_rgba(24,174,120,0.14),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
                   <IndianRupee className="h-7 w-7" />
                 </div>
 
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-gray-500">
+                  <p className="truncate text-sm font-bold text-muted-foreground">
                     Total Earnings
                   </p>
 
-                  <p className="truncate text-2xl font-black text-black sm:text-3xl">
+                  <p className="truncate text-2xl font-black text-foreground sm:text-3xl">
                     ₹{totalEarnings.toLocaleString('en-IN')}
                   </p>
                 </div>
@@ -238,19 +238,19 @@ export default function BarberEarnings() {
           </Card>
 
           {/* THIS WEEK */}
-          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-[#eeeeee] bg-white shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]">
+          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-sm dark:shadow-black/20">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-[#eee4ff] text-[#9855e8] shadow-[4px_5px_11px_rgba(152,85,232,0.14),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-violet-500/15 text-violet-700 dark:text-violet-300 shadow-[4px_5px_11px_rgba(152,85,232,0.14),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
                   <TrendingUp className="h-7 w-7" />
                 </div>
 
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-gray-500">
+                  <p className="truncate text-sm font-bold text-muted-foreground">
                     This Week
                   </p>
 
-                  <p className="truncate text-2xl font-black text-black sm:text-3xl">
+                  <p className="truncate text-2xl font-black text-foreground sm:text-3xl">
                     ₹{weeklyEarnings.toLocaleString('en-IN')}
                   </p>
                 </div>
@@ -259,19 +259,19 @@ export default function BarberEarnings() {
           </Card>
 
           {/* COMPLETED JOBS */}
-          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-[#eeeeee] bg-white shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]">
+          <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-sm dark:shadow-black/20">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-[#deebff] text-[#3982e7] shadow-[4px_5px_11px_rgba(57,130,231,0.14),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-blue-500/15 text-blue-700 dark:text-blue-300 shadow-[4px_5px_11px_rgba(57,130,231,0.14),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
                   <Calendar className="h-7 w-7" />
                 </div>
 
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-gray-500">
+                  <p className="truncate text-sm font-bold text-muted-foreground">
                     Completed Jobs
                   </p>
 
-                  <p className="text-3xl font-black text-black">
+                  <p className="text-3xl font-black text-foreground">
                     {completedBookings.length}
                   </p>
                 </div>
@@ -281,27 +281,27 @@ export default function BarberEarnings() {
         </div>
 
         {/* ================= EARNINGS OVERVIEW ================= */}
-        <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-[#eeeeee] bg-white shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]">
+        <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-sm dark:shadow-black/20">
           <CardHeader className="flex w-full min-w-0 flex-row items-center justify-between gap-3 p-5 pb-2 sm:p-6">
             <div className="min-w-0">
               <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[17px] bg-[#fff0e5] text-[#ff7417] shadow-[4px_5px_10px_rgba(255,116,23,0.13),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[17px] bg-primary/10 text-primary shadow-[4px_5px_10px_rgba(255,116,23,0.13),inset_2px_2px_5px_rgba(255,255,255,0.9)]">
                   <TrendingUp className="h-5 w-5" />
                 </div>
 
                 <div className="min-w-0">
-                  <CardTitle className="truncate text-xl font-black text-black sm:text-2xl">
+                  <CardTitle className="truncate text-xl font-black text-foreground sm:text-2xl">
                     Earnings Overview
                   </CardTitle>
 
-                  <p className="truncate text-xs font-semibold text-gray-500 sm:text-sm">
+                  <p className="truncate text-xs font-semibold text-muted-foreground sm:text-sm">
                     Your recent completed earnings
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="shrink-0 rounded-[18px] bg-[#fff0e5] px-3 py-2.5 text-xs font-bold text-[#ff7417] shadow-[4px_5px_9px_rgba(255,116,23,0.12),inset_1px_1px_4px_rgba(255,255,255,0.9)] sm:px-4 sm:text-sm">
+            <div className="shrink-0 rounded-[18px] bg-primary/10 px-3 py-2.5 text-xs font-bold text-primary shadow-[4px_5px_9px_rgba(255,116,23,0.12),inset_1px_1px_4px_rgba(255,255,255,0.9)] sm:px-4 sm:text-sm">
               This Week⌄
             </div>
           </CardHeader>
@@ -333,7 +333,7 @@ export default function BarberEarnings() {
                     <XAxis
                       dataKey="date"
                       tick={{
-                        fill: '#64748b',
+                        fill: 'hsl(var(--muted-foreground))',
                         fontSize: 11,
                       }}
                       axisLine={false}
@@ -343,7 +343,7 @@ export default function BarberEarnings() {
 
                     <YAxis
                       tick={{
-                        fill: '#64748b',
+                        fill: 'hsl(var(--muted-foreground))',
                         fontSize: 11,
                       }}
                       axisLine={false}
@@ -359,15 +359,15 @@ export default function BarberEarnings() {
                         fill: 'rgba(255,116,23,0.04)',
                       }}
                       contentStyle={{
-                        background: '#ffffff',
-                        border: 'none',
+                        background: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
                         borderRadius: '18px',
                         boxShadow:
-                          '6px 7px 14px rgba(0,0,0,0.10), -4px -4px 10px rgba(255,255,255,0.95)',
+                          '0 8px 24px rgba(0,0,0,0.16)',
                         padding: '10px 14px',
                       }}
                       labelStyle={{
-                        color: '#111111',
+                        color: 'hsl(var(--foreground))',
                         fontWeight: 700,
                         marginBottom: 4,
                       }}
@@ -394,13 +394,13 @@ export default function BarberEarnings() {
                       dot={{
                         r: 5,
                         fill: '#ff7417',
-                        stroke: '#ffffff',
+                        stroke: 'hsl(var(--card))',
                         strokeWidth: 2,
                       }}
                       activeDot={{
                         r: 7,
                         fill: '#ff7417',
-                        stroke: '#ffffff',
+                        stroke: 'hsl(var(--card))',
                         strokeWidth: 3,
                       }}
                       connectNulls
@@ -410,34 +410,34 @@ export default function BarberEarnings() {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="flex min-h-[260px] w-full flex-col items-center justify-center rounded-[22px] bg-[#f8f9fb]">
-                <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#fff0e5] text-[#ff7417] shadow-[4px_5px_10px_rgba(0,0,0,0.08)]">
+              <div className="flex min-h-[260px] w-full flex-col items-center justify-center rounded-[22px] bg-secondary">
+                <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-primary/10 text-primary shadow-[4px_5px_10px_rgba(0,0,0,0.08)]">
                   <IndianRupee className="h-7 w-7" />
                 </div>
 
-                <p className="mt-4 text-center font-bold text-gray-600">
+                <p className="mt-4 text-center font-bold text-muted-foreground">
                   No completed bookings in the last 7 days
                 </p>
 
-                <p className="mt-1 text-center text-xs text-gray-400">
+                <p className="mt-1 text-center text-xs text-muted-foreground/70">
                   Revenue will appear here once bookings are completed
                 </p>
               </div>
             )}
 
             {/* TOTAL EARNINGS FOOTER */}
-            <div className="mt-3 flex w-full items-center justify-between gap-3 rounded-[22px] bg-[#fff8f2] p-4 shadow-[4px_5px_10px_rgba(255,116,23,0.08),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
+            <div className="mt-3 flex w-full items-center justify-between gap-3 rounded-[22px] bg-secondary p-4 shadow-[4px_5px_10px_rgba(255,116,23,0.08),inset_2px_2px_5px_rgba(255,255,255,0.95)]">
               <div className="min-w-0">
-                <p className="text-xs font-bold text-gray-500">
+                <p className="text-xs font-bold text-muted-foreground">
                   Total Earnings
                 </p>
 
-                <p className="text-2xl font-black text-black sm:text-3xl">
+                <p className="text-2xl font-black text-foreground sm:text-3xl">
                   ₹{totalEarnings.toLocaleString('en-IN')}
                 </p>
               </div>
 
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-[#ffe9d8] text-[#ff7417] shadow-[4px_5px_9px_rgba(255,116,23,0.12),inset_1px_1px_4px_rgba(255,255,255,0.9)]">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-primary/10 text-primary shadow-[4px_5px_9px_rgba(255,116,23,0.12),inset_1px_1px_4px_rgba(255,255,255,0.9)]">
                 <TrendingUp className="h-5 w-5" />
               </div>
             </div>
@@ -445,9 +445,9 @@ export default function BarberEarnings() {
         </Card>
 
         {/* ================= RECENT COMPLETED ================= */}
-        <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-[#eeeeee] bg-white shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]">
+        <Card className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-sm dark:shadow-black/20">
           <CardHeader className="p-5 pb-3 sm:p-6">
-            <CardTitle className="text-xl font-black text-black sm:text-2xl">
+            <CardTitle className="text-xl font-black text-foreground sm:text-2xl">
               Recent Completed Bookings
             </CardTitle>
           </CardHeader>
@@ -460,10 +460,10 @@ export default function BarberEarnings() {
                   .map((b) => (
                     <div
                       key={b.id}
-                      className="flex w-full min-w-0 items-center justify-between gap-3 border-b border-gray-100 py-4 last:border-0"
+                      className="flex w-full min-w-0 items-center justify-between gap-3 border-b border-border py-4 last:border-0"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold text-black sm:text-base">
+                        <p className="truncate text-sm font-bold text-foreground sm:text-base">
                           {bookingServiceNames(
                             b,
                             serviceMap
@@ -471,17 +471,17 @@ export default function BarberEarnings() {
                             'Service'}
                         </p>
 
-                        <p className="mt-1 truncate text-xs font-medium text-gray-500 sm:text-sm">
+                        <p className="mt-1 truncate text-xs font-medium text-muted-foreground sm:text-sm">
                           {b.date} • {b.time_slot}
                         </p>
                       </div>
 
                       <div className="flex shrink-0 items-center gap-2">
-                        <span className="text-sm font-black text-black sm:text-base">
+                        <span className="text-sm font-black text-foreground sm:text-base">
                           ₹{amountOf(b)}
                         </span>
 
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#fff0e5] text-[#ff7417] shadow-[3px_4px_7px_rgba(0,0,0,0.08)]">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary shadow-[3px_4px_7px_rgba(0,0,0,0.08)]">
                           <ChevronRight className="h-4 w-4" />
                         </div>
                       </div>
@@ -490,7 +490,7 @@ export default function BarberEarnings() {
               </div>
             ) : (
               <div className="py-10 text-center">
-                <p className="font-semibold text-gray-400">
+                <p className="font-semibold text-muted-foreground/70">
                   No completed bookings yet
                 </p>
               </div>

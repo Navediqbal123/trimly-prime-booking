@@ -122,7 +122,7 @@ export default function LikedShops() {
   };
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-white px-5 pb-8 pt-5 sm:px-8 sm:pt-8">
+    <div className="min-h-screen w-full overflow-x-hidden bg-background px-5 pb-8 pt-5 text-foreground sm:px-8 sm:pt-8">
 
       {/* Header */}
       <div className="mb-10 flex items-center gap-4 sm:mb-14">
@@ -135,7 +135,7 @@ export default function LikedShops() {
             flex h-12 w-12 shrink-0 items-center justify-center
             rounded-full bg-gradient-to-br from-[#ff963f] to-[#ff7417]
             text-white
-            shadow-[inset_2px_2px_4px_rgba(255,255,255,0.45),inset_-2px_-3px_5px_rgba(190,65,0,0.18),0_6px_12px_rgba(255,116,23,0.25)]
+            shadow-[inset_2px_2px_4px_rgba(255,255,255,0.22),inset_-2px_-3px_5px_rgba(190,65,0,0.18),0_6px_12px_rgba(255,116,23,0.25)]
             transition-transform duration-150
             active:scale-95
             sm:h-14 sm:w-14
@@ -145,7 +145,7 @@ export default function LikedShops() {
         </button>
 
         <div className="min-w-0">
-          <h1 className="flex flex-wrap items-center gap-2 text-[27px] font-extrabold leading-tight tracking-tight text-black sm:text-4xl">
+          <h1 className="flex flex-wrap items-center gap-2 text-[27px] font-extrabold leading-tight tracking-tight text-foreground sm:text-4xl">
             Liked Shops
             <Heart
               aria-hidden="true"
@@ -153,7 +153,7 @@ export default function LikedShops() {
             />
           </h1>
 
-          <p className="mt-1 text-sm font-medium text-slate-500 sm:text-base">
+          <p className="mt-1 text-sm font-medium text-muted-foreground sm:text-base">
             {likedShops.length} saved{' '}
             {likedShops.length === 1 ? 'shop' : 'shops'}
           </p>
@@ -171,11 +171,11 @@ export default function LikedShops() {
         /* Error State */
         <div
           className="
-            rounded-[28px] bg-white p-7 text-center
-            shadow-[6px_7px_18px_rgba(0,0,0,0.07),-5px_-5px_15px_rgba(255,255,255,0.95)]
+            rounded-[28px] border border-border bg-card p-7 text-center
+            shadow-none
           "
         >
-          <p className="text-base font-bold text-slate-800">
+          <p className="text-base font-bold text-foreground">
             Could not load liked shops.
           </p>
 
@@ -194,8 +194,9 @@ export default function LikedShops() {
             className="
               mb-8 flex h-56 w-56 items-center justify-center
               rounded-full
-              bg-[radial-gradient(circle,#fffaf6_48%,#fff0e3_72%,#ffe2c7_100%)]
-              shadow-[inset_5px_5px_14px_rgba(255,255,255,0.95),inset_-6px_-7px_16px_rgba(255,174,106,0.18),0_12px_30px_rgba(255,116,23,0.10)]
+              border border-border
+              bg-secondary
+              shadow-[inset_5px_5px_14px_rgba(0,0,0,0.04),inset_-6px_-7px_16px_rgba(255,174,106,0.10),0_12px_30px_rgba(255,116,23,0.08)]
               sm:mb-10 sm:h-64 sm:w-64
             "
           >
@@ -211,11 +212,11 @@ export default function LikedShops() {
           </div>
 
           {/* Empty State Text */}
-          <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+          <h2 className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
             No liked shops yet
           </h2>
 
-          <p className="mt-3 max-w-sm text-base leading-7 text-slate-500 sm:text-lg">
+          <p className="mt-3 max-w-sm text-base leading-7 text-muted-foreground sm:text-lg">
             Save your favourite barber shops
             <br className="hidden sm:block" /> to find them here.
           </p>
@@ -229,7 +230,7 @@ export default function LikedShops() {
               rounded-full border-0
               bg-gradient-to-b from-[#ff963f] via-[#ff801f] to-[#ff7417]
               px-6 text-lg font-bold text-white
-              shadow-[inset_0_3px_4px_rgba(255,255,255,0.35),inset_0_-4px_5px_rgba(205,69,0,0.16),0_9px_18px_rgba(255,116,23,0.24)]
+              shadow-[inset_0_3px_4px_rgba(255,255,255,0.25),inset_0_-4px_5px_rgba(205,69,0,0.16),0_9px_18px_rgba(255,116,23,0.24)]
               transition-all duration-150
               hover:brightness-[1.03]
               active:scale-[0.98]
