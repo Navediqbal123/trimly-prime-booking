@@ -169,7 +169,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-white animate-fade-in pb-4 pt-16 lg:pt-0">
+    <div className="min-h-screen w-full animate-fade-in bg-background pb-4 pt-16 text-foreground transition-colors duration-200 lg:pt-0">
 
       {/* =========================================================
           SEARCH BAR
@@ -179,19 +179,17 @@ export default function Dashboard() {
           className="
             flex h-[54px] w-full items-center
             rounded-[22px]
-            border border-orange-100
-            bg-white
+            border border-border
+            bg-card
             px-2.5
-            shadow-[5px_6px_14px_rgba(0,0,0,0.09),-4px_-4px_11px_rgba(255,255,255,0.95)]
           "
         >
           <div
             className="
               flex h-9 w-9 shrink-0 items-center justify-center
               rounded-[14px]
-              bg-[#fff3e8]
+              bg-[#ff7417]/10
               text-[#ff7417]
-              shadow-[3px_4px_7px_rgba(255,116,23,0.12),inset_2px_2px_4px_rgba(255,255,255,0.9)]
             "
           >
             <Search
@@ -218,16 +216,16 @@ export default function Dashboard() {
             "
           />
 
-          <div className="mx-1 h-7 w-px bg-slate-200" />
+          <div className="mx-1 h-7 w-px bg-border" />
 
           <button
             type="button"
             className="
               flex h-9 w-9 shrink-0 items-center justify-center
               rounded-[14px]
-              bg-background
-              text-slate-600
-              shadow-[3px_4px_7px_rgba(0,0,0,0.07)]
+              border border-border
+              bg-secondary
+              text-foreground
               transition-transform
               active:scale-95
             "
@@ -256,12 +254,11 @@ export default function Dashboard() {
           w-full
           overflow-hidden
           rounded-[25px]
-          border border-orange-100
-          shadow-[7px_8px_17px_rgba(0,0,0,0.11),-5px_-5px_14px_rgba(255,255,255,0.95)]
+          border border-border/60
         "
         style={{ background: currentBanner.background }}
       >
-        <div className="absolute -right-10 -top-14 h-32 w-32 rounded-fubg-card/30" />
+        <div className="absolute -right-10 -top-14 h-32 w-32 rounded-full bg-white/10" />
 
         <div className="absolute -right-3 bottom-[-45px] h-36 w-36 rounded-full bg-[#ff7417]/10" />
 
@@ -283,10 +280,9 @@ export default function Dashboard() {
                 items-center
                 gap-1.5
                 rounded-full
-                bg-white/70
+                bg-white/75
                 px-2.5
                 py-1
-                shadow-[2px_3px_6px_rgba(0,0,0,0.05)]
               "
             >
               <Sparkles className="h-3 w-3 text-[#ff7417]" />
@@ -304,7 +300,7 @@ export default function Dashboard() {
                 font-bold
                 leading-[0.95]
                 tracking-[-0.7px]
-                text-foreground
+                text-[#24152c]
                 sm:text-3xl
               "
             >
@@ -316,7 +312,7 @@ export default function Dashboard() {
               </span>
             </h2>
 
-            <p className="mt-1.5 max-w-[240px] text-[11px] font-medium text-slate-600 sm:text-xs">
+            <p className="mt-1.5 max-w-[240px] text-[11px] font-medium text-[#4b4350] sm:text-xs">
               {currentBanner.description}
             </p>
           </div>
@@ -336,7 +332,6 @@ export default function Dashboard() {
               text-[10px]
               font-bold
               text-white
-              shadow-[4px_5px_10px_rgba(255,116,23,0.28),inset_2px_2px_4px_rgba(255,255,255,0.28),inset_-2px_-2px_5px_rgba(190,70,0,0.22)]
               hover:bg-[#ff7417]
               active:scale-95
             "
@@ -379,14 +374,14 @@ export default function Dashboard() {
                 font-bold
                 leading-none
                 tracking-[-1px]
-                text-black
+                text-foreground
                 sm:text-4xl
               "
             >
               Barber Shops
             </h2>
 
-            <p className="mt-0 text-xs font-medium text-slate-500 sm:text-sm">
+            <p className="mt-1 text-xs font-medium text-muted-foreground sm:text-sm">
               {searchQuery
                 ? `${filteredBarbers.length} shop${
                     filteredBarbers.length === 1 ? '' : 's'
@@ -422,15 +417,15 @@ export default function Dashboard() {
           <div
             className="
               rounded-[25px]
-            bg-secondary
+              border border-border
+              bg-card
               p-8
               text-center
-              shadow-[6px_7px_16px_rgba(0,0,0,0.08),-5px_-5px_13px_rgba(255,255,255,0.95)]
             "
           >
-            <Scissors className="mx-auto mb-3 h-10 w-10 text-slate-300" />
+            <Scissors className="mx-auto mb-3 h-10 w-10 text-muted-foreground/60" />
 
-            <p className="text-sm font-semibold text-slate-600">
+            <p className="text-sm font-semibold text-muted-foreground">
               {searchQuery
                 ? 'No barber shop found.'
                 : 'No barber shops available yet.'}
