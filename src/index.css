@@ -8,24 +8,34 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
+
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
+
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
+
     --primary: 262 83% 58%;
     --primary-foreground: 0 0% 100%;
+
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
+
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
+
     --accent: 262 83% 58%;
     --accent-foreground: 0 0% 100%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 262 83% 58%;
+
     --radius: 0.75rem;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 262 83% 58%;
@@ -34,31 +44,65 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 262 83% 58%;
+
+    --gold: 43 90% 45%;
+    --gold-foreground: 0 0% 100%;
+
+    --primary-glow: 262 83% 58%;
+    --glow-primary: 0 0 24px hsl(262 83% 58% / 0.25);
+    --glow-card: 0 8px 32px hsl(240 10% 3.9% / 0.08);
+    --glow-gold: 0 0 18px hsl(43 90% 50% / 0.2);
+
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(262 83% 58%),
+      hsl(290 75% 55%)
+    );
+
+    --gradient-gold: linear-gradient(
+      135deg,
+      hsl(43 95% 65%),
+      hsl(36 90% 50%)
+    );
+
+    --gradient-bg: hsl(var(--background));
+    --glass-background: hsl(0 0% 100% / 0.85);
+    --glass-border: hsl(240 5.9% 90%);
   }
 
   .dark {
     --background: 0 0% 4%;
     --foreground: 0 0% 100%;
+
     --card: 270 60% 11%;
     --card-foreground: 0 0% 100%;
+
     --popover: 0 0% 6%;
     --popover-foreground: 0 0% 100%;
+
     --primary: 270 70% 60%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 280 80% 70%;
+
     --secondary: 270 40% 14%;
     --secondary-foreground: 0 0% 100%;
+
     --muted: 270 30% 12%;
     --muted-foreground: 0 0% 85%;
+
     --accent: 43 90% 60%;
     --accent-foreground: 0 0% 4%;
+
     --gold: 43 90% 60%;
     --gold-foreground: 0 0% 4%;
+
     --destructive: 0 70% 45%;
     --destructive-foreground: 0 0% 100%;
+
     --border: 270 50% 22%;
     --input: 270 40% 14%;
     --ring: 270 70% 60%;
+
     --sidebar-background: 0 0% 5%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 270 70% 60%;
@@ -71,9 +115,22 @@
     --glow-primary: 0 0 24px hsl(270 70% 60% / 0.5);
     --glow-card: 0 8px 40px hsl(270 70% 30% / 0.35);
     --glow-gold: 0 0 18px hsl(43 90% 60% / 0.45);
-    --gradient-primary: linear-gradient(135deg, hsl(270 70% 60%), hsl(290 75% 55%));
-    --gradient-gold: linear-gradient(135deg, hsl(43 95% 65%), hsl(36 90% 50%));
-    --gradient-bg: #0A0A0A;
+
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(270 70% 60%),
+      hsl(290 75% 55%)
+    );
+
+    --gradient-gold: linear-gradient(
+      135deg,
+      hsl(43 95% 65%),
+      hsl(36 90% 50%)
+    );
+
+    --gradient-bg: hsl(var(--background));
+    --glass-background: hsl(270 40% 10% / 0.9);
+    --glass-border: hsl(270 50% 30% / 0.6);
   }
 }
 
@@ -84,24 +141,27 @@
   }
 
   html {
-   
     width: 100%;
     min-height: 100%;
     overflow-x: hidden;
     margin: 0;
     padding: 0;
+    scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+
     font-family: 'Inter', sans-serif;
     width: 100%;
     min-width: 0;
     min-height: 100vh;
     margin: 0;
     padding: 0;
-    background: var(--gradient-bg);
+
+    background: hsl(var(--background));
     background-attachment: fixed;
+
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
@@ -114,28 +174,53 @@
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 
-  html {
-    scroll-behavior: smooth;
+  a,
+  button {
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease,
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
 
-  a, button {
-    transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Playfair Display', serif;
   }
 }
 
 @layer utilities {
-  .glow-primary { box-shadow: var(--glow-primary); }
-  .glow-card { box-shadow: var(--glow-card); }
-  .glow-gold { box-shadow: var(--glow-gold); }
-  .text-gold { color: hsl(var(--gold)); }
-  .bg-gold { background-color: hsl(var(--gold)); }
-  .border-gold { border-color: hsl(var(--gold)); }
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+
+  .glow-card {
+    box-shadow: var(--glow-card);
+  }
+
+  .glow-gold {
+    box-shadow: var(--glow-gold);
+  }
+
+  .text-gold {
+    color: hsl(var(--gold));
+  }
+
+  .bg-gold {
+    background-color: hsl(var(--gold));
+  }
+
+  .border-gold {
+    border-color: hsl(var(--gold));
+  }
 
   .gradient-text {
     @apply bg-gradient-to-r from-primary via-purple-300 to-primary bg-clip-text text-transparent;
@@ -149,14 +234,18 @@
   }
 
   .glass-card {
-    background: #1A0A2E;
-    border: 1px solid hsl(270 50% 30% / 0.6);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    background: var(--glass-background);
+    color: hsl(var(--card-foreground));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--glow-card);
   }
 
   .glass-panel {
-    background: #0A0A0A;
-    border: 1px solid hsl(270 50% 30% / 0.6);
+    background: var(--glass-background);
+    color: hsl(var(--foreground));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
   }
 
   .page-black {
@@ -165,10 +254,15 @@
     min-height: 100vh;
     margin: 0;
     padding: 0;
-    background: #ffffff;
-    color: #000000;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
     overflow-x: hidden;
   }
+
+  /*
+   * Theme-aware defaults for page-black.
+   * Explicitly styled hero elements retain their intended colors.
+   */
 
   .page-black,
   .page-black h1,
@@ -183,7 +277,7 @@
   .page-black th,
   .page-black label,
   .page-black div {
-    color: #000000;
+    color: hsl(var(--foreground));
   }
 
   .page-black .hero-dark,
@@ -207,42 +301,52 @@
   }
 
   .page-black .gradient-text {
-    -webkit-text-fill-color: initial;
-    color: inherit;
+    -webkit-text-fill-color: currentColor;
   }
+
+  /*
+   * Card surfaces follow the active theme.
+   * Removed the previous forced white background and black text.
+   */
 
   .page-black .glass-card,
   .page-black .bg-card,
   .page-black [class*="bg-card"] {
-    background: #ffffff !important;
-    border-color: rgba(0, 0, 0, 0.12) !important;
-    color: #000000 !important;
+    background-color: hsl(var(--card));
+    border-color: hsl(var(--border));
+    color: hsl(var(--card-foreground));
   }
 
-  .page-black .text-muted-foreground,
-  .page-black .text-foreground\/70,
-  .page-black .text-foreground\/80,
-  .page-black .text-foreground\/60 {
-    color: rgba(0, 0, 0, 0.75) !important;
+  .page-black .text-muted-foreground {
+    color: hsl(var(--muted-foreground));
   }
 
   .page-black input,
   .page-black textarea,
   .page-black select {
-    background: #ffffff !important;
-    color: #000000 !important;
-    border-color: rgba(0, 0, 0, 0.2) !important;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    border-color: hsl(var(--input));
   }
 
   .page-black input::placeholder,
   .page-black textarea::placeholder {
-    color: rgba(0, 0, 0, 0.5) !important;
+    color: hsl(var(--muted-foreground));
+    opacity: 1;
   }
 
   .gradient-border {
     @apply relative;
-    background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
-                linear-gradient(135deg, hsl(var(--primary)), hsl(var(--gold)), hsl(var(--primary))) border-box;
+
+    background:
+      linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+      linear-gradient(
+        135deg,
+        hsl(var(--primary)),
+        hsl(var(--gold)),
+        hsl(var(--primary))
+      ) border-box;
+
     border: 1px solid transparent;
   }
 
@@ -267,8 +371,13 @@
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes slideUp {
@@ -276,6 +385,7 @@
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -287,6 +397,7 @@
       opacity: 0;
       transform: scale(0.95);
     }
+
     to {
       opacity: 1;
       transform: scale(1);
