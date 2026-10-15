@@ -171,7 +171,7 @@ setPrivacyAcknowledged(false);
           <p className="mt-2 text-sm font-medium text-muted-foreground">Your style, your way.</p>
         </header>
 
-        <section className="rounded-[28px] border border-border bg-card p-5 shadow-[6px_7px_16px_rgba(0,0,0,0.08),-5px_-5px_13px_rgba(255,255,255,0.95)] sm:p-7">
+        <section className="rounded-[28px] border border-border bg-card p-5 sm:p-7">
           <div className="mb-6 flex h-12 w-full rounded-full border border-border bg-muted p-1 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.04),inset_-2px_-2px_5px_rgba(255,255,255,0.95)]">
             <button type="button" onClick={() => { if (isSignUp) toggleMode(); }} className={`h-full flex-1 rounded-full text-sm font-bold transition-colors duration-150 ${!isSignUp ? 'bg-[#f97316] text-white shadow-[5px_6px_12px_rgba(194,65,12,0.24),inset_1px_1px_3px_rgba(255,255,255,0.28),inset_-2px_-2px_4px_rgba(154,52,18,0.20)]' : 'text-muted-foreground hover:text-foreground'}`}>
               Sign In
@@ -190,8 +190,8 @@ setPrivacyAcknowledged(false);
             {isSignUp && (
               <div className="space-y-1.5">
                 <Label htmlFor="name" className="text-sm font-semibold text-foreground">Full Name</Label>
-                <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#fff0e5] text-[#e85d04] shadow-[2px_3px_6px_rgba(0,0,0,0.07),inset_1px_1px_3px_rgba(255,255,255,0.9)]"><User className="h-[18px] w-[18px]" /></span>
+                <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 focus-within:border-orange-300">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#fff0e5] text-[#e85d04] "><User className="h-[18px] w-[18px]" /></span>
                   <Input id="name" name="name" type="text" autoComplete="name" placeholder="Your full name" value={formData.name} onChange={handleChange} className="h-11 border-0 bg-transparent px-0 text-foreground text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
                 </div>
                 {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
@@ -201,8 +201,8 @@ setPrivacyAcknowledged(false);
             {isSignUp && (
               <div className="space-y-1.5">
                 <Label htmlFor="phone" className="text-sm font-semibold text-foreground">Phone Number <span className="font-normal text-muted-foreground">(optional)</span></Label>
-                <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#f0eaff] text-[#7c3aed] shadow-[2px_3px_6px_rgba(0,0,0,0.07),inset_1px_1px_3px_rgba(255,255,255,0.9)]"><Phone className="h-[18px] w-[18px]" /></span>
+                <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 focus-within:border-orange-300">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#f0eaff] text-[#7c3aed] "><Phone className="h-[18px] w-[18px]" /></span>
                   <Input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="Phone number" value={formData.phone} onChange={handleChange} className="h-11 border-0 bg-transparent px-0 text-foreground text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
                 </div>
               </div>
@@ -210,8 +210,8 @@ setPrivacyAcknowledged(false);
 
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-sm font-semibold text-foreground">Email Address</Label>
-              <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#e8f3ff] text-[#1971c2] shadow-[2px_3px_6px_rgba(0,0,0,0.07),inset_1px_1px_3px_rgba(255,255,255,0.9)]"><Mail className="h-[18px] w-[18px]" /></span>
+              <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 focus-within:border-orange-300">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#e8f3ff] text-[#1971c2] "><Mail className="h-[18px] w-[18px]" /></span>
                 <Input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" value={formData.email} onChange={handleChange} className="h-11 border-0 bg-transparent px-0 text-foreground text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
               </div>
               {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
@@ -219,8 +219,8 @@ setPrivacyAcknowledged(false);
 
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-sm font-semibold text-foreground">Password</Label>
-              <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 shadow-[4px_5px_10px_rgba(0,0,0,0.06),-3px_-3px_8px_rgba(255,255,255,0.95)] focus-within:border-orange-300">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#ffe8ee] text-[#e11d48] shadow-[2px_3px_6px_rgba(0,0,0,0.07),inset_1px_1px_3px_rgba(255,255,255,0.9)]"><Lock className="h-[18px] w-[18px]" /></span>
+              <div className="flex min-h-[52px] items-center gap-3 rounded-[18px] border border-border bg-background px-3 focus-within:border-orange-300">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#ffe8ee] text-[#e11d48] "><Lock className="h-[18px] w-[18px]" /></span>
                 <Input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete={isSignUp ? 'new-password' : 'current-password'} placeholder="Enter your password" value={formData.password} onChange={handleChange} className="h-11 min-w-0 border-0 bg-transparent px-0 text-foreground text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'} className="shrink-0 rounded-lg p-1 text-muted-foreground transition-colors hover:text-[#f97316]">{showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}</button>
               </div>
@@ -243,7 +243,7 @@ setPrivacyAcknowledged(false);
               </div>
             )}
 
-            <Button type="submit" disabled={loading} className="mt-2 h-12 w-full rounded-full border-0 bg-[#f97316] text-sm font-bold text-white shadow-[6px_7px_14px_rgba(194,65,12,0.28),inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(154,52,18,0.25)] transition-transform duration-150 hover:bg-[#f97316] active:translate-y-[1px] active:shadow-[3px_4px_8px_rgba(194,65,12,0.22)] disabled:cursor-not-allowed disabled:opacity-70">
+            <Button type="submit" disabled={loading} className="mt-2 h-12 w-full rounded-full border-0 bg-[#f97316] text-sm font-bold text-white transition-transform duration-150 hover:bg-[#f97316] active:translate-y-[1px] disabled:cursor-not-allowed disabled:opacity-70">
               {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Please wait...</> : isSignUp ? 'Create Account' : 'Sign In'}
             </Button>
 
