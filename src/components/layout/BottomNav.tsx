@@ -23,7 +23,7 @@ export function BottomNav() {
         bottom-0
         z-[900]
         w-full
-        bg-white
+        bg-background border-t border-border
         shadow-[0_-6px_20px_rgba(0,0,0,0.08)]
       "
     >
@@ -38,7 +38,7 @@ export function BottomNav() {
               to={item.href}
               className={cn(
                 'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 py-2.5 transition-all duration-200',
-                active ? 'text-orange-500' : 'text-slate-400'
+                active ? 'text-orange-500' : 'text-muted-foreground'
               )}
             >
               <div
@@ -59,7 +59,7 @@ export function BottomNav() {
                 <span
                   className={cn(
                     'mt-1 text-[11px] font-semibold leading-none',
-                    active ? 'text-orange-500' : 'text-slate-400'
+                    active ? 'text-orange-500' : 'text-muted-foreground'
                   )}
                 >
                   {item.title}

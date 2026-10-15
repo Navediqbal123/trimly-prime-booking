@@ -151,7 +151,7 @@ export function AppSidebar() {
             left: 0,
             width: '100%',
             zIndex: 1000,
-            backgroundColor: '#ffffff',
+            backgroundColor: 'hsl(var(--background))',
             willChange: 'transform',
           }}
         >
@@ -185,7 +185,7 @@ export function AppSidebar() {
                 aria-label="TrimlyHub home"
                 className="flex min-w-0 items-center whitespace-nowrap"
               >
-                <span className="text-[25px] font-display font-extrabold leading-none tracking-tight text-black sm:text-3xl">
+                <span className="text-[25px] font-display font-extrabold leading-none tracking-tight text-foreground sm:text-3xl">
                   Trimly<span className="text-[#ff7417]">Hub</span>
                 </span>
               </Link>
@@ -242,7 +242,7 @@ export function AppSidebar() {
                 <Scissors className="w-6 h-6" />
               </div>
 
-              <span className="text-3xl font-display font-extrabold tracking-wide leading-none text-black">
+              <span className="text-3xl font-display font-extrabold tracking-wide leading-none text-foreground">
                 Trimly<span className="text-[#ff7417]">Hub</span>
               </span>
             </Link>
