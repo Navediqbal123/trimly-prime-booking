@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getApprovedBarbers, getBarberServices } from '@/lib/api';
-import { shopImage, shopRating, shopDescription } from '@/lib/shopMedia';
+import { shopImage, shopRating } from '@/lib/shopMedia';
 import { listShopMedia } from '@/lib/shopMediaStore';
 import { useState, useEffect } from 'react';
 
@@ -90,7 +90,6 @@ export default function BarberProfile() {
   }
 
   const { rating, reviews } = shopRating(shop.id);
-  const description = shopDescription(shop.id);
   const heroImage = selectedImage || shopMedia[0] || shopImage(shop.id);
 
   const fullAddress = [
@@ -125,9 +124,9 @@ export default function BarberProfile() {
           onClick={() => navigate(-1)}
           className="
             h-11 w-11 rounded-full p-0
-            bg-white text-foreground
-            shadow-[5px_6px_12px_rgba(0,0,0,0.10),-4px_-4px_9px_rgba(255,255,255,0.95)]
-            hover:bg-white hover:text-foreground
+            bg-[#ff7417] text-white
+            shadow-none
+            hover:bg-[#f5660a] hover:text-white
           "
           aria-label="Go back"
         >
@@ -143,7 +142,7 @@ export default function BarberProfile() {
         className="
           relative w-full overflow-hidden rounded-[30px]
           border border-border bg-card
-          shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]
+          shadow-none
         "
       >
         <img
@@ -156,27 +155,27 @@ export default function BarberProfile() {
       {/* Shop name + like */}
       <section className="relative mt-5">
         <div className="pr-20">
-          <h1 className="font-display text-[36px] font-bold leading-[1.02] tracking-[-1.4px] text-foreground sm:text-4xl">
+          <h1 className="font-display text-[29px] font-bold leading-[1.08] tracking-[-0.8px] text-foreground sm:text-3xl">
             {shop.shop_name}
           </h1>
 
           {/* Rating */}
-          <div className="mt-3 flex items-center gap-1.5">
+          <div className="mt-3 flex min-w-0 flex-nowrap items-center gap-1">
             {[1, 2, 3, 4, 5].map((i) => (
               <Star
                 key={i}
                 className={cn(
-                  'h-7 w-7',
+                  'h-5 w-5 shrink-0 sm:h-6 sm:w-6',
                   i <= Math.round(rating)
                     ? 'fill-[#ffc107] text-[#ffc107]'
                     : 'text-muted-foreground',
                 )}
               />
             ))}
-            <span className="ml-2 text-[22px] font-bold text-foreground">
+            <span className="ml-1 shrink-0 text-[18px] font-bold text-foreground sm:text-xl">
               {rating.toFixed(1)}
             </span>
-            <span className="text-[17px] font-medium text-muted-foreground">
+            <span className="shrink-0 whitespace-nowrap text-[12px] font-medium text-muted-foreground sm:text-sm">
               ({reviews} reviews)
             </span>
           </div>
@@ -189,8 +188,8 @@ export default function BarberProfile() {
           aria-label={liked ? 'Unlike shop' : 'Like shop'}
           className="
             absolute right-0 top-0 flex h-16 w-16 items-center justify-center
-            rounded-full border-0 bg-white
-            shadow-[6px_7px_15px_rgba(239,68,68,0.14),-4px_-4px_10px_rgba(255,255,255,0.95)]
+            rounded-full border-0 bg-[#ff7417]
+            shadow-none
             transition-transform duration-200
             active:scale-95
           "
@@ -199,8 +198,8 @@ export default function BarberProfile() {
             className={cn(
               'h-9 w-9 transition-all duration-200',
               liked
-                ? 'fill-[#e11d48] text-[#e11d48]'
-                : 'text-[#e11d48]',
+                ? 'fill-white text-white'
+                : 'text-white',
             )}
             strokeWidth={2}
           />
@@ -214,31 +213,21 @@ export default function BarberProfile() {
         className="
           mt-6 w-full rounded-[25px]
           border border-orange-200/70 bg-orange-50 dark:bg-orange-950/25
-          shadow-[6px_7px_15px_rgba(255,116,23,0.16),inset_2px_2px_5px_rgba(255,255,255,0.75),inset_-3px_-3px_7px_rgba(214,93,0,0.10)]
+          shadow-none
         "
       >
-        <div className="flex min-w-0 items-center gap-4 px-5 py-5">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-[#ff9a4d] shadow-[3px_4px_8px_rgba(214,93,0,0.20),inset_1px_1px_3px_rgba(255,255,255,0.45)]">
-            <MapPin className="h-7 w-7 text-[#e85d00]" />
+        <div className="flex min-w-0 items-center gap-3 px-4 py-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-[#ff9a4d] shadow-none">
+            <MapPin className="h-6 w-6 text-[#e85d00]" />
           </div>
 
-          <p className="min-w-0 flex-1 break-words text-[17px] font-medium leading-[1.35] text-foreground sm:text-lg">
+          <p className="max-h-20 min-w-0 flex-1 overflow-y-auto break-words text-sm font-medium leading-[1.35] text-foreground sm:text-base">
             {fullAddress || 'Address not available'}
           </p>
 
-          <ArrowRight className="h-7 w-7 shrink-0 text-[#e85d00]" />
+          <ArrowRight className="h-6 w-6 shrink-0 text-[#e85d00]" />
         </div>
       </motion.section>
-
-      {/* About */}
-      <section className="mt-8">
-        <h2 className="font-display text-[30px] font-bold leading-none tracking-[-0.8px] text-foreground">
-          About
-        </h2>
-        <p className="mt-3 text-[16px] font-medium leading-[1.55] text-muted-foreground sm:text-lg">
-          {description}
-        </p>
-      </section>
 
       {/* Services */}
       <section className="mt-8">
@@ -256,7 +245,7 @@ export default function BarberProfile() {
           <div
             className="
               rounded-[25px] border border-border bg-card p-8 text-center
-              shadow-[6px_7px_15px_rgba(0,0,0,0.08),-5px_-5px_13px_rgba(255,255,255,0.95)]
+              shadow-none
             "
           >
             <Scissors className="mx-auto mb-2 h-9 w-9 text-orange-400" />
@@ -280,24 +269,24 @@ export default function BarberProfile() {
                     `
                       flex w-full items-center gap-3 rounded-[22px] border
                       bg-card p-3.5 text-left transition-all duration-200
-                      shadow-[5px_6px_13px_rgba(0,0,0,0.08),-4px_-4px_10px_rgba(255,255,255,0.95)]
+                      shadow-none
                       active:scale-[0.99]
                     `,
                     active
-                      ? 'border-orange-200 shadow-[6px_7px_15px_rgba(255,116,23,0.14),-4px_-4px_10px_rgba(255,255,255,0.95)]'
+                      ? 'border-orange-200'
                       : 'border-border',
                   )}
                 >
                   {/* Service icon */}
                   <div
                     className={cn(
-                      'flex h-14 w-14 shrink-0 items-center justify-center rounded-[17px] shadow-[3px_4px_8px_rgba(0,0,0,0.08),inset_1px_1px_3px_rgba(255,255,255,0.65)]',
+                      'flex h-14 w-14 shrink-0 items-center justify-center rounded-[17px] shadow-none',
                       active ? 'bg-[#fff0e3]' : 'bg-[#f5f7fa]',
                     )}
                   >
                     <Scissors
                       className={cn(
-                        'h-7 w-7',
+                        'h-5 w-5 shrink-0 sm:h-6 sm:w-6',
                         active ? 'text-[#ff7417]' : 'text-muted-foreground',
                       )}
                     />
@@ -331,7 +320,7 @@ export default function BarberProfile() {
                       className={cn(
                         'flex h-10 w-10 items-center justify-center rounded-[13px] border-2 transition-all',
                         active
-                          ? 'border-[#ff7417] bg-[#fff0e3] shadow-[3px_4px_8px_rgba(255,116,23,0.15),inset_1px_1px_3px_rgba(255,255,255,0.7)]'
+                          ? 'border-[#ff7417] bg-[#fff0e3] shadow-none'
                           : 'border-orange-200/70 bg-card',
                       )}
                     >
@@ -376,3 +365,4 @@ export default function BarberProfile() {
     </div>
   );
 }
+
