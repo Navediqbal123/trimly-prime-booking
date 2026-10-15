@@ -212,9 +212,9 @@ export default function Dashboard() {
               px-2.5
               text-sm
               font-medium
-              text-black
+              text-foreground
               outline-none
-              placeholder:text-slate-400
+              placeholder:text-muted-foreground
             "
           />
 
@@ -225,7 +225,7 @@ export default function Dashboard() {
             className="
               flex h-9 w-9 shrink-0 items-center justify-center
               rounded-[14px]
-              bg-white
+              bg-background
               text-slate-600
               shadow-[3px_4px_7px_rgba(0,0,0,0.07)]
               transition-transform
@@ -261,7 +261,7 @@ export default function Dashboard() {
         "
         style={{ background: currentBanner.background }}
       >
-        <div className="absolute -right-10 -top-14 h-32 w-32 rounded-full bg-white/30" />
+        <div className="absolute -right-10 -top-14 h-32 w-32 rounded-fubg-card/30" />
 
         <div className="absolute -right-3 bottom-[-45px] h-36 w-36 rounded-full bg-[#ff7417]/10" />
 
@@ -304,7 +304,7 @@ export default function Dashboard() {
                 font-bold
                 leading-[0.95]
                 tracking-[-0.7px]
-                text-black
+                text-foreground
                 sm:text-3xl
               "
             >
@@ -422,7 +422,7 @@ export default function Dashboard() {
           <div
             className="
               rounded-[25px]
-              bg-white
+            bg-secondary
               p-8
               text-center
               shadow-[6px_7px_16px_rgba(0,0,0,0.08),-5px_-5px_13px_rgba(255,255,255,0.95)]
