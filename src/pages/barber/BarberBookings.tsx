@@ -959,14 +959,14 @@ export default function BarberBookings() {
         <TabsList className="mb-5 flex h-[54px] w-full min-w-0 rounded-[22px] border border-border bg-card p-2 ">
           <TabsTrigger
             value="upcoming"
-            className="h-full min-w-0 flex-1 rounded-[16px] px-2 text-sm font-bold text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-[0_3px_10px_rgba(255,116,23,0.25)] sm:text-base"
+            className="h-full min-w-0 flex-1 rounded-[16px] px-2 text-sm font-bold text-muted-foreground data-[state=active]:bg-[#ff7417] data-[state=active]:text-white data-[state=active]:shadow-[0_3px_10px_rgba(255,116,23,0.25)] sm:text-base"
           >
             Upcoming ({upcomingBookings.length})
           </TabsTrigger>
 
           <TabsTrigger
             value="past"
-            className="h-full min-w-0 flex-1 rounded-[16px] px-2 text-sm font-bold text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-[0_3px_10px_rgba(255,116,23,0.25)] sm:text-base"
+            className="h-full min-w-0 flex-1 rounded-[16px] px-2 text-sm font-bold text-muted-foreground data-[state=active]:bg-[#ff7417] data-[state=active]:text-white data-[state=active]:shadow-[0_3px_10px_rgba(255,116,23,0.25)] sm:text-base"
           >
             Past ({pastBookings.length})
           </TabsTrigger>
