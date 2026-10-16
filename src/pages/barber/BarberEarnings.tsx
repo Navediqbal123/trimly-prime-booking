@@ -203,7 +203,7 @@ export default function BarberEarnings() {
           type="button"
           onClick={fetchData}
           disabled={loading}
-          className="flex h-11 w-full rounded-[18px] bg-primary font-bold text-primary-foreground shadow-none hover:bg-primary/90"
+          className="flex h-11 w-full rounded-[18px] bg-[#ff7417] font-bold text-white shadow-none hover:bg-[#f56d10]"
         >
           <RefreshCw
             className={`mr-2 h-5 w-5 ${
