@@ -92,10 +92,10 @@ const rowVariants = {
 };
 
 const clayCard =
-  'rounded-[30px] border-0 bg-white shadow-[7px_8px_17px_rgba(0,0,0,0.10),-6px_-6px_15px_rgba(255,255,255,0.95)]';
+  'rounded-[30px] border border-border bg-card';
 
 const softClay =
-  'shadow-[4px_5px_11px_rgba(0,0,0,0.08),-4px_-4px_10px_rgba(255,255,255,0.95)]';
+  '';
 
 export function BookingsTable({
   bookings,
@@ -193,15 +193,14 @@ export function BookingsTable({
               rounded-full
               bg-[#fff0e5]
               text-orange-500
-              shadow-[inset_3px_3px_7px_rgba(255,255,255,0.95),inset_-4px_-4px_8px_rgba(0,0,0,0.06),5px_6px_12px_rgba(0,0,0,0.08)]
             "
           >
             <Calendar className="h-6 w-6" />
           </div>
 
           <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-bold text-slate-950 sm:text-2xl">
+            <div className="flex flex-nowrap items-center gap-2">
+              <h2 className="whitespace-nowrap text-lg font-bold text-foreground sm:text-xl">
                 Customer Bookings
               </h2>
 
@@ -217,7 +216,6 @@ export function BookingsTable({
                     text-[11px]
                     font-bold
                     text-[#e34b4b]
-                    shadow-[inset_2px_2px_4px_rgba(255,255,255,0.95),inset_-2px_-2px_4px_rgba(0,0,0,0.04)]
                   "
                 >
                   {pendingCount} new
@@ -236,7 +234,6 @@ export function BookingsTable({
                     text-[11px]
                     font-bold
                     text-orange-500
-                    shadow-[inset_2px_2px_4px_rgba(255,255,255,0.95),inset_-2px_-2px_4px_rgba(0,0,0,0.04)]
                   "
                 >
                   {bookings.length}
@@ -260,14 +257,14 @@ export function BookingsTable({
             h-11
             rounded-[18px]
             border-0
-            bg-white
+            bg-orange-500
             px-4
-            text-slate-700
+            text-white
             shadow-[5px_6px_12px_rgba(0,0,0,0.09),-4px_-4px_10px_rgba(255,255,255,0.95)]
             transition-all
             duration-200
-            hover:bg-white
-            hover:text-orange-500
+            hover:bg-orange-600
+            hover:text-white
             hover:scale-105
             active:scale-95
           "
@@ -288,8 +285,8 @@ export function BookingsTable({
             className="
               overflow-x-auto
               rounded-[22px]
-              bg-white
-              shadow-[inset_2px_2px_6px_rgba(0,0,0,0.04),inset_-2px_-2px_6px_rgba(255,255,255,0.95)]
+              border border-border
+              bg-card
             "
           >
             <Table>
@@ -398,7 +395,6 @@ export function BookingsTable({
                                 rounded-full
                                 bg-[#eaf3ff]
                                 text-[#2878d7]
-                                shadow-[inset_2px_2px_5px_rgba(255,255,255,0.95),inset_-3px_-3px_6px_rgba(0,0,0,0.05),4px_5px_10px_rgba(0,0,0,0.07)]
                               "
                               whileHover={{
                                 scale: 1.1,
@@ -510,7 +506,6 @@ export function BookingsTable({
                                         bg-[#fff0f0]
                                         px-3
                                         text-[#e34b4b]
-                                        shadow-[4px_5px_10px_rgba(0,0,0,0.07),-3px_-3px_8px_rgba(255,255,255,0.95)]
                                         transition-all
                                         duration-200
                                         hover:bg-[#fff0f0]
@@ -549,7 +544,6 @@ export function BookingsTable({
                                         bg-[#eafff4]
                                         px-3
                                         text-[#0b9b5b]
-                                        shadow-[4px_5px_10px_rgba(0,0,0,0.07),-3px_-3px_8px_rgba(255,255,255,0.95)]
                                         transition-all
                                         duration-200
                                         hover:bg-[#eafff4]
@@ -589,7 +583,6 @@ export function BookingsTable({
                                 bg-[#fff0f0]
                                 px-3
                                 text-[#e34b4b]
-                                shadow-[4px_5px_10px_rgba(0,0,0,0.07),-3px_-3px_8px_rgba(255,255,255,0.95)]
                                 transition-all
                                 duration-200
                                 hover:bg-[#fff0f0]
@@ -641,7 +634,6 @@ export function BookingsTable({
                 rounded-full
                 bg-[#fff0e5]
                 text-orange-400
-                shadow-[inset_3px_3px_7px_rgba(255,255,255,0.95),inset_-4px_-4px_8px_rgba(0,0,0,0.05),5px_6px_12px_rgba(0,0,0,0.07)]
               "
             >
               <Calendar className="h-8 w-8" />
