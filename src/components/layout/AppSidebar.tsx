@@ -90,11 +90,11 @@ export function AppSidebar() {
         to={item.href}
         onClick={() => setIsOpen(false)}
         className={cn(
-          'flex items-center gap-3 rounded-lg transition-all duration-200',
-          'hover:bg-sidebar-accent/60 group',
-          nested ? 'px-4 py-2.5 ml-4' : 'px-4 py-3',
-          isActive &&
-            'bg-primary/15 text-primary border border-primary/30 glow-primary'
+          'group flex items-center gap-3 rounded-2xl border transition-all duration-200',
+          nested ? 'ml-4 px-4 py-2.5' : 'px-4 py-3.5',
+          isActive
+            ? 'border-[#ff7417] bg-gradient-to-b from-[#ff963f] to-[#ff7417] text-white shadow-[inset_0_2px_3px_rgba(255,255,255,0.28),0_5px_12px_rgba(255,116,23,0.22)]'
+            : 'border-transparent bg-[#ff7417]/[0.045] text-muted-foreground hover:border-[#ff7417]/20 hover:bg-[#ff7417]/[0.10] hover:text-foreground'
         )}
       >
         <item.icon
@@ -102,8 +102,8 @@ export function AppSidebar() {
             'transition-colors',
             nested ? 'w-4 h-4' : 'w-5 h-5',
             isActive
-              ? 'text-primary'
-              : 'text-muted-foreground group-hover:text-foreground'
+              ? 'text-white'
+              : 'text-muted-foreground group-hover:text-[#ff7417]'
           )}
         />
 
@@ -112,15 +112,15 @@ export function AppSidebar() {
             'transition-colors',
             nested ? 'text-sm' : 'font-medium',
             isActive
-              ? 'text-primary'
-              : 'text-muted-foreground group-hover:text-foreground'
+              ? 'text-white'
+              : 'text-muted-foreground group-hover:text-[#ff7417]'
           )}
         >
           {item.title}
         </span>
 
         {isActive && (
-          <ChevronRight className="w-4 h-4 ml-auto text-primary" />
+          <ChevronRight className="ml-auto h-4 w-4 text-white" />
         )}
       </Link>
     );
@@ -225,7 +225,7 @@ export function AppSidebar() {
           stiffness: 300,
         }}
         className={cn(
-          'fixed top-0 left-0 h-screen w-72 bg-sidebar border-r border-sidebar-border z-[1100] shadow-2xl lg:z-auto',
+          'fixed top-0 left-0 z-[1100] flex h-screen w-72 flex-col border-r border-border bg-background lg:z-auto',
           'flex flex-col',
           'lg:translate-x-0 lg:static'
         )}
@@ -239,8 +239,8 @@ export function AppSidebar() {
         >
           <div className="flex items-center justify-between gap-3">
             <Link to="/dashboard" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center btn-gold shrink-0">
-                <Scissors className="w-6 h-6" />
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#ff7417]/10 p-1">
+                <img src="/trimly-logo.png" alt="Trimly logo" className="h-full w-full object-contain" />
               </div>
 
               <span className="text-3xl font-display font-extrabold tracking-wide leading-none text-foreground">
@@ -329,7 +329,7 @@ export function AppSidebar() {
 <button
   type="button"
   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-  className="mx-4 mb-3 flex w-[calc(100%-2rem)] items-center justify-between rounded-xl border border-border bg-secondary/40 px-4 py-3 text-foreground transition-colors hover:bg-secondary"
+  className="mx-4 mb-3 flex w-[calc(100%-2rem)] min-w-0 shrink-0 items-center justify-between gap-3 rounded-2xl border border-[#ff7417]/20 bg-[#ff7417]/[0.06] px-4 py-3 text-foreground transition-colors hover:bg-[#ff7417]/[0.10]"
   aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
 >
   <span className="flex items-center gap-3">
@@ -359,11 +359,11 @@ export function AppSidebar() {
         <div className="border-t border-border">
           <button
             onClick={() => setProfileOpen(!profileOpen)}
-            className="w-full p-4 flex items-center gap-3 hover:bg-secondary/50 transition-colors duration-200"
+            className="flex w-full min-w-0 items-center gap-3 border-t border-border p-4 transition-colors duration-200 hover:bg-[#ff7417]/[0.06]"
             aria-expanded={profileOpen}
           >
-            <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-              <span className="text-sm font-bold text-primary">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#ff7417]/15">
+              <span className="text-sm font-bold text-[#ff7417]">
                 {userInitials}
               </span>
             </div>
