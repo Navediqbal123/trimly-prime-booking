@@ -12,6 +12,7 @@ import { timeAgo, useTimeTick } from '@/lib/timeAgo';
 
 type ProfileInfo = {
   name?: string | null;
+  full_name?: string | null;
   avatar_url?: string | null;
 };
 
@@ -49,7 +50,7 @@ export function NotificationBell({
     const ids = Array.from(
       new Set(
         list
-          .map((n) => n.actor_id || n.customer_id || n.user_id)
+          .map((n) => n.actor_id || n.customer_id)
           .filter((id): id is string => !!id)
       )
     );
@@ -58,7 +59,7 @@ export function NotificationBell({
 
     const { data } = await supabase
       .from('profiles')
-      .select('id, name, avatar_url')
+      .select('id, full_name, name, avatar_url')
       .in('id', ids);
 
     if (data) {
@@ -68,6 +69,7 @@ export function NotificationBell({
         for (const p of data as any[]) {
           next[p.id] = {
             name: p.name,
+            full_name: p.full_name,
             avatar_url: p.avatar_url,
           };
         }
@@ -271,12 +273,20 @@ export function NotificationBell({
                   </div>
                 ) : (
                   items.map((n, i) => {
-                    const pid =
-                      n.actor_id || n.customer_id || n.user_id;
+                    const pid = n.actor_id || n.customer_id;
 
                     const prof = pid ? profiles[pid] : undefined;
-                    const name = n.name || prof?.name || 'TrimlyHub';
-                    const avatar = n.avatar_url || prof?.avatar_url || '';
+                    const name =
+                      n.customer_full_name ||
+                      n.name ||
+                      prof?.full_name ||
+                      prof?.name ||
+                      'TrimlyHub';
+                    const avatar =
+                      n.customer_avatar_url ||
+                      n.avatar_url ||
+                      prof?.avatar_url ||
+                      '';
 
                     const otp =
                       (n as any).otp ||

@@ -617,6 +617,8 @@ export interface NotificationData {
   actor_id?: string;
   customer_id?: string;
   barber_id?: string;
+  customer_full_name?: string;
+  customer_avatar_url?: string;
   name?: string;
   avatar_url?: string;
 }
