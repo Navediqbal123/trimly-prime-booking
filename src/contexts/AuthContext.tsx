@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { supabase, SUPER_ADMIN_EMAIL } from '@/lib/supabase';
 import { getApprovedBarbers, getPendingBarbers } from '@/lib/api';
+import { activatePushNotifications, deactivatePushNotifications } from '@/pushNotifications';
 import type { User, Session } from '@supabase/supabase-js';
 
 export type UserRole = 'user' | 'barber_pending' | 'barber' | 'admin' | 'super_admin';
@@ -184,6 +185,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [user?.id, refreshBarberStatus]);
 
+  useEffect(() => {
+    if (loading || !user?.id) return;
+
+    void activatePushNotifications(user.id);
+  }, [loading, user?.id]);
+
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { error: new Error(error.message) };
@@ -253,6 +260,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
   const signOut = async () => {
+    await deactivatePushNotifications();
     await supabase.auth.signOut();
     setUser(null);
     setBarberStatusChecked(false);

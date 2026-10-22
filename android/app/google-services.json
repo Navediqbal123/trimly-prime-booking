@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "907866829238",
+    "project_id": "trimlyhub-e07f9",
+    "storage_bucket": "trimlyhub-e07f9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907866829238:android:c78924d354fed4e7611117",
+        "android_client_info": {
+          "package_name": "trimly.apliata"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8i0y98d9CL412yJXK_FcWNr103yC-TL0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -39,15 +39,50 @@ async function apiCall<T>(
 
     if (!response.ok) {
       const errorMessage = data.message || data.error || data.msg || data.detail || `Request failed with status ${response.status}`;
-      console.error(`API ${response.status} on ${endpoint}:`, JSON.stringify(data));
+      if (endpoint !== '/api/device-tokens/register' && endpoint !== '/api/device-tokens/revoke') {
+        console.error(`API ${response.status} on ${endpoint}:`, JSON.stringify(data));
+      } else {
+        console.error(`API ${response.status} on ${endpoint}`);
+      }
       return { success: false, error: `[${response.status}] ${errorMessage}` };
     }
 
     return { success: true, data };
   } catch (error) {
-    console.error('API call error:', error, '| URL:', `${BASE_URL}${endpoint}`);
+    if (endpoint !== '/api/device-tokens/register' && endpoint !== '/api/device-tokens/revoke') {
+      console.error('API call error:', error, '| URL:', `${BASE_URL}${endpoint}`);
+    } else {
+      console.error(`API call failed on ${endpoint}`);
+    }
     return { success: false, error: 'Network error. Please try again.' };
   }
+}
+
+function redactDeviceToken(result: ApiResponse, fcmToken: string): ApiResponse {
+  if (result.success || !result.error) return { success: result.success };
+  return {
+    success: false,
+    error: result.error.split(fcmToken).join('[redacted]'),
+  };
+}
+
+export async function registerDeviceToken(
+  fcmToken: string,
+  platform: 'android' | 'ios' = 'android'
+): Promise<ApiResponse> {
+  const result = await apiCall('/api/device-tokens/register', {
+    method: 'POST',
+    body: JSON.stringify({ fcm_token: fcmToken, platform }),
+  });
+  return redactDeviceToken(result, fcmToken);
+}
+
+export async function revokeDeviceToken(fcmToken: string): Promise<ApiResponse> {
+  const result = await apiCall('/api/device-tokens/revoke', {
+    method: 'POST',
+    body: JSON.stringify({ fcm_token: fcmToken }),
+  });
+  return redactDeviceToken(result, fcmToken);
 }
 
 // ==========================================
