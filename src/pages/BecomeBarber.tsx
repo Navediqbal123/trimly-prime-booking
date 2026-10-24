@@ -26,6 +26,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { registerBarber } from '@/lib/api';
+import { Capacitor } from '@capacitor/core';
+import { getCurrentLocation, getLocationErrorMessage } from '@/lib/deviceLocation';
+import { pickNativeImages } from '@/lib/nativeImagePicker';
 
 const STATES = [
   'Andhra Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Delhi', 'Goa', 'Gujarat', 'Haryana',
@@ -99,41 +102,42 @@ export default function BecomeBarber() {
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((previous) => ({ ...previous, [key]: e.target.value }));
 
-  const pick = (key: string) => fileRefs.current[key]?.click();
+  const pick = async (key: string) => {
+    if (!Capacitor.isNativePlatform()) {
+      fileRefs.current[key]?.click();
+      return;
+    }
+
+    try {
+      const [image] = await pickNativeImages();
+      if (!image) return;
+      if (key === 'chairs') setChairPhoto(image.previewUrl);
+      else if (key === 'profile') setProfilePhoto(image.previewUrl);
+      else {
+        const index = Number(key.slice('shop-'.length));
+        setShopPhotos((previous) => previous.map((value, i) => i === index ? image.previewUrl : value));
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Could not open camera or photo gallery.');
+    }
+  };
 
   const onFile = (callback: (url: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) callback(URL.createObjectURL(file));
   };
 
-  const captureCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      toast.error('Location is not supported by this device or browser.');
-      return;
-    }
-
+  const captureCurrentLocation = async () => {
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setCoordinates({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-        setLocating(false);
-        toast.success('Current location captured successfully.');
-      },
-      (error) => {
-        setLocating(false);
-        if (error.code === error.PERMISSION_DENIED) {
-          toast.error('Location permission denied. Allow location access and try again.');
-        } else if (error.code === error.TIMEOUT) {
-          toast.error('Location request timed out. Please try again.');
-        } else {
-          toast.error('Could not get your location. Turn on device location and try again.');
-        }
-      },
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
-    );
+    try {
+      const current = await getCurrentLocation({ enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+      setCoordinates(current);
+      toast.success('Current location captured successfully.');
+    } catch (error) {
+      toast.error(getLocationErrorMessage(error));
+    } finally {
+      setLocating(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

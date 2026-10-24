@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { Capacitor } from '@capacitor/core';
+import { pickNativeImages } from '@/lib/nativeImagePicker';
 import { toast } from 'sonner';
 
 export default function Profile() {
@@ -60,11 +62,7 @@ export default function Profile() {
     }));
   };
 
-  const handleAvatarUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-
+  const uploadAvatarFile = async (file?: File) => {
     if (!file || !user?.id) return;
 
     if (!file.type.startsWith('image/')) {
@@ -113,6 +111,28 @@ export default function Profile() {
     }
 
     setUploading(false);
+  };
+
+  const handleAvatarUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    await uploadAvatarFile(e.target.files?.[0]);
+    e.target.value = '';
+  };
+
+  const openAvatarPicker = async () => {
+    if (!Capacitor.isNativePlatform()) {
+      fileInputRef.current?.click();
+      return;
+    }
+
+    try {
+      const [image] = await pickNativeImages();
+      if (image) await uploadAvatarFile(image.file);
+    } catch (error) {
+      console.error('Could not open profile photo picker:', error);
+      toast.error(error instanceof Error ? error.message : 'Could not open camera or gallery.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -179,7 +199,7 @@ export default function Profile() {
           <button
             type="button"
             disabled={uploading}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={openAvatarPicker}
             aria-label="Change profile photo"
             className="
               absolute top-4 right-4 z-20

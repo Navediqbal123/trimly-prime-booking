@@ -17,6 +17,8 @@ import {
 } from "@/lib/api";
 
 import { shopRating } from "@/lib/shopMedia";
+import { toast } from "sonner";
+import { getCurrentLocation, getLocationErrorMessage } from "@/lib/deviceLocation";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -253,43 +255,6 @@ export default function Map() {
   );
 
   // ==========================================
-  // CURRENT LOCATION
-  // ==========================================
-
-  const getCurrentLocation = (): Promise<{
-    latitude: number;
-    longitude: number;
-  }> => {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(
-          new Error(
-            "Location is not supported by this browser."
-          )
-        );
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          resolve({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (error) => {
-          reject(error);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0,
-        }
-      );
-    });
-  };
-
-  // ==========================================
   // LOAD NEARBY BARBERS
   // ==========================================
 
@@ -328,6 +293,7 @@ export default function Map() {
       );
 
       setNearbyBarbers([]);
+      toast.error(getLocationErrorMessage(error));
     } finally {
       setNearbyLoading(false);
     }

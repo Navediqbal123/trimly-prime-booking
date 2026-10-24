@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 import {
   Search,
@@ -29,40 +30,7 @@ import {
 import type { NearbyBarberData } from '@/lib/api';
 
 import { shopImage, shopRating } from '@/lib/shopMedia';
-
-
-// ==========================================
-// CURRENT USER LOCATION
-// ==========================================
-
-const getCurrentLocation = (): Promise<{
-  latitude: number;
-  longitude: number;
-}> => {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error('Location is not supported by this browser.'));
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        resolve({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-      },
-      (error) => {
-        reject(error);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      }
-    );
-  });
-};
+import { getCurrentLocation, getLocationErrorMessage } from '@/lib/deviceLocation';
 
 
 // ==========================================
@@ -132,6 +100,7 @@ export default function DiscoverBarbers() {
       );
 
       setNearbyBarbers([]);
+      toast.error(getLocationErrorMessage(error));
     } finally {
       setNearbyLoading(false);
     }

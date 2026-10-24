@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { Capacitor } from '@capacitor/core';
 
 import {
   getMyBarberProfile,
@@ -30,6 +31,7 @@ import {
   uploadShopImage,
   deleteShopImage,
 } from '@/lib/shopMediaStore';
+import { pickNativeImages } from '@/lib/nativeImagePicker';
 
 export default function MyShop() {
   const [loading, setLoading] = useState(true);
@@ -79,13 +81,8 @@ export default function MyShop() {
     setLoading(false);
   };
 
-  const handleFileSelect = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = Array.from(e.target.files || []);
-
-    e.target.value = '';
-
+  const handleFiles = async (files: File[]) => {
+    if (files.length === 0) return;
     if (!profile) return;
 
     const slots = MAX_IMAGES - images.length;
@@ -118,6 +115,32 @@ export default function MyShop() {
       );
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    void handleFiles(files);
+  };
+
+  const openShopImagePicker = async () => {
+    if (!Capacitor.isNativePlatform()) {
+      fileRef.current?.click();
+      return;
+    }
+
+    const slots = MAX_IMAGES - images.length;
+    if (slots <= 0) {
+      toast.error(`Maximum ${MAX_IMAGES} photos allowed`);
+      return;
+    }
+
+    try {
+      const selected = await pickNativeImages({ allowMultiple: true, limit: slots });
+      await handleFiles(selected.map(({ file }) => file));
+    } catch (err: any) {
+      toast.error(err?.message || 'Could not open camera or photo gallery.');
     }
   };
 
@@ -712,7 +735,7 @@ export default function MyShop() {
             {images.length < MAX_IMAGES && (
               <button
                 type="button"
-                onClick={() => fileRef.current?.click()}
+                onClick={openShopImagePicker}
                 disabled={uploading}
                 className="
                   aspect-square
