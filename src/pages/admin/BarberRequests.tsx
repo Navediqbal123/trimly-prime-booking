@@ -4,6 +4,7 @@ import { Store, MapPin, Check, X, Loader2, AlertCircle, RefreshCw } from 'lucide
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { approveBarber, getPendingBarbers, PendingBarberData } from '@/lib/api';
+import { AdminMenuButton } from '@/components/layout/AdminMenuButton';
 
 export default function BarberRequests() {
   const [requests, setRequests] = useState<PendingBarberData[]>([]);
@@ -71,9 +72,12 @@ export default function BarberRequests() {
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
-            Barber <span className="gradient-text">Requests</span>
-          </h1>
+          <div className="mb-2 flex items-center gap-2">
+            <AdminMenuButton />
+            <h1 className="text-3xl lg:text-4xl font-display font-bold">
+              Barber <span className="gradient-text">Requests</span>
+            </h1>
+          </div>
           <p className="text-muted-foreground">Review and approve barber applications</p>
         </div>
         <Button variant="outline" onClick={fetchPendingBarbers} disabled={loading}>

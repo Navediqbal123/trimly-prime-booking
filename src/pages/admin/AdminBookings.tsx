@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Clock, User, Scissors, Loader2, RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getAllBookings, BookingData } from '@/lib/api';
+import { AdminMenuButton } from '@/components/layout/AdminMenuButton';
 import { toast } from 'sonner';
 
 export default function AdminBookings() {
@@ -42,9 +43,12 @@ export default function AdminBookings() {
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
-            All <span className="gradient-text">Bookings</span>
-          </h1>
+          <div className="mb-2 flex items-center gap-2">
+            <AdminMenuButton />
+            <h1 className="text-3xl lg:text-4xl font-display font-bold">
+              All <span className="gradient-text">Bookings</span>
+            </h1>
+          </div>
           <p className="text-muted-foreground">View and manage all platform bookings</p>
         </div>
         <Button variant="outline" onClick={fetchBookings} disabled={loading}>

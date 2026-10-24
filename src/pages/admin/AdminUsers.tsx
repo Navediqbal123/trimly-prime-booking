@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { getAdminUsers, UserData } from '@/lib/api';
+import { AdminMenuButton } from '@/components/layout/AdminMenuButton';
 import { cn } from '@/lib/utils';
 
 const roleConfig: Record<string, { label: string; className: string }> = {
@@ -37,6 +38,7 @@ const roleConfig: Record<string, { label: string; className: string }> = {
 export default function AdminUsers() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [usersError, setUsersError] = useState<string | null>(null);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -44,7 +46,10 @@ export default function AdminUsers() {
     
     if (response.success && response.data) {
       setUsers(response.data);
+      setUsersError(null);
     } else {
+      setUsers([]);
+      setUsersError(response.error || 'Failed to fetch users');
       toast.error(response.error || 'Failed to fetch users');
     }
     setLoading(false);
@@ -71,9 +76,12 @@ export default function AdminUsers() {
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
-            All <span className="gradient-text">Users</span>
-          </h1>
+          <div className="mb-2 flex items-center gap-2">
+            <AdminMenuButton />
+            <h1 className="text-3xl lg:text-4xl font-display font-bold">
+              All <span className="gradient-text">Users</span>
+            </h1>
+          </div>
           <p className="text-muted-foreground">Manage platform users</p>
         </div>
         <Button variant="outline" onClick={fetchUsers} disabled={loading}>
@@ -90,7 +98,16 @@ export default function AdminUsers() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {users.length > 0 ? (
+          {usersError ? (
+            <div role="alert" className="flex flex-col items-center justify-center py-12 text-center">
+              <AlertCircle className="w-12 h-12 text-destructive mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Users Could Not Be Loaded</h3>
+              <p className="text-muted-foreground">{usersError}</p>
+              <Button variant="outline" onClick={fetchUsers} className="mt-4">
+                Try Again
+              </Button>
+            </div>
+          ) : users.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>

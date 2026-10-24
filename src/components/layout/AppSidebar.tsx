@@ -50,7 +50,13 @@ const adminNavItems: NavItemType[] = [
   { title: 'Bookings', href: '/admin/bookings', icon: Calendar },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  adminMode?: boolean;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function AppSidebar({ adminMode = false, isOpen: controlledOpen, onOpenChange }: AppSidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -67,10 +73,14 @@ export function AppSidebar() {
 
   const location = useLocation();
   const headerVisible = useHideOnScroll(0);
+  const menuOpen = controlledOpen ?? isOpen;
+  const setMenuOpen = (open: boolean) => {
+    if (controlledOpen === undefined) setIsOpen(open);
+    onOpenChange?.(open);
+  };
 
   const showCustomerHeader =
-    location.pathname === '/dashboard' ||
-    location.pathname.startsWith('/admin/');
+    !adminMode && location.pathname === '/dashboard';
 
   const isBarberApproved = isBarber;
   const isPending = isBarberPending;
@@ -88,7 +98,7 @@ export function AppSidebar() {
     return (
       <Link
         to={item.href}
-        onClick={() => setIsOpen(false)}
+        onClick={() => setMenuOpen(false)}
         className={cn(
           'group flex items-center gap-3 rounded-2xl border transition-all duration-200',
           nested ? 'ml-4 px-4 py-2.5' : 'px-4 py-3.5',
@@ -139,7 +149,7 @@ export function AppSidebar() {
       {showCustomerHeader && (
         <motion.div
           initial={false}
-          animate={{ y: headerVisible || isOpen ? 0 : '-100%' }}
+          animate={{ y: headerVisible || menuOpen ? 0 : '-100%' }}
           transition={{
             duration: 0.25,
             ease: [0.22, 1, 0.36, 1],
@@ -159,9 +169,9 @@ export function AppSidebar() {
             {/* Orange 3D Menu Button */}
             <button
               type="button"
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label={isOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={isOpen}
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
               className="
                 relative z-10 flex h-12 w-12 shrink-0 items-center justify-center
                 rounded-full
@@ -172,7 +182,7 @@ export function AppSidebar() {
                 active:scale-95
               "
             >
-              {isOpen ? (
+              {menuOpen ? (
                 <X className="h-6 w-6" strokeWidth={2.5} />
               ) : (
                 <Menu className="h-6 w-6" strokeWidth={2.5} />
@@ -200,15 +210,15 @@ export function AppSidebar() {
 
       {/* Mobile Overlay */}
       <AnimatePresence>
-        {isOpen && (
+        {menuOpen && (
           <motion.div
             key="overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[1050] bg-background/80 backdrop-blur-sm lg:hidden"
-            onClick={() => setIsOpen(false)}
+            className={cn('fixed inset-0 z-[1050] bg-background/80 backdrop-blur-sm', !adminMode && 'lg:hidden')}
+            onClick={() => setMenuOpen(false)}
           />
         )}
       </AnimatePresence>
@@ -217,7 +227,7 @@ export function AppSidebar() {
       <motion.aside
         initial={false}
         animate={{
-          x: isOpen ? 0 : '-100%',
+          x: menuOpen ? 0 : '-100%',
         }}
         transition={{
           type: 'spring',
@@ -225,9 +235,9 @@ export function AppSidebar() {
           stiffness: 300,
         }}
         className={cn(
-          'fixed top-0 left-0 z-[1100] flex h-screen w-72 flex-col border-r border-border bg-background lg:z-auto',
-          'flex flex-col',
-          'lg:translate-x-0 lg:static'
+            adminMode
+              ? 'fixed top-0 left-0 z-[1100] flex h-screen w-72 flex-col border-r border-border bg-background'
+              : 'fixed top-0 left-0 z-[1100] flex h-screen w-72 flex-col border-r border-border bg-background lg:z-auto lg:translate-x-0 lg:static'
         )}
       >
         {/* Desktop Sidebar Logo */}
@@ -240,7 +250,7 @@ export function AppSidebar() {
           <div className="flex items-center justify-between gap-3">
             <Link to="/dashboard" className="flex items-center gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#ff7417]/10 p-1">
-                <img src="/trimly-logo.png" alt="Trimly logo" className="h-full w-full object-contain" />
+                <img src="/trimly-logo.png" alt="Trimly logo" className="h-full w-full rounded-[15%] object-contain" />
               </div>
 
               <span className="text-3xl font-display font-extrabold tracking-wide leading-none text-foreground">
@@ -248,13 +258,18 @@ export function AppSidebar() {
               </span>
             </Link>
 
-            <NotificationBell className="hidden lg:block" />
+            {!adminMode && <NotificationBell className="hidden lg:block" />}
           </div>
         </motion.div>
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {baseUserNavItems.map((item, i) => (
+          {adminMode ? (
+            <>
+              <NavLink item={{ title: 'Customer Dashboard', href: '/dashboard', icon: LayoutDashboard }} />
+              {adminNavItems.map((item) => <NavLink key={item.href} item={item} />)}
+            </>
+          ) : baseUserNavItems.map((item, i) => (
             <motion.div
               key={item.href}
               initial={{ opacity: 0, x: -20 }}
@@ -265,7 +280,7 @@ export function AppSidebar() {
             </motion.div>
           ))}
 
-          {hasNoBarber && (
+          {!adminMode && hasNoBarber && (
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -281,7 +296,7 @@ export function AppSidebar() {
             </motion.div>
           )}
 
-          {isPending && !isBarberApproved && (
+          {!adminMode && isPending && !isBarberApproved && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -296,7 +311,7 @@ export function AppSidebar() {
             </motion.div>
           )}
 
-          {isBarberApproved && (
+          {!adminMode && isBarberApproved && (
             <>
               <div className="my-4 border-t border-border" />
               <NavLink
@@ -309,7 +324,7 @@ export function AppSidebar() {
             </>
           )}
 
-          {isSuperAdmin && (
+          {!adminMode && isSuperAdmin && (
             <>
               <div className="my-4 border-t border-border" />
 
@@ -344,13 +359,13 @@ export function AppSidebar() {
   </span>
 
   <span
-    className={`relative h-6 w-11 rounded-full transition-colors ${
+    className={`relative block h-6 w-11 shrink-0 overflow-hidden rounded-full transition-colors ${
       theme === 'dark' ? 'bg-[#ff7417]' : 'bg-muted-foreground/30'
     }`}
   >
     <span
-      className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
-        theme === 'dark' ? 'translate-x-[22px]' : 'translate-x-0.5'
+      className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
+        theme === 'dark' ? 'translate-x-5' : 'translate-x-0'
       }`}
     />
   </span>

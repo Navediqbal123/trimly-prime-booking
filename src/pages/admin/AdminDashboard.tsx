@@ -7,9 +7,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getAdminUsers, getApprovedBarbers, getAllBookings } from '@/lib/api';
 import { toast } from 'sonner';
 import { useCountUp } from '@/hooks/useCountUp';
+import { AdminMenuButton } from '@/components/layout/AdminMenuButton';
 
 interface DashboardStats {
-  totalUsers: number;
+  totalUsers: number | null;
   totalBarbers: number;
   totalBookings: number;
   totalRevenue: number;
@@ -17,7 +18,7 @@ interface DashboardStats {
 
 interface StatCardProps {
   title: string;
-  value: number;
+  value: number | null;
   prefix?: string;
   icon: React.ComponentType<{ className?: string }>;
   color: string;
@@ -27,7 +28,7 @@ interface StatCardProps {
 }
 
 function StatCard({ title, value, prefix = '', icon: Icon, color, bgColor, index, formatAsCurrency }: StatCardProps) {
-  const displayValue = useCountUp(value, {
+  const displayValue = useCountUp(value ?? 0, {
     duration: 1200,
     delay: index * 100,
     formatter: (v) => formatAsCurrency ? v.toLocaleString('en-IN') : v.toString(),
@@ -67,7 +68,7 @@ function StatCard({ title, value, prefix = '', icon: Icon, color, bgColor, index
             animate={{ opacity: 1 }}
             transition={{ delay: index * 0.1 + 0.2 }}
           >
-            {prefix}{displayValue}
+            {value === null ? '—' : `${prefix}${displayValue}`}
           </motion.div>
           <p className="text-xs text-muted-foreground mt-1">Real-time data</p>
         </CardContent>
@@ -114,13 +115,14 @@ function DashboardSkeleton() {
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats>({
-    totalUsers: 0,
+    totalUsers: null,
     totalBarbers: 0,
     totalBookings: 0,
     totalRevenue: 0,
   });
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [usersError, setUsersError] = useState<string | null>(null);
 
   const fetchStats = async (showRefreshState = false) => {
     if (showRefreshState) {
@@ -136,13 +138,17 @@ export default function AdminDashboard() {
         getAllBookings(),
       ]);
 
-      let totalUsers = 0;
+      let totalUsers: number | null = null;
       let totalBarbers = 0;
       let totalBookings = 0;
       let totalRevenue = 0;
 
       if (usersRes.success && usersRes.data) {
         totalUsers = usersRes.data.length;
+        setUsersError(null);
+      } else {
+        setUsersError(usersRes.error || 'Could not load registered users.');
+        toast.error(usersRes.error || 'Failed to fetch user statistics');
       }
 
       if (barbersRes.success && barbersRes.data) {
@@ -163,10 +169,11 @@ export default function AdminDashboard() {
         totalRevenue,
       });
 
-      if (showRefreshState) {
+      if (showRefreshState && usersRes.success) {
         toast.success('Dashboard refreshed');
       }
     } catch (error) {
+      setUsersError('Failed to fetch dashboard stats. Please try refreshing.');
       toast.error('Failed to fetch dashboard stats');
     } finally {
       setLoading(false);
@@ -223,9 +230,12 @@ export default function AdminDashboard() {
     >
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
-            Admin <span className="gradient-text">Dashboard</span>
-          </h1>
+          <div className="flex items-center gap-2">
+            <AdminMenuButton />
+            <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
+              Admin <span className="gradient-text">Dashboard</span>
+            </h1>
+          </div>
           <p className="text-muted-foreground">Platform overview and statistics</p>
         </div>
         <Button 
@@ -238,6 +248,12 @@ export default function AdminDashboard() {
           Refresh
         </Button>
       </div>
+
+      {usersError && (
+        <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          User statistics could not be loaded: {usersError}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statsCards.map((stat, index) => (

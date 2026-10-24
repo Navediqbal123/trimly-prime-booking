@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { getApprovedBarbers, ApprovedBarberData } from '@/lib/api';
+import { AdminMenuButton } from '@/components/layout/AdminMenuButton';
 
 export default function AdminBarbers() {
   const [barbers, setBarbers] = useState<ApprovedBarberData[]>([]);
@@ -51,9 +52,12 @@ export default function AdminBarbers() {
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2">
-            Approved <span className="gradient-text">Barbers</span>
-          </h1>
+          <div className="mb-2 flex items-center gap-2">
+            <AdminMenuButton />
+            <h1 className="text-3xl lg:text-4xl font-display font-bold">
+              Approved <span className="gradient-text">Barbers</span>
+            </h1>
+          </div>
           <p className="text-muted-foreground">View all approved barbers on the platform</p>
         </div>
         <Button variant="outline" onClick={fetchBarbers} disabled={loading}>
