@@ -13,13 +13,106 @@ import {
   Check,
   ArrowRight,
   Heart,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getApprovedBarbers, getBarberServices } from '@/lib/api';
 import { shopImage, shopRating } from '@/lib/shopMedia';
 import { listShopMedia } from '@/lib/shopMediaStore';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+interface ShopPhotoGalleryProps {
+  images: string[];
+  initialImage: string | null;
+  alt: string;
+}
+
+function ShopPhotoGallery({ images, initialImage, alt }: ShopPhotoGalleryProps) {
+  const initialIndex = Math.max(0, images.indexOf(initialImage ?? ''));
+  const [activeIndex, setActiveIndex] = useState(initialIndex);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+
+    const timer = window.setTimeout(() => {
+      setActiveIndex((current) => (current + 1) % images.length);
+    }, 3000);
+
+    return () => window.clearTimeout(timer);
+  }, [activeIndex, images.length]);
+
+  const goPrevious = () =>
+    setActiveIndex((current) => (current - 1 + images.length) % images.length);
+  const goNext = () =>
+    setActiveIndex((current) => (current + 1) % images.length);
+
+  return (
+    <div
+      className="relative w-full touch-pan-y overflow-hidden"
+      onTouchStart={(event) => {
+        const touch = event.touches[0];
+        touchStart.current = { x: touch.clientX, y: touch.clientY };
+      }}
+      onTouchEnd={(event) => {
+        const start = touchStart.current;
+        const touch = event.changedTouches[0];
+        touchStart.current = null;
+        if (!start || images.length <= 1) return;
+
+        const deltaX = touch.clientX - start.x;
+        const deltaY = touch.clientY - start.y;
+        if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
+          if (deltaX < 0) goNext();
+          else goPrevious();
+        }
+      }}
+    >
+      <img
+        src={images[activeIndex]}
+        alt={alt}
+        className="block aspect-[16/10] w-full object-cover"
+      />
+
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={goPrevious}
+            aria-label="Previous shop photo"
+            className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            onClick={goNext}
+            aria-label="Next shop photo"
+            className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/35 px-2.5 py-1.5">
+            {images.map((image, index) => (
+              <button
+                key={`${image}-${index}`}
+                type="button"
+                onClick={() => setActiveIndex(index)}
+                aria-label={`Show shop photo ${index + 1}`}
+                aria-current={activeIndex === index ? 'true' : undefined}
+                className={`h-2 rounded-full transition-all ${
+                  activeIndex === index ? 'w-5 bg-white' : 'w-2 bg-white/60'
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function BarberProfile() {
   const { shopId } = useParams();
@@ -55,7 +148,7 @@ export default function BarberProfile() {
   const { data: shopMedia = [] } = useQuery({
     queryKey: ['shopMedia', shopId],
     queryFn: () => listShopMedia(shopId ?? ''),
-    enabled: !!shopId && !selectedImage,
+    enabled: !!shopId,
     staleTime: 30_000,
   });
 
@@ -90,7 +183,13 @@ export default function BarberProfile() {
   }
 
   const { rating, reviews } = shopRating(shop.id);
-  const heroImage = selectedImage || shopMedia[0] || shopImage(shop.id);
+  const uploadedPhotos = Array.from(
+    new Set(shopMedia.map((image) => image.trim()).filter(Boolean)),
+  );
+  const galleryImages =
+    uploadedPhotos.length > 0
+      ? uploadedPhotos
+      : [selectedImage || shopImage(shop.id)];
 
   const fullAddress = [
     shop.address || shop.location,
@@ -145,10 +244,11 @@ export default function BarberProfile() {
           shadow-none
         "
       >
-        <img
-          src={heroImage}
+        <ShopPhotoGallery
+          key={`${shop.id}:${galleryImages.join('\u0000')}:${selectedImage ?? ''}`}
+          images={galleryImages}
+          initialImage={selectedImage}
           alt={shop.shop_name}
-          className="block aspect-[16/10] w-full object-cover"
         />
       </motion.div>
 
@@ -365,4 +465,3 @@ export default function BarberProfile() {
     </div>
   );
 }
-

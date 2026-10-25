@@ -6,6 +6,8 @@ import {
   Scissors,
   Loader2,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   Search,
   SlidersHorizontal,
   Sparkles,
@@ -131,14 +133,13 @@ export default function Dashboard() {
     staleTime: 30_000,
   });
 
-  /* Auto change advertisement banner */
   useEffect(() => {
     const interval = window.setInterval(() => {
       setActiveBanner((current) => (current + 1) % adBanners.length);
     }, 5000);
 
     return () => window.clearInterval(interval);
-  }, []);
+  }, [activeBanner]);
 
   const currentBanner = adBanners[activeBanner];
 
@@ -258,6 +259,21 @@ export default function Dashboard() {
         "
         style={{ background: currentBanner.background }}
       >
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label="Previous promotional banner"
+          onClick={() =>
+            setActiveBanner(
+              (current) => (current - 1 + adBanners.length) % adBanners.length,
+            )
+          }
+          className="absolute left-2 top-1/2 z-20 h-11 w-11 -translate-y-1/2 rounded-full border border-white/70 bg-white/80 p-0 text-[#ff7417] shadow-sm backdrop-blur-sm hover:bg-white focus-visible:ring-[#ff7417]"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+
         <div className="absolute -right-10 -top-14 h-32 w-32 rounded-full bg-white/10" />
 
         <div className="absolute -right-3 bottom-[-45px] h-36 w-36 rounded-full bg-[#ff7417]/10" />
@@ -272,7 +288,7 @@ export default function Dashboard() {
           <div className="absolute right-4 top-1 h-11 w-24 rotate-[-8deg] rounded-[50%] bg-[#3b2418]" />
         </div>
 
-        <div className="relative z-10 flex h-full flex-col justify-start p-4 pb-8 sm:p-5 sm:pb-8">
+        <div className="relative z-10 flex h-full flex-col justify-start p-4 pb-8 pl-14 pr-14 sm:p-5 sm:pb-8 sm:pl-14 sm:pr-14">
           <div>
             <div
               className="
@@ -341,6 +357,19 @@ export default function Dashboard() {
             <ArrowRight className="ml-1 h-3 w-3" />
           </Button>
         </div>
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label="Next promotional banner"
+          onClick={() =>
+            setActiveBanner((current) => (current + 1) % adBanners.length)
+          }
+          className="absolute right-2 top-1/2 z-20 h-11 w-11 -translate-y-1/2 rounded-full border border-white/70 bg-white/80 p-0 text-[#ff7417] shadow-sm backdrop-blur-sm hover:bg-white focus-visible:ring-[#ff7417]"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </Button>
 
         {/* Banner dots */}
         <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
