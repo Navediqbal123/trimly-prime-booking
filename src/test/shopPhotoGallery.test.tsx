@@ -71,11 +71,7 @@ describe('Shop details photo gallery', () => {
       expect(alphaImage).toHaveAttribute('src', 'https://photos.test/alpha-two.jpg');
       expect(screen.getAllByRole('button', { name: /Show shop photo/ })).toHaveLength(2);
     });
-
-    fireEvent.click(screen.getByRole('button', { name: 'Next shop photo' }));
-    expect(alphaImage).toHaveAttribute('src', 'https://photos.test/alpha-one.jpg');
-    fireEvent.click(screen.getByRole('button', { name: 'Previous shop photo' }));
-    expect(alphaImage).toHaveAttribute('src', 'https://photos.test/alpha-two.jpg');
+    expect(screen.queryByRole('button', { name: /Previous shop photo|Next shop photo/ })).not.toBeInTheDocument();
 
     alpha.unmount();
     renderShop('beta');
@@ -93,7 +89,7 @@ describe('Shop details photo gallery', () => {
     await waitFor(() => {
       expect(singleImage).toHaveAttribute('src', 'https://photos.test/single.jpg');
     });
-    expect(screen.queryByRole('button', { name: 'Next shop photo' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /shop photo/ })).not.toBeInTheDocument();
 
     single.unmount();
     renderShop('empty');
@@ -101,7 +97,7 @@ describe('Shop details photo gallery', () => {
     await waitFor(() => {
       expect(emptyImage).toHaveAttribute('src', shopImage('empty'));
     });
-    expect(screen.queryByRole('button', { name: 'Next shop photo' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /shop photo/ })).not.toBeInTheDocument();
   });
 
   it('supports horizontal swipes and advances automatically after three seconds', async () => {
@@ -120,6 +116,25 @@ describe('Shop details photo gallery', () => {
     fireEvent.touchEnd(gallery!, {
       changedTouches: [{ identifier: 1, target: gallery, clientX: 100, clientY: 125 }],
     });
+    expect(image).toHaveAttribute('src', 'https://photos.test/beta-two.jpg');
+
+    fireEvent.touchStart(gallery!, {
+      touches: [{ identifier: 1, target: gallery, clientX: 100, clientY: 125 }],
+    });
+    fireEvent.touchEnd(gallery!, {
+      changedTouches: [{ identifier: 1, target: gallery, clientX: 200, clientY: 120 }],
+    });
+    expect(image).toHaveAttribute('src', 'https://photos.test/beta-one.jpg');
+
+    fireEvent.touchStart(gallery!, {
+      touches: [{ identifier: 1, target: gallery, clientX: 100, clientY: 125 }],
+    });
+    fireEvent.touchEnd(gallery!, {
+      changedTouches: [{ identifier: 1, target: gallery, clientX: 200, clientY: 120 }],
+    });
+    expect(image).toHaveAttribute('src', 'https://photos.test/beta-three.jpg');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show shop photo 2' }));
     expect(image).toHaveAttribute('src', 'https://photos.test/beta-two.jpg');
 
     await waitFor(

@@ -13,8 +13,6 @@ import {
   Check,
   ArrowRight,
   Heart,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -53,14 +51,21 @@ function ShopPhotoGallery({ images, initialImage, alt }: ShopPhotoGalleryProps) 
     <div
       className="relative w-full touch-pan-y overflow-hidden"
       onTouchStart={(event) => {
+        const target = event.target;
+        if (target instanceof Element && target.closest('button')) {
+          touchStart.current = null;
+          return;
+        }
         const touch = event.touches[0];
-        touchStart.current = { x: touch.clientX, y: touch.clientY };
+        touchStart.current = touch
+          ? { x: touch.clientX, y: touch.clientY }
+          : null;
       }}
       onTouchEnd={(event) => {
         const start = touchStart.current;
         const touch = event.changedTouches[0];
         touchStart.current = null;
-        if (!start || images.length <= 1) return;
+        if (!start || !touch || images.length <= 1) return;
 
         const deltaX = touch.clientX - start.x;
         const deltaY = touch.clientY - start.y;
@@ -77,38 +82,20 @@ function ShopPhotoGallery({ images, initialImage, alt }: ShopPhotoGalleryProps) 
       />
 
       {images.length > 1 && (
-        <>
-          <button
-            type="button"
-            onClick={goPrevious}
-            aria-label="Previous shop photo"
-            className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            onClick={goNext}
-            aria-label="Next shop photo"
-            className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/35 px-2.5 py-1.5">
-            {images.map((image, index) => (
-              <button
-                key={`${image}-${index}`}
-                type="button"
-                onClick={() => setActiveIndex(index)}
-                aria-label={`Show shop photo ${index + 1}`}
-                aria-current={activeIndex === index ? 'true' : undefined}
-                className={`h-2 rounded-full transition-all ${
-                  activeIndex === index ? 'w-5 bg-white' : 'w-2 bg-white/60'
-                }`}
-              />
-            ))}
-          </div>
-        </>
+        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/35 px-2.5 py-1.5">
+          {images.map((image, index) => (
+            <button
+              key={`${image}-${index}`}
+              type="button"
+              onClick={() => setActiveIndex(index)}
+              aria-label={`Show shop photo ${index + 1}`}
+              aria-current={activeIndex === index ? 'true' : undefined}
+              className={`h-2 rounded-full transition-all ${
+                activeIndex === index ? 'w-5 bg-white' : 'w-2 bg-white/60'
+              }`}
+            />
+          ))}
+        </div>
       )}
     </div>
   );

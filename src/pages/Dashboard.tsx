@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -6,8 +6,6 @@ import {
   Scissors,
   Loader2,
   ArrowRight,
-  ChevronLeft,
-  ChevronRight,
   Search,
   SlidersHorizontal,
   Sparkles,
@@ -76,6 +74,7 @@ export default function Dashboard() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeBanner, setActiveBanner] = useState(0);
+  const bannerTouchStart = useRef<{ x: number; y: number } | null>(null);
 
   const { data: shops, isLoading } = useQuery({
     queryKey: ['approvedBarbersHome'],
@@ -253,27 +252,38 @@ export default function Dashboard() {
           mb-4
           h-[160px]
           w-full
+          touch-pan-y
           overflow-hidden
           rounded-[25px]
           border border-border/60
         "
         style={{ background: currentBanner.background }}
-      >
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="Previous promotional banner"
-          onClick={() =>
-            setActiveBanner(
-              (current) => (current - 1 + adBanners.length) % adBanners.length,
-            )
+        onTouchStart={(event) => {
+          const target = event.target;
+          if (target instanceof Element && target.closest('button')) {
+            bannerTouchStart.current = null;
+            return;
           }
-          className="absolute left-2 top-1/2 z-20 h-11 w-11 -translate-y-1/2 rounded-full border border-white/70 bg-white/80 p-0 text-[#ff7417] shadow-sm backdrop-blur-sm hover:bg-white focus-visible:ring-[#ff7417]"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
+          const touch = event.touches[0];
+          bannerTouchStart.current = { x: touch.clientX, y: touch.clientY };
+        }}
+        onTouchEnd={(event) => {
+          const start = bannerTouchStart.current;
+          const touch = event.changedTouches[0];
+          bannerTouchStart.current = null;
+          if (!start || !touch) return;
 
+          const deltaX = touch.clientX - start.x;
+          const deltaY = touch.clientY - start.y;
+          if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
+            setActiveBanner(
+              (current) =>
+                (current + (deltaX < 0 ? 1 : -1) + adBanners.length) %
+                adBanners.length,
+            );
+          }
+        }}
+      >
         <div className="absolute -right-10 -top-14 h-32 w-32 rounded-full bg-white/10" />
 
         <div className="absolute -right-3 bottom-[-45px] h-36 w-36 rounded-full bg-[#ff7417]/10" />
@@ -288,7 +298,7 @@ export default function Dashboard() {
           <div className="absolute right-4 top-1 h-11 w-24 rotate-[-8deg] rounded-[50%] bg-[#3b2418]" />
         </div>
 
-        <div className="relative z-10 flex h-full flex-col justify-start p-4 pb-8 pl-14 pr-14 sm:p-5 sm:pb-8 sm:pl-14 sm:pr-14">
+        <div className="relative z-10 flex h-full flex-col justify-start p-4 pb-8 sm:p-5 sm:pb-8">
           <div>
             <div
               className="
@@ -357,19 +367,6 @@ export default function Dashboard() {
             <ArrowRight className="ml-1 h-3 w-3" />
           </Button>
         </div>
-
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="Next promotional banner"
-          onClick={() =>
-            setActiveBanner((current) => (current + 1) % adBanners.length)
-          }
-          className="absolute right-2 top-1/2 z-20 h-11 w-11 -translate-y-1/2 rounded-full border border-white/70 bg-white/80 p-0 text-[#ff7417] shadow-sm backdrop-blur-sm hover:bg-white focus-visible:ring-[#ff7417]"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </Button>
 
         {/* Banner dots */}
         <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
