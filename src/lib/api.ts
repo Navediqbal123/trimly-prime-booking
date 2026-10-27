@@ -348,6 +348,16 @@ export interface LikedShopData extends Partial<ApprovedBarberData> {
   barber_id?: string;
 }
 
+export interface MyShopLikesCountData {
+  count: number;
+}
+
+export async function getMyShopLikesCount(): Promise<ApiResponse<MyShopLikesCountData>> {
+  return apiCall<MyShopLikesCountData>('/api/liked-shops/my-shop/count', {
+    method: 'GET',
+  });
+}
+
 function normalizeLikedShop(raw: unknown): LikedShopData | null {
   if (typeof raw === 'string') {
     return { id: raw, shop_id: raw, barber_id: raw };

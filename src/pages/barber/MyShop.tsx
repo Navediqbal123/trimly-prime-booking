@@ -34,6 +34,7 @@ import { useProtectedUser } from '@/contexts/ProtectedUserContext';
 import {
   deleteMyShop,
   getMyBarberProfile,
+  getMyShopLikesCount,
   getMyServices,
   updateMyShop,
   type BarberProfileData,
@@ -233,6 +234,25 @@ export default function MyShop() {
       return response.data ?? [];
     },
     enabled: Boolean(profile),
+  });
+
+  const likesQuery = useQuery({
+    queryKey: ['myShopLikesCount', user.id],
+    queryFn: async () => {
+      const response = await getMyShopLikesCount();
+      if (!response.success) {
+        throw new Error(response.error || 'Could not load likes.');
+      }
+
+      const count = response.data?.count;
+      if (typeof count !== 'number' || !Number.isInteger(count) || count < 0) {
+        throw new Error('The server returned an invalid likes count.');
+      }
+      return count;
+    },
+    enabled: Boolean(profile?.id && user.id),
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   const reviewsQuery = useQuery({
@@ -618,9 +638,15 @@ export default function MyShop() {
           />
           <StatCard
             icon={<Heart className="h-4 w-4 fill-current" />}
-            value="—"
+            value={
+              likesQuery.isLoading
+                ? '…'
+                : likesQuery.isError
+                  ? 'Unavailable'
+                  : String(likesQuery.data)
+            }
             detail="Likes"
-            title="The current API does not expose a shop's received-like count."
+            title={likesQuery.isError ? likesQuery.error.message : undefined}
           />
           <StatCard
             icon={<Star className="h-4 w-4 fill-current" />}

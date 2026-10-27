@@ -27,6 +27,7 @@ const { navigation, api, supabaseMock } = vi.hoisted(() => {
     navigation: { navigate: vi.fn() },
     api: {
       getMyBarberProfile: vi.fn(),
+      getMyShopLikesCount: vi.fn(),
       getMyServices: vi.fn(),
       updateMyShop: vi.fn(),
       deleteMyShop: vi.fn(),
@@ -85,7 +86,12 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-function renderMyShop() {
+function renderMyShop(
+  likesResponse: { success: boolean; data?: { count: number }; error?: string } = {
+    success: true,
+    data: { count: 23 },
+  },
+) {
   api.getMyBarberProfile.mockResolvedValue({
     success: true,
     data: {
@@ -104,19 +110,21 @@ function renderMyShop() {
       { id: 'service-2', name: 'Beard trim', barber_id: 'barber-1' },
     ],
   });
+  api.getMyShopLikesCount.mockResolvedValue(likesResponse);
   api.updateMyShop.mockResolvedValue({ success: true });
   api.deleteMyShop.mockResolvedValue({ success: true });
 
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return render(
+  const view = render(
     <QueryClientProvider client={client}>
       <MemoryRouter>
         <MyShop />
       </MemoryRouter>
     </QueryClientProvider>,
   );
+  return { ...view, client };
 }
 
 function openShopMenu() {
@@ -141,7 +149,8 @@ describe('My Shop redesign', () => {
     expect(await screen.findByText('4.5')).toBeInTheDocument();
     expect(screen.getByText('Services').previousElementSibling).toHaveTextContent('2');
     expect(screen.getAllByText('Services')).toHaveLength(1);
-    expect(screen.getByText('Likes').previousElementSibling).toHaveTextContent('—');
+    expect(screen.getByText('Likes').previousElementSibling).toHaveTextContent('23');
+    expect(api.getMyShopLikesCount).toHaveBeenCalledTimes(1);
     expect(screen.queryByText('count')).not.toBeInTheDocument();
     expect(screen.getByText('4.5').nextElementSibling).toHaveTextContent('2 reviews');
 
@@ -202,6 +211,28 @@ describe('My Shop redesign', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Show gallery item 3' }));
     expect(screen.getByRole('button', { name: 'Add shop photo' })).toBeInTheDocument();
   }, 15000);
+
+  it('refreshes likes on query invalidation and shows an unavailable state on API errors', async () => {
+    const { client } = renderMyShop();
+    expect(await screen.findByText('23')).toBeInTheDocument();
+
+    api.getMyShopLikesCount.mockResolvedValue({
+      success: true,
+      data: { count: 24 },
+    });
+    await client.invalidateQueries({ queryKey: ['myShopLikesCount', 'auth-user-1'] });
+    expect(await screen.findByText('24')).toBeInTheDocument();
+    expect(api.getMyShopLikesCount).toHaveBeenCalledTimes(2);
+
+    cleanup();
+    renderMyShop({ success: false, error: 'Likes are temporarily unavailable.' });
+    const unavailableLikes = await screen.findByText('Unavailable');
+    expect(unavailableLikes).toBeInTheDocument();
+    expect(unavailableLikes.parentElement).toHaveAttribute(
+      'title',
+      'Likes are temporarily unavailable.',
+    );
+  });
 
   it('opens Edit Shop and keeps Delete Shop behind confirmation in the menu', async () => {
     renderMyShop();
