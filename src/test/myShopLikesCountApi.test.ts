@@ -25,7 +25,7 @@ describe('getMyShopLikesCount', () => {
   it('requests the authenticated barber count endpoint', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ count: 9 }),
+      json: async () => ({ success: true, data: { count: 9 } }),
     });
     vi.stubGlobal('fetch', fetchMock);
 

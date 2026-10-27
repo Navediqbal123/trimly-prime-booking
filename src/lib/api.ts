@@ -353,9 +353,16 @@ export interface MyShopLikesCountData {
 }
 
 export async function getMyShopLikesCount(): Promise<ApiResponse<MyShopLikesCountData>> {
-  return apiCall<MyShopLikesCountData>('/api/liked-shops/my-shop/count', {
-    method: 'GET',
-  });
+  const response = await apiCall<{ success: boolean; data: MyShopLikesCountData }>(
+    '/api/liked-shops/my-shop/count',
+    {
+      method: 'GET',
+    },
+  );
+  return {
+    ...response,
+    data: response.data?.data,
+  };
 }
 
 function normalizeLikedShop(raw: unknown): LikedShopData | null {
