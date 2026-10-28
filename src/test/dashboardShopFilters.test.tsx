@@ -3,15 +3,23 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
-const { getApprovedBarbers, getBarberServices, supabaseMock } = vi.hoisted(() => ({
+const { getApprovedBarbers, getBarberServices, supabaseMock, toggleLike } = vi.hoisted(() => ({
   getApprovedBarbers: vi.fn(),
   getBarberServices: vi.fn(),
+  toggleLike: vi.fn(),
   supabaseMock: {
     from: vi.fn(),
   },
 }));
 
 vi.mock('@/lib/api', () => ({ getApprovedBarbers, getBarberServices }));
+vi.mock('@/hooks/useLikedShops', () => ({
+  useLikedShops: () => ({
+    likedShopIds: new Set<string>(),
+    pendingShopIds: new Set<string>(),
+    toggleLike,
+  }),
+}));
 vi.mock('@/lib/supabase', () => ({ supabase: supabaseMock }));
 vi.mock('@/lib/shopMediaStore', () => ({
   listAllShopMedia: vi.fn().mockResolvedValue({}),
@@ -56,6 +64,7 @@ const ratings = [
 
 afterEach(() => {
   cleanup();
+  vi.unstubAllGlobals();
   vi.clearAllMocks();
 });
 
@@ -105,18 +114,41 @@ describe('Dashboard shop filters and cards', () => {
       );
     });
     expect(await findShopHeading('Lower Rated Shop')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Top Rated/ })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Top Rated' })).toBeEnabled();
     expect(screen.getByRole('button', { name: /Recommended/ })).toBeDisabled();
     expect(screen.getByRole('button', { name: /Premium/ })).toBeDisabled();
     expect(screen.getByRole('button', { name: /Home Service/ })).toBeEnabled();
+    for (const filter of ['Top Rated', 'Recommended', 'Premium', 'Home Service']) {
+      expect(screen.getByRole('button', { name: new RegExp(`^${filter}$`) })).toHaveClass('h-10');
+    }
 
-    fireEvent.click(screen.getByRole('button', { name: /Top Rated/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Top Rated' }));
     await waitFor(() => {
       const cardHeadings = screen.getAllByRole('heading', { level: 3 });
       expect(cardHeadings[0]).toHaveTextContent('Top Rated Shop');
       expect(cardHeadings[1]).toHaveTextContent('Lower Rated Shop');
     }, { timeout: 10_000 });
   }, 20_000);
+
+  it('uses the existing like handler without opening details and shares the selected shop', async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { ...navigator, share });
+    renderDashboard();
+
+    await findShopHeading('Lower Rated Shop');
+    fireEvent.click(screen.getByRole('button', { name: 'Like Lower Rated Shop' }));
+    expect(toggleLike).toHaveBeenCalledTimes(1);
+    expect(toggleLike.mock.calls[0][1]).toBe('shop-low');
+    expect(screen.queryByText('Shop details')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Share Lower Rated Shop' }));
+    await waitFor(() => {
+      expect(share).toHaveBeenCalledWith({
+        title: 'Lower Rated Shop',
+        url: `${window.location.origin}/barber/shop-low/profile`,
+      });
+    });
+  });
 
   it('filters only shops whose real services provide home service', async () => {
     renderDashboard();
@@ -136,9 +168,16 @@ describe('Dashboard shop filters and cards', () => {
     const shopHeading = await findShopHeading('Lower Rated Shop');
     const card = shopHeading.closest('article');
     expect(card).not.toBeNull();
-    expect(screen.getByText('Karol Bagh, Delhi')).toBeInTheDocument();
+    expect(screen.getByText('Area: Karol Bagh, Delhi')).toBeInTheDocument();
     expect(screen.getByText('3.5')).toBeInTheDocument();
-    expect(within(card!).getByText('(2 reviews)')).toBeInTheDocument();
+    expect(within(card!).getByText('(2)')).toBeInTheDocument();
+    expect(card).toHaveTextContent('Long address used as fallback, Karol Bagh, Delhi');
+    expect(shopHeading).not.toHaveClass('truncate', 'line-clamp-2');
+    expect(screen.getByRole('img', { name: 'Lower Rated Shop shop' })).toHaveClass(
+      'h-full',
+      'w-full',
+      'object-cover',
+    );
 
     const mapLink = screen.getByRole('link', { name: 'Open map for Lower Rated Shop' });
     expect(mapLink).toHaveAttribute(
@@ -166,7 +205,7 @@ describe('Dashboard shop filters and cards', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Photo unavailable')).toBeInTheDocument();
 
-    expect(screen.queryByRole('button', { name: /like|unlike/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Like Lower Rated Shop' })).toBeInTheDocument();
 
   }, 20000);
 
@@ -174,7 +213,7 @@ describe('Dashboard shop filters and cards', () => {
     renderDashboard();
 
     await findShopHeading('Lower Rated Shop');
-    fireEvent.click(screen.getAllByText('Visit')[0].closest('button')!);
+    fireEvent.click(screen.getAllByText('Visit Shop')[0].closest('button')!);
     expect(await screen.findByText('Shop details')).toBeInTheDocument();
 
     cleanup();

@@ -1,29 +1,25 @@
 import { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, MapPinned, Scissors, Star } from 'lucide-react';
+import { ArrowRight, Heart, MapPin, Scissors, Share2, Star } from 'lucide-react';
+import type { MouseEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShopImageCarousel } from '@/components/ShopImageCarousel';
-import type { ShopCardShop } from '@/components/ShopCard';
+import type { ApprovedBarberData } from '@/lib/api';
 
-interface DashboardShop extends ShopCardShop {
-  latitude?: number | null;
-  longitude?: number | null;
-  address?: string;
-  locality?: string;
-  city?: string;
-  village?: string;
-  town?: string;
-  state?: string;
-}
+type DashboardShop = ApprovedBarberData;
 
 interface DashboardShopCardProps {
   shop: DashboardShop;
   rating: number;
   reviewCount: number;
   gallery: string[];
+  isLiked: boolean;
+  isLikePending?: boolean;
   animationIndex?: number;
+  onToggleLike: (event: MouseEvent<HTMLButtonElement>, shopId: string) => void;
   onVisit: (shopId: string, image: string) => void;
   onOpenProfile: (shopId: string) => void;
+  onShare: (shopId: string, shopName: string) => void;
 }
 
 function mapUrl(shop: DashboardShop): string | null {
@@ -43,7 +39,7 @@ function mapUrl(shop: DashboardShop): string | null {
 
   const query = [shop.locality, shop.city || shop.village || shop.town, shop.state]
     .filter(Boolean)
-    .join(', ') || shop.location;
+    .join(', ') || shop.location || shop.address;
 
   return query.trim()
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
@@ -57,14 +53,29 @@ function shortLocation(shop: DashboardShop): string {
   return locality || shop.location || shop.address || 'Location unavailable';
 }
 
+function fullLocation(shop: DashboardShop): string {
+  const primary = shop.address || shop.location;
+  const additional = [
+    shop.locality,
+    shop.city || shop.village || shop.town,
+    shop.state,
+    shop.pincode || shop.pin_code || shop.postal_code || shop.zip_code,
+  ].filter((part) => part && !primary?.toLowerCase().includes(part.toLowerCase()));
+  return [primary, ...additional].filter(Boolean).join(', ') || 'Location unavailable';
+}
+
 export function DashboardShopCard({
   shop,
   rating,
   reviewCount,
   gallery,
+  isLiked,
+  isLikePending = false,
   animationIndex = 0,
+  onToggleLike,
   onVisit,
   onOpenProfile,
+  onShare,
 }: DashboardShopCardProps) {
   const displayedImage = useRef(gallery[0] || '');
   const destination = mapUrl(shop);
@@ -74,10 +85,10 @@ export function DashboardShopCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: animationIndex * 0.04, duration: 0.3, ease: 'easeOut' }}
-      className="overflow-hidden rounded-[24px] border border-orange-100 bg-card p-3 shadow-[0_5px_16px_rgba(80,45,20,0.07)] dark:border-border"
+      className="w-full rounded-[24px] border border-[#9ab985] bg-white p-3 shadow-[0_5px_16px_rgba(80,45,20,0.07)] dark:bg-card"
     >
-      <div className="flex min-w-0 items-center gap-3">
-        <div className="relative aspect-[5/3] w-[44%] min-w-[118px] max-w-[190px] shrink-0 overflow-hidden rounded-[18px] bg-orange-50 dark:bg-orange-950/30">
+      <div className="flex min-w-0 items-start gap-3">
+        <div className="relative h-[112px] w-[min(180px,56vw)] min-w-[150px] shrink-0 overflow-hidden rounded-[16px] bg-orange-50 dark:bg-orange-950/30">
           <ShopImageCarousel
             images={gallery}
             alt={`${shop.shop_name} shop`}
@@ -92,52 +103,82 @@ export function DashboardShopCard({
               </div>
             }
           />
+          <div className="absolute right-1.5 top-1.5 z-20 inline-flex items-center gap-1 rounded-full border border-[#9ab985] bg-white px-2 py-1 text-[#25351e] shadow-sm">
+            <Star className="h-3.5 w-3.5 fill-[#ffc107] text-[#c89000]" />
+            <span className="text-[11px] font-bold">{rating.toFixed(1)}</span>
+            <span className="text-[10px] font-medium">({reviewCount})</span>
+          </div>
         </div>
 
-        <div className="min-w-0 flex-1">
-          <h3 className="line-clamp-2 break-words font-display text-base font-bold leading-tight text-foreground sm:text-lg">
-            {shop.shop_name}
-          </h3>
-          <div className="mt-1.5 flex items-center gap-1.5 text-xs">
-            <Star className="h-4 w-4 shrink-0 fill-[#ffc107] text-[#ffc107]" />
-            <span className="font-bold text-foreground">{rating.toFixed(1)}</span>
-            <span className="truncate text-muted-foreground">
-              ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+        <div className="flex shrink-0 flex-col items-center gap-2">
+          <button
+            type="button"
+            disabled={isLikePending}
+            aria-label={isLiked ? `Unlike ${shop.shop_name}` : `Like ${shop.shop_name}`}
+            aria-pressed={isLiked}
+            onClick={(event) => onToggleLike(event, shop.id)}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#ff963f] to-[#ff7417] text-white shadow-[inset_2px_2px_4px_rgba(255,255,255,0.25),inset_-2px_-2px_4px_rgba(165,55,0,0.22),0_4px_8px_rgba(205,75,0,0.20)] transition-transform active:scale-95 disabled:opacity-60"
+          >
+            <Heart className="h-5 w-5" fill={isLiked ? 'currentColor' : 'none'} strokeWidth={2.5} />
+          </button>
+          {destination ? (
+            <a
+              href={destination}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Open map for ${shop.shop_name}`}
+              title="Open map"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d6e2cf] bg-[#f7faf4] text-[#e85d00] shadow-[inset_1px_1px_3px_rgba(255,255,255,0.9),0_3px_7px_rgba(40,70,30,0.10)] transition-transform active:scale-95"
+            >
+              <MapPin className="h-5 w-5" />
+            </a>
+          ) : (
+            <span
+              aria-label="Location unavailable"
+              title="Location unavailable"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d6e2cf] bg-[#f7faf4] text-[#e85d00]/45"
+            >
+              <MapPin className="h-5 w-5" />
             </span>
-          </div>
-          <div className="mt-2 flex min-w-0 items-center gap-2">
-            <p className="line-clamp-2 min-w-0 flex-1 break-words text-xs leading-snug text-muted-foreground sm:text-sm">
-              {shortLocation(shop)}
-            </p>
-            {destination && (
-              <a
-                href={destination}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Open map for ${shop.shop_name}`}
-                title="Open map"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-50 text-[#e85d00] shadow-[inset_1px_1px_3px_rgba(255,255,255,0.9),0_3px_7px_rgba(194,65,12,0.12)] transition-transform active:scale-95 dark:bg-orange-950/50"
-              >
-                <MapPinned className="h-4 w-4" />
-              </a>
-            )}
-          </div>
+          )}
+          <button
+            type="button"
+            aria-label={`Share ${shop.shop_name}`}
+            onClick={() => onShare(shop.id, shop.shop_name)}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#ff963f] to-[#ff7417] text-white shadow-[inset_2px_2px_4px_rgba(255,255,255,0.25),inset_-2px_-2px_4px_rgba(165,55,0,0.22),0_4px_8px_rgba(205,75,0,0.20)] transition-transform active:scale-95"
+          >
+            <Share2 className="h-5 w-5" />
+          </button>
         </div>
+      </div>
+
+      <div className="mt-3 min-w-0">
+        <h3 className="break-words font-display text-base font-bold leading-tight text-foreground sm:text-lg">
+          {shop.shop_name}
+        </h3>
+        <p className="mt-1 break-words text-sm leading-snug text-muted-foreground">
+          {fullLocation(shop)}
+        </p>
+        {shortLocation(shop) !== fullLocation(shop) && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            Area: {shortLocation(shop)}
+          </p>
+        )}
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2">
         <Button
           type="button"
           onClick={() => onVisit(shop.id, displayedImage.current || gallery[0])}
-          className="h-11 rounded-full border-0 bg-gradient-to-b from-[#ff963f] to-[#ff7417] px-3 text-xs font-bold text-white shadow-[inset_2px_2px_4px_rgba(255,255,255,0.30),inset_-2px_-2px_4px_rgba(165,55,0,0.22),0_4px_9px_rgba(205,75,0,0.22)] hover:from-[#ff963f] hover:to-[#ff7417] active:translate-y-px sm:text-sm"
+          className="h-10 rounded-full border-0 bg-gradient-to-b from-[#ff963f] to-[#ff7417] px-3 text-xs font-bold text-white shadow-[inset_2px_2px_4px_rgba(255,255,255,0.30),inset_-2px_-2px_4px_rgba(165,55,0,0.22),0_4px_9px_rgba(205,75,0,0.22)] hover:from-[#ff963f] hover:to-[#ff7417] active:translate-y-px sm:text-sm"
         >
-          Visit
+          Visit Shop
           <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
         </Button>
         <Button
           type="button"
           onClick={() => onOpenProfile(shop.id)}
-          className="h-11 rounded-full border-0 bg-gradient-to-b from-[#ff963f] to-[#ff7417] px-2 text-xs font-bold text-white shadow-[inset_2px_2px_4px_rgba(255,255,255,0.30),inset_-2px_-2px_4px_rgba(165,55,0,0.22),0_4px_9px_rgba(205,75,0,0.22)] hover:from-[#ff963f] hover:to-[#ff7417] active:translate-y-px sm:text-sm"
+          className="h-10 rounded-full border-0 bg-gradient-to-b from-[#ff963f] to-[#ff7417] px-2 text-xs font-bold text-white shadow-[inset_2px_2px_4px_rgba(255,255,255,0.30),inset_-2px_-2px_4px_rgba(165,55,0,0.22),0_4px_9px_rgba(205,75,0,0.22)] hover:from-[#ff963f] hover:to-[#ff7417] active:translate-y-px sm:text-sm"
         >
           Barber Profile
         </Button>

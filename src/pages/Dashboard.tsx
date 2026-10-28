@@ -20,6 +20,8 @@ import { supabase } from '@/lib/supabase';
 import { listAllShopMedia } from '@/lib/shopMediaStore';
 import { DashboardShopCard } from '@/components/DashboardShopCard';
 import type { ApprovedBarberData } from '@/lib/api';
+import { useLikedShops } from '@/hooks/useLikedShops';
+import { toast } from 'sonner';
 
 type ShopFilter = 'all' | 'top-rated' | 'recommended' | 'premium' | 'home-service';
 const EMPTY_BARBERS: ApprovedBarberData[] = [];
@@ -88,6 +90,7 @@ const adBanners = [
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { likedShopIds, pendingShopIds, toggleLike } = useLikedShops();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<ShopFilter>('all');
@@ -240,6 +243,32 @@ export default function Dashboard() {
 
   const openBarberProfile = (shopId: string) => {
     navigate(`/barber/${shopId}/profile`);
+  };
+
+  const shareShop = async (shopId: string, shopName: string) => {
+    const url = `${window.location.origin}/barber/${encodeURIComponent(shopId)}/profile`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shopName, url });
+        return;
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return;
+        console.error('Could not share shop:', error);
+        toast.error('Could not share this shop.');
+        return;
+      }
+    }
+
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error('Clipboard access is unavailable.');
+      }
+      await navigator.clipboard.writeText(url);
+      toast.success('Shop link copied.');
+    } catch (error) {
+      console.error('Could not copy shop link:', error);
+      toast.error('Could not share this shop.');
+    }
   };
 
   const handleBookNow = () => {
@@ -503,7 +532,7 @@ export default function Dashboard() {
               aria-pressed={active}
               title={unavailable}
               onClick={() => setActiveFilter(id)}
-              className={`inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full border-0 px-4 text-xs font-bold text-white shadow-[inset_2px_2px_4px_rgba(255,255,255,0.30),inset_-2px_-2px_4px_rgba(165,55,0,0.22),0_4px_9px_rgba(205,75,0,0.22)] transition-all active:translate-y-px sm:px-5 sm:text-sm ${
+              className={`inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border-0 px-4 text-xs font-bold text-white shadow-[inset_2px_2px_4px_rgba(255,255,255,0.30),inset_-2px_-2px_4px_rgba(165,55,0,0.22),0_4px_9px_rgba(205,75,0,0.22)] transition-all active:translate-y-px sm:px-5 sm:text-sm ${
                 active
                   ? 'bg-gradient-to-b from-[#ff7417] to-[#e85d00] ring-2 ring-[#ff963f]/50 ring-offset-2 ring-offset-background'
                   : 'bg-gradient-to-b from-[#ff963f] to-[#ff7417] hover:brightness-105'
@@ -621,9 +650,13 @@ export default function Dashboard() {
                   rating={stats.rating}
                   reviewCount={stats.reviewCount}
                   gallery={gallery}
+                  isLiked={likedShopIds.has(b.id)}
+                  isLikePending={pendingShopIds.has(b.id)}
                   animationIndex={i}
+                  onToggleLike={toggleLike}
                   onVisit={openShop}
                   onOpenProfile={openBarberProfile}
+                  onShare={shareShop}
                 />
               );
             })}
