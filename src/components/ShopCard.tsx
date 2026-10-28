@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
-  Heart,
   MapPin,
   MessageCircle,
   Star,
@@ -35,10 +34,7 @@ export function ShopCard({
   rating,
   reviewCount,
   gallery,
-  isLiked,
-  isLikePending = false,
   animationIndex = 0,
-  onToggleLike,
   onOpen,
 }: ShopCardProps) {
   const displayedImage = useRef(gallery[0] || '');
@@ -106,20 +102,6 @@ export function ShopCard({
             displayedImage.current = image;
           }}
         />
-        <button
-          type="button"
-          disabled={isLikePending}
-          onClick={(event) => onToggleLike(event, shop.id)}
-          aria-label={isLiked ? `Unlike ${shop.shop_name}` : `Like ${shop.shop_name}`}
-          aria-pressed={isLiked}
-          className="absolute right-2 top-2 z-20 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#ff963f] to-[#ff7417] text-white shadow-[inset_2px_2px_4px_rgba(255,255,255,0.22),inset_-2px_-3px_5px_rgba(190,65,0,0.18),0_6px_12px_rgba(255,116,23,0.25)] transition-transform duration-150 active:scale-95 disabled:cursor-wait disabled:opacity-70"
-        >
-          <Heart
-            className="h-6 w-6"
-            fill={isLiked ? 'currentColor' : 'none'}
-            strokeWidth={2.5}
-          />
-        </button>
       </div>
 
       <div className="flex min-w-0 flex-1 self-stretch flex-col pt-0 pr-1 pb-0">

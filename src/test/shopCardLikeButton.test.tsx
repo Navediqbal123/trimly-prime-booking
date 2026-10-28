@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ShopCard } from '@/components/ShopCard';
 
 describe('ShopCard like button', () => {
-  it('uses the orange circular button and calls the existing handler once without opening the shop', () => {
+  it('does not render a like button and preserves the shop card content and navigation', () => {
     const onOpen = vi.fn();
     const onToggleLike = vi.fn((event: React.MouseEvent<HTMLButtonElement>, _shopId: string) => {
       event.stopPropagation();
@@ -11,7 +11,12 @@ describe('ShopCard like button', () => {
 
     render(
       <ShopCard
-        shop={{ id: 'shop-1', shop_name: 'Sample Shop', location: 'Delhi' }}
+        shop={{
+          id: 'shop-1',
+          shop_name: 'Sample Shop',
+          location: 'Delhi',
+          description: 'Sample description',
+        }}
         rating={4.5}
         reviewCount={2}
         gallery={['https://photos.test/shop.jpg']}
@@ -21,15 +26,23 @@ describe('ShopCard like button', () => {
       />,
     );
 
-    const likeButton = screen.getByRole('button', { name: 'Like Sample Shop' });
-    expect(likeButton).toHaveClass('h-12', 'w-12', 'rounded-full');
-    expect(likeButton.className).toContain('from-[#ff963f]');
-    expect(likeButton).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.queryByRole('button', { name: /like|unlike/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Sample Shop' })).toHaveAttribute(
+      'src',
+      'https://photos.test/shop.jpg',
+    );
+    expect(screen.getByText('4.5')).toBeInTheDocument();
+    expect(screen.getByText('(2)')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Sample Shop' })).toBeInTheDocument();
+    expect(screen.getByText('Delhi')).toBeInTheDocument();
+    expect(screen.getByText('Sample description...')).toBeInTheDocument();
 
-    fireEvent.click(likeButton);
+    fireEvent.click(screen.getByText('Sample description...').closest('button')!);
+    expect(onOpen).toHaveBeenCalledWith('shop-1', 'https://photos.test/shop.jpg');
 
-    expect(onToggleLike).toHaveBeenCalledTimes(1);
-    expect(onToggleLike.mock.calls[0][1]).toBe('shop-1');
-    expect(onOpen).not.toHaveBeenCalled();
+    onOpen.mockClear();
+    fireEvent.click(screen.getByText('Visit').closest('button')!);
+    expect(onOpen).toHaveBeenCalledWith('shop-1', 'https://photos.test/shop.jpg');
+    expect(onToggleLike).not.toHaveBeenCalled();
   });
 });
