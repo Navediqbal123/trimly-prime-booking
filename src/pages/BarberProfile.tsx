@@ -316,6 +316,17 @@ export default function BarberProfile() {
         </div>
       </motion.section>
 
+      <div className="mt-4">
+        <Button
+          type="button"
+          onClick={() => navigate(`/barber/${shop.id}/profile`)}
+          className="h-12 w-full rounded-full border-0 bg-gradient-to-b from-[#ff963f] to-[#ff7417] text-sm font-bold text-white shadow-[inset_2px_2px_5px_rgba(255,255,255,0.30),inset_-3px_-3px_6px_rgba(154,52,18,0.25),0_6px_14px_rgba(194,65,12,0.28)] hover:from-[#ff963f] hover:to-[#ff7417] active:translate-y-[1px]"
+        >
+          Visit barber profile
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+
       {/* Services */}
       <section className="mt-8">
         <div className="mb-4 flex items-end justify-between gap-3">

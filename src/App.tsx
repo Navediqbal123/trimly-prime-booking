@@ -20,6 +20,7 @@ import Map from "./pages/Map";
 import BecomeBarber from "./pages/BecomeBarber";
 import BookingPage from "./pages/BookingPage";
 import BarberProfile from "./pages/BarberProfile";
+import CustomerBarberProfile from "./pages/CustomerBarberProfile";
 
 import BarberDashboard from "./pages/barber/BarberDashboard";
 import MyShop from "./pages/barber/MyShop";
@@ -74,6 +75,7 @@ function AppRoutes() {
         <Route path="/become-barber" element={<BecomeBarber />} />
         <Route path="/book/:shopId" element={<BookingPage />} />
         <Route path="/barber/:shopId" element={<BarberProfile />} />
+        <Route path="/barber/:shopId/profile" element={<CustomerBarberProfile />} />
         
         {/* Admin Routes - super admin email only */}
         <Route path="/admin/dashboard" element={<AdminOnlyRoute><AdminDashboard /></AdminOnlyRoute>} />

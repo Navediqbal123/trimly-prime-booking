@@ -106,6 +106,20 @@ export function ShopCard({
             displayedImage.current = image;
           }}
         />
+        <button
+          type="button"
+          disabled={isLikePending}
+          onClick={(event) => onToggleLike(event, shop.id)}
+          aria-label={isLiked ? `Unlike ${shop.shop_name}` : `Like ${shop.shop_name}`}
+          aria-pressed={isLiked}
+          className="absolute right-2 top-2 z-20 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#ff963f] to-[#ff7417] text-white shadow-[inset_2px_2px_4px_rgba(255,255,255,0.22),inset_-2px_-3px_5px_rgba(190,65,0,0.18),0_6px_12px_rgba(255,116,23,0.25)] transition-transform duration-150 active:scale-95 disabled:cursor-wait disabled:opacity-70"
+        >
+          <Heart
+            className="h-6 w-6"
+            fill={isLiked ? 'currentColor' : 'none'}
+            strokeWidth={2.5}
+          />
+        </button>
       </div>
 
       <div className="flex min-w-0 flex-1 self-stretch flex-col pt-0 pr-1 pb-0">
@@ -113,20 +127,6 @@ export function ShopCard({
           <h3 className="min-w-0 flex-1 truncate font-display text-[16px] font-bold leading-[1.05] tracking-[-0.2px] text-foreground line-clamp-2 break-words">
             {shop.shop_name}
           </h3>
-          <button
-            type="button"
-            disabled={isLikePending}
-            onClick={(event) => onToggleLike(event, shop.id)}
-            aria-label={isLiked ? `Unlike ${shop.shop_name}` : `Like ${shop.shop_name}`}
-            aria-pressed={isLiked}
-            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-[13px] transition-all active:scale-90 disabled:cursor-wait disabled:opacity-70 ${
-              isLiked
-                ? 'bg-[#ffd9df] text-[#f0445e] shadow-[3px_4px_8px_rgba(240,68,94,0.22),inset_2px_2px_4px_rgba(255,255,255,0.85),inset_-2px_-2px_4px_rgba(190,40,65,0.10)]'
-                : 'bg-[#fff0f3] text-[#f47b8c] shadow-[3px_4px_8px_rgba(240,68,94,0.14),inset_2px_2px_4px_rgba(255,255,255,0.9),inset_-2px_-2px_4px_rgba(190,40,65,0.08)]'
-            }`}
-          >
-            <Heart className="h-[18px] w-[18px]" fill={isLiked ? 'currentColor' : 'none'} strokeWidth={2.2} />
-          </button>
         </div>
 
         <p className="mt-0.5 flex min-w-0 items-start gap-1 text-[10px] font-medium leading-tigtext-muted-foreground">

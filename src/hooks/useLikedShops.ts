@@ -32,11 +32,12 @@ export function useLikedShops() {
     (likesQuery.data ?? []).map((shop) => shop.shop_id ?? shop.barber_id ?? shop.id),
   );
 
-  const toggleLike = async (event: MouseEvent<HTMLButtonElement>, shopId: string) => {
-    event.stopPropagation();
+  const setShopLiked = async (shopId: string, shouldLike: boolean) => {
     if (!customerId || pendingShopIds.has(shopId)) return;
 
     const wasLiked = likedShopIds.has(shopId);
+    if (wasLiked === shouldLike) return;
+
     const key = likedShopsQueryKey(customerId);
     const previousLikes = queryClient.getQueryData<Awaited<typeof likesQuery.data>>(key) ?? [];
 
@@ -45,9 +46,9 @@ export function useLikedShops() {
       ? previousLikes.filter((shop) => (shop.shop_id ?? shop.barber_id ?? shop.id) !== shopId)
       : [...previousLikes, { id: shopId, shop_id: shopId, barber_id: shopId }]);
 
-    const response = wasLiked
-      ? await unlikeShop(customerId, shopId)
-      : await likeShop(customerId, shopId);
+    const response = shouldLike
+      ? await likeShop(customerId, shopId)
+      : await unlikeShop(customerId, shopId);
 
     if (!response.success) {
       queryClient.setQueryData(key, (current: typeof previousLikes | undefined) => {
@@ -70,10 +71,16 @@ export function useLikedShops() {
     await queryClient.invalidateQueries({ queryKey: key });
   };
 
+  const toggleLike = (event: MouseEvent<HTMLButtonElement>, shopId: string) => {
+    event.stopPropagation();
+    return setShopLiked(shopId, !likedShopIds.has(shopId));
+  };
+
   return {
     likedShops: likesQuery.data ?? [],
     likedShopIds,
     toggleLike,
+    setShopLiked,
     isLoading: likesQuery.isLoading,
     error: likesQuery.error,
     pendingShopIds,
