@@ -175,7 +175,7 @@ describe('Dashboard shop filters and cards', () => {
     expect(shopHeading).not.toHaveClass('truncate', 'line-clamp-2');
     const photo = card!.querySelector<HTMLElement>(':scope > div > div:first-child');
     expect(photo).not.toBeNull();
-    expect(photo).toHaveClass('aspect-[13/8]', 'w-[min(195px,calc(100%_-_52px))]');
+    expect(photo).toHaveClass('aspect-[13/8]', 'w-[min(180px,calc(100%_-_52px))]');
     expect(within(photo!).getByText('(2)')).toBeInTheDocument();
     const address = within(card!).getByText('Long address used as fallback, Karol Bagh, Delhi');
     expect(address.parentElement).toHaveClass('flex', 'items-start');

@@ -88,7 +88,7 @@ export function DashboardShopCard({
       className="w-full rounded-[24px] border border-[#9ab985] bg-white p-3 shadow-[0_5px_16px_rgba(80,45,20,0.07)] dark:bg-card"
     >
       <div className="flex min-w-0 items-start gap-3">
-        <div className="relative aspect-[13/8] w-[min(195px,calc(100%_-_52px))] shrink-0 overflow-hidden rounded-[16px] bg-orange-50 dark:bg-orange-950/30">
+        <div className="relative aspect-[13/8] w-[min(180px,calc(100%_-_52px))] shrink-0 overflow-hidden rounded-[16px] bg-orange-50 dark:bg-orange-950/30">
           <ShopImageCarousel
             images={gallery}
             alt={`${shop.shop_name} shop`}
