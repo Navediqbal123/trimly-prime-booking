@@ -15,7 +15,7 @@ interface Client {
 async function fetchMyClients(): Promise<Client[]> {
   const { supabase } = await import('@/lib/supabase');
   const { data: { session } } = await supabase.auth.getSession();
-  const res = await fetch('https://saloon-backend-gp4v.onrender.com/api/clients/my-clients', {
+  const res = await fetch('https://https://trimly-backend-djic.onrender.com/api/clients/my-clients', {
     headers: {
       'Content-Type': 'application/json',
       ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),

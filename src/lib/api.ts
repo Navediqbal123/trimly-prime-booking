@@ -2,7 +2,7 @@
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 
-const BASE_URL = 'https://saloon-backend-gp4v.onrender.com';
+const BASE_URL = 'https://trimly-backend-djic.onrender.com';
 
 interface ApiResponse<T = unknown> {
   success: boolean;
