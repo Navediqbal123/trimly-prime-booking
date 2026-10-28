@@ -173,6 +173,13 @@ describe('Dashboard shop filters and cards', () => {
     expect(within(card!).getByText('(2)')).toBeInTheDocument();
     expect(card).toHaveTextContent('Long address used as fallback, Karol Bagh, Delhi');
     expect(shopHeading).not.toHaveClass('truncate', 'line-clamp-2');
+    const photo = card!.querySelector<HTMLElement>(':scope > div > div:first-child');
+    expect(photo).not.toBeNull();
+    expect(photo).toHaveClass('aspect-[13/8]', 'w-[min(195px,calc(100%_-_52px))]');
+    expect(within(photo!).getByText('(2)')).toBeInTheDocument();
+    const address = within(card!).getByText('Long address used as fallback, Karol Bagh, Delhi');
+    expect(address.parentElement).toHaveClass('flex', 'items-start');
+    expect(address.parentElement?.querySelector('svg')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Lower Rated Shop shop' })).toHaveClass(
       'h-full',
       'w-full',
