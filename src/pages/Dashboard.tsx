@@ -9,14 +9,22 @@ import {
   Search,
   SlidersHorizontal,
   Sparkles,
+  Star,
+  Home,
+  Crown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getApprovedBarbers } from '@/lib/api';
+import { getApprovedBarbers, getBarberServices } from '@/lib/api';
 import { shopImage } from '@/lib/shopMedia';
 import { supabase } from '@/lib/supabase';
 import { listAllShopMedia } from '@/lib/shopMediaStore';
-import { ShopCard } from '@/components/ShopCard';
-import { useLikedShops } from '@/hooks/useLikedShops';
+import { DashboardShopCard } from '@/components/DashboardShopCard';
+import type { ApprovedBarberData } from '@/lib/api';
+
+type ShopFilter = 'all' | 'top-rated' | 'recommended' | 'premium' | 'home-service';
+const EMPTY_BARBERS: ApprovedBarberData[] = [];
+const EMPTY_SHOP_IDS = new Set<string>();
+
 interface Barber {
   id: string;
   shop_name: string;
@@ -24,6 +32,16 @@ interface Barber {
   latitude?: number | null;
   longitude?: number | null;
   description?: string | null;
+  address?: string;
+  locality?: string;
+  city?: string;
+  village?: string;
+  town?: string;
+  state?: string;
+  pincode?: string;
+  pin_code?: string;
+  postal_code?: string;
+  zip_code?: string;
 }
 
 const adBanners = [
@@ -70,16 +88,16 @@ const adBanners = [
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { likedShopIds, toggleLike, pendingShopIds } = useLikedShops();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState<ShopFilter>('all');
   const [activeBanner, setActiveBanner] = useState(0);
   const bannerTouchStart = useRef<{ x: number; y: number } | null>(null);
 
   const { data: shops, isLoading } = useQuery({
     queryKey: ['approvedBarbersHome'],
     queryFn: async (): Promise<{
-      list: Barber[];
+      list: ApprovedBarberData[];
       error: string | null;
     }> => {
       const res = await getApprovedBarbers();
@@ -92,25 +110,46 @@ export default function Dashboard() {
       }
 
       return {
-        list: res.data.map((b) => ({
-          id: b.id,
-          shop_name: b.shop_name,
-          location: b.location,
-          latitude: b.latitude,
-          longitude: b.longitude,
-          description:
-            'description' in b
-              ? (b as Barber).description
-              : null,
-        })),
+        list: res.data,
         error: null,
       };
     },
     refetchOnWindowFocus: true,
   });
 
-  const barbers = shops?.list ?? [];
+  const barbers = shops?.list ?? EMPTY_BARBERS;
   const loadError = shops?.error ?? null;
+
+  const { data: homeServiceResults, isLoading: homeServiceLoading } = useQuery({
+    queryKey: ['barbersHomeServiceFlags', barbers.map((barber) => barber.id).join(',')],
+    enabled: barbers.length > 0,
+    queryFn: async () => {
+      const results = await Promise.all(
+        barbers.map(async (barber) => {
+          const response = await getBarberServices(barber.id);
+          if (!response.success || !response.data) {
+            console.error(
+              `Could not verify home service availability for shop ${barber.id}:`,
+              response.error,
+            );
+            return { id: barber.id, hasHomeService: false, failed: true };
+          }
+          return {
+            id: barber.id,
+            hasHomeService: response.data.some((service) => service.home_service),
+            failed: false,
+          };
+        }),
+      );
+      return {
+        shopIds: new Set(
+          results.filter((result) => result.hasHomeService).map((result) => result.id),
+        ),
+        failedCount: results.filter((result) => result.failed).length,
+      };
+    },
+  });
+  const homeServiceIds = homeServiceResults?.shopIds ?? EMPTY_SHOP_IDS;
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['barberRatings'],
@@ -132,6 +171,25 @@ export default function Dashboard() {
     staleTime: 30_000,
   });
 
+  const reviewStats = useMemo(() => {
+    const stats = new Map<string, { rating: number; reviewCount: number }>();
+    for (const review of reviews) {
+      const current = stats.get(review.barber_id) ?? { rating: 0, reviewCount: 0 };
+      const value = Number(review.rating);
+      if (!Number.isFinite(value)) continue;
+      current.rating += value;
+      current.reviewCount += 1;
+      stats.set(review.barber_id, current);
+    }
+    for (const [barberId, stat] of stats) {
+      stats.set(barberId, {
+        ...stat,
+        rating: stat.reviewCount ? stat.rating / stat.reviewCount : 0,
+      });
+    }
+    return stats;
+  }, [reviews]);
+
   useEffect(() => {
     const interval = window.setInterval(() => {
       setActiveBanner((current) => (current + 1) % adBanners.length);
@@ -151,15 +209,37 @@ export default function Dashboard() {
     return barbers.filter((barber) => {
       return (
         barber.shop_name.toLowerCase().includes(query) ||
-        barber.location.toLowerCase().includes(query) ||
+        barber.location?.toLowerCase().includes(query) ||
+        barber.locality?.toLowerCase().includes(query) ||
+        barber.city?.toLowerCase().includes(query) ||
         barber.description?.toLowerCase().includes(query)
       );
     });
   }, [barbers, searchQuery]);
 
+  const displayedBarbers = useMemo(() => {
+    const results = filteredBarbers.map((barber, index) => ({
+      barber,
+      index,
+      stats: reviewStats.get(barber.id) ?? { rating: 0, reviewCount: 0 },
+    }));
+
+    if (activeFilter === 'home-service') {
+      return results.filter(({ barber }) => homeServiceIds.has(barber.id));
+    }
+    if (activeFilter === 'top-rated') {
+      return results.sort((a, b) => b.stats.rating - a.stats.rating || a.index - b.index);
+    }
+    return results;
+  }, [activeFilter, filteredBarbers, homeServiceIds, reviewStats]);
+
   const openShop = (shopId: string, image: string) => {
     const params = new URLSearchParams({ image });
     navigate(`/barber/${shopId}?${params.toString()}`);
+  };
+
+  const openBarberProfile = (shopId: string) => {
+    navigate(`/barber/${shopId}/profile`);
   };
 
   const handleBookNow = () => {
@@ -167,6 +247,28 @@ export default function Dashboard() {
       .getElementById('featured-shops')
       ?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const filters: {
+    id: Exclude<ShopFilter, 'all'>;
+    label: string;
+    icon: typeof Star;
+    unavailable?: string;
+  }[] = [
+    { id: 'top-rated', label: 'Top Rated', icon: Star },
+    {
+      id: 'recommended',
+      label: 'Recommended',
+      icon: Sparkles,
+      unavailable: 'Recommendation data is not available yet.',
+    },
+    {
+      id: 'premium',
+      label: 'Premium',
+      icon: Crown,
+      unavailable: 'Premium status is not available yet.',
+    },
+    { id: 'home-service', label: 'Home Service', icon: Home },
+  ];
 
   return (
     <div className="min-h-screen w-full animate-fade-in bg-background pb-4 pt-16 text-foreground transition-colors duration-200 lg:pt-0">
@@ -386,6 +488,41 @@ export default function Dashboard() {
         </div>
       </motion.section>
 
+      <div
+        role="group"
+        aria-label="Filter barber shops"
+        className="-mx-1 mb-5 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {filters.map(({ id, label, icon: Icon, unavailable }) => {
+          const active = activeFilter === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              disabled={Boolean(unavailable)}
+              aria-pressed={active}
+              title={unavailable}
+              onClick={() => setActiveFilter(id)}
+              className={`inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full border-0 px-4 text-xs font-bold text-white shadow-[inset_2px_2px_4px_rgba(255,255,255,0.30),inset_-2px_-2px_4px_rgba(165,55,0,0.22),0_4px_9px_rgba(205,75,0,0.22)] transition-all active:translate-y-px sm:px-5 sm:text-sm ${
+                active
+                  ? 'bg-gradient-to-b from-[#ff7417] to-[#e85d00] ring-2 ring-[#ff963f]/50 ring-offset-2 ring-offset-background'
+                  : 'bg-gradient-to-b from-[#ff963f] to-[#ff7417] hover:brightness-105'
+              } disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:brightness-100`}
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+      {activeFilter === 'home-service' &&
+        (homeServiceResults?.failedCount ?? 0) > 0 && (
+          <p role="status" className="-mt-3 mb-4 text-xs text-muted-foreground">
+            Home service availability could not be verified for{' '}
+            {homeServiceResults?.failedCount} shop
+            {homeServiceResults?.failedCount === 1 ? '' : 's'}.
+          </p>
+        )}
 
       {/* =========================================================
           BARBER SHOPS
@@ -408,9 +545,9 @@ export default function Dashboard() {
             </h2>
 
             <p className="mt-1 text-xs font-medium text-muted-foreground sm:text-sm">
-              {searchQuery
-                ? `${filteredBarbers.length} shop${
-                    filteredBarbers.length === 1 ? '' : 's'
+              {searchQuery || activeFilter !== 'all'
+                ? `${displayedBarbers.length} shop${
+                    displayedBarbers.length === 1 ? '' : 's'
                   } found`
                 : 'Choose a shop to view services'}
             </p>
@@ -439,7 +576,11 @@ export default function Dashboard() {
           <div className="flex items-center justify-center py-10">
             <Loader2 className="h-7 w-7 animate-spin text-[#ff7417]" />
           </div>
-        ) : filteredBarbers.length === 0 ? (
+        ) : activeFilter === 'home-service' && homeServiceLoading ? (
+          <div className="flex items-center justify-center py-10">
+            <Loader2 className="h-7 w-7 animate-spin text-[#ff7417]" />
+          </div>
+        ) : displayedBarbers.length === 0 ? (
           <div
             className="
               rounded-[25px]
@@ -452,7 +593,7 @@ export default function Dashboard() {
             <Scissors className="mx-auto mb-3 h-10 w-10 text-muted-foreground/60" />
 
             <p className="text-sm font-semibold text-muted-foreground">
-              {searchQuery
+              {searchQuery || activeFilter !== 'all'
                 ? 'No barber shop found.'
                 : 'No barber shops available yet.'}
             </p>
@@ -465,21 +606,7 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {filteredBarbers.map((b, i) => {
-              const barberReviews = reviews.filter(
-                (review) => review.barber_id === b.id
-              );
-
-              const reviewCount = barberReviews.length;
-
-              const rating =
-                reviewCount > 0
-                  ? barberReviews.reduce(
-                      (sum, review) => sum + review.rating,
-                      0
-                    ) / reviewCount
-                  : 0;
-
+            {displayedBarbers.map(({ barber: b, stats }, i) => {
               const uploaded = mediaMap[b.id] || [];
 
               const gallery =
@@ -488,17 +615,15 @@ export default function Dashboard() {
                   : [shopImage(b.id)];
 
               return (
-                <ShopCard
+                <DashboardShopCard
                   key={b.id}
                   shop={b}
-                  rating={rating}
-                  reviewCount={reviewCount}
+                  rating={stats.rating}
+                  reviewCount={stats.reviewCount}
                   gallery={gallery}
-                  isLiked={likedShopIds.has(b.id)}
-                  isLikePending={pendingShopIds.has(b.id)}
                   animationIndex={i}
-                  onToggleLike={toggleLike}
-                  onOpen={openShop}
+                  onVisit={openShop}
+                  onOpenProfile={openBarberProfile}
                 />
               );
             })}
